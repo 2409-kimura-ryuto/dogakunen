@@ -6,6 +6,62 @@
     <title>ホーム画面</title>
 </head>
 <body>
+<div class="header-contents">
+    <h1>勤怠管理システム</h1>
+    <div class="header">
+        <div class="userInf" >
+            社員番号：<!--<span th:text="${loginUser.employeeNumber}"/>--><br>
+            　　氏名：<!--<span th:text="${loginUser.name}"/>--><br>
+        </div>
+        <div th:if="${positionId == 2}" class="header-item">
+            <form th:action="@{/userManage}" method="get" class="header-item">
+                <button type="submit">承認者用画面</button>
+            </form>
+        </div>
+        <!--<div th:if="${positionId == 3}" class="header-item">-->
+            <form th:action="@{/systemManage}" method="get" class="header-item">
+                <button type="submit">システム管理</button>
+            </form>
+        <!--</div>-->
+        <form th:action="@{/setting}" method="get" class="header-item">
+            <button type="submit">設定画面</button>
+        </form>
+        <form th:action="@{/logout}" method="get" class="header-item">
+            <button type="submit">ログアウト</button>
+        </form>
+    </div>
+    <form th:action="@{/newAttendance}" method="get" class="new-button">
+        <input type="submit" value="新規勤怠登録">
+    </form>
+</div>
+<div class="attendances">
+    <tr>
+        <th>日付</th>
+        <th>勤務区分</th>
+        <th>開始</th>
+        <th>終了</th>
+        <th>休憩時間</th>
+        <th>労働時間</th>
+        <th>メモ</th>
+    </tr>
+    <div class="attendance" th:each="attendance : ${attendances}">
+        <tr>
+        　   <td><span th:text="${attendance.month} + '/' + ${attendance.date}"/></td>
+        　   <td><span th:text="${attendance.attendance}"/></td>
+            <td><span th:text="${attendance.workTimeStart}"/></td>
+            <td><span th:text="${attendance.workTimeFinish}"/></td>
+            <td><span th:text="${attendance.breakTime}"/></td>
+            <td><span th:text="${attendance.workTime}"/></td>
+            <td><span th:text="${attendance.memo}"/></td>
+        </tr>
+    </div>
+</div>
+<div class="request-button">
+    <form th:action="@{/newAttendance}" method="get" class="header-item">
+        <input type="submit" value="申請">
+    </form>
+</div>
+
 
 </body>
 </html>
