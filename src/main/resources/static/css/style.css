@@ -1,0 +1,19 @@
+body {
+	background-color: #E0FFFF;
+}
+
+.header-contents {
+	margin-left: 20px;
+}
+
+.header {
+	text-align: right;
+}
+
+.header-item {
+    display : inline-block;
+}
+
+.new-button {
+    text-align: left;
+}

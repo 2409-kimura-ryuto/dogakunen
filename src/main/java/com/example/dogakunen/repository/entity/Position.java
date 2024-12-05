@@ -19,9 +19,6 @@ public class Position {
     private int id;
 
     @Column
-    private String password;
-
-    @Column
     private String name;
 
     @Column(name = "created_date", insertable = true, updatable = false)
