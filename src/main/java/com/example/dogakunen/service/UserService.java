@@ -16,14 +16,24 @@ public class UserService {
     UserRepository userRepository;
 
     /*
-     *システム管理画面の表示（ユーザ取得）
+     * ログイン時のユーザ情報取得
      */
-    public List<UserForm> findAllUser(){
-        //repositoryを呼び出して、戻り値をEntityとして受け取る
-        List<User> results = userRepository.selectUser();
-        List<UserForm> users = setUserForm(results);
-        return users;
+
+    public UserForm selectLoginUser(Integer employeeNumber){
+        //社員番号をもとにユーザ情報取得
+        List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
+        //存在しないアカウントの場合nullを返す
+        if (results.size() == 0) {
+            return null;
+        }
+        //アカウントが存在した場合、ユーザ情報をentityからformに詰める
+        List<UserForm> loginUser = setUserForm(results);
+        return loginUser.get(0);
     }
+
+    /*
+     * entityからformに詰める作業
+     */
 
     private List<UserForm> setUserForm(List<User> results) {
         List<UserForm> users = new ArrayList<>();
@@ -42,6 +52,16 @@ public class UserService {
             user.setUpdatedDate(result.getUpdatedDate());
             users.add(user);
         }
+        return users;
+    }
+
+    /*
+     *システム管理画面の表示（ユーザ取得）
+     */
+    public List<UserForm> findAllUser(){
+        //repositoryを呼び出して、戻り値をEntityとして受け取る
+        List<User> results = userRepository.selectUser();
+        List<UserForm> users = setUserForm(results);
         return users;
     }
 
