@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.antlr.v4.runtime.misc.Interval;
 
 import java.sql.Time;
+import java.time.Duration;
 import java.util.Date;
 
 @Entity
@@ -39,10 +40,10 @@ public class DateAttendance {
     private Time workTimeFinish ;
 
     @Column(name = "break_time")
-    private Interval breakTime;
+    private Duration breakTime;
 
     @Column(name = "work_time")
-    private Interval workTime;
+    private Duration workTime;
 
     @Column(name = "created_date", insertable = true, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
