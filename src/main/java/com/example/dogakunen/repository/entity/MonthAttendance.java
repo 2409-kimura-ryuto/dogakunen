@@ -37,4 +37,10 @@ public class MonthAttendance {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
 
+    @PreUpdate
+    public  void  onPreUpdate () {
+        Date date = new Date();
+        this .setUpdatedDate(date);
+    }
+
 }

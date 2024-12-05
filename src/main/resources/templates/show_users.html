@@ -6,6 +6,9 @@
     <title>承認対象者一覧画面</title>
 </head>
 <body>
-
+<!-- 個の完了申請ボタンはホーム画面に設置する。またURLでグインユーザIDをcontrollerに渡すようにはしなくてもいい-->
+<form th:method="put" th:action="@{/request}" >
+    <input type="submit" value="申請"/>
+</form>
 </body>
 </html>
