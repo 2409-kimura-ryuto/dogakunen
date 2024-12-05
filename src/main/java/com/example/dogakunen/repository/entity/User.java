@@ -28,8 +28,13 @@ public class User {
     @Column(name = "employee_number")
     private Integer employeeNumber;
 
-    @Column(name = "position_id")
-    private Integer positionId;
+    //システム管理画面表示
+    //Positionと多対一でリレーションを形成
+    @ManyToOne
+    @JoinColumn(name="position_id")
+    private Position position;
+    //@Column(name = "position_id")
+    //private Integer positionId;
 
     @Column(name = "is_stopped")
     private int isStopped;

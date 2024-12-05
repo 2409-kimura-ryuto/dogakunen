@@ -1,0 +1,13 @@
+.table {
+    border-collapse: collapse;
+    border : 1px solid #000;
+}
+
+.table-systemManage tr th {
+    width : 15%;
+    text-align : left;
+}
+
+.table-newUser tr th{
+    text-align : left;
+}
