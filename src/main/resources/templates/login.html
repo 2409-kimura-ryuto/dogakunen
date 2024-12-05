@@ -13,7 +13,7 @@
     <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
         <p th:text="${errorMessage}"></p>
     </div>
-    <form th:action="@{/login}" th:method="get">
+    <form th:action="@{/loginUser}" th:method="get">
         <div class="employee_number">
             <label>社員番号</label>
             <input type="text" name="employeeNumber" th:value="${employeeNumber}"><br/>

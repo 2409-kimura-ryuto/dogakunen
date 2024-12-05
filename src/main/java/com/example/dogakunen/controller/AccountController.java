@@ -25,7 +25,7 @@ public class AccountController {
     /*
      * ログイン画面表示
      */
-    @GetMapping
+    @GetMapping("/login")
     public ModelAndView loginView() {
         ModelAndView mav = new ModelAndView();
         // form用の空のentityを準備
@@ -48,7 +48,7 @@ public class AccountController {
     /*
      * ログイン処理
      */
-    @GetMapping("/login")
+    @GetMapping("/loginUser")
     public ModelAndView login(@RequestParam(name = "employeeNumber", required = false) Integer employeeNumber,
                               @RequestParam(name = "password", required = false) String password) {
         //バリデーション
@@ -68,7 +68,7 @@ public class AccountController {
             session.setAttribute("errorMessages", errorMessages);
             session.setAttribute("employeeNumber", employeeNumber);
             //ログイン画面にリダイレクト
-            return new ModelAndView("redirect:/");
+            return new ModelAndView("redirect:/login");
         }
         //リクエストから取得した社員番号をもとにユーザ情報を取得
         UserForm loginUser = userService.selectLoginUser(employeeNumber);
@@ -83,7 +83,7 @@ public class AccountController {
             session.setAttribute("errorMessages", errorMessages);
             session.setAttribute("employeeNumber", employeeNumber);
             //ログイン画面にリダイレクト
-            return new ModelAndView("redirect:/");
+            return new ModelAndView("redirect:/login");
         }
         //セッションにログインユーザ情報を詰める
         session.setAttribute("loginUser", loginUser);
