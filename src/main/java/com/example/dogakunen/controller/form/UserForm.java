@@ -17,7 +17,8 @@ public class UserForm {
     private String passwordConfirmation;
 
     private String name;
-    private int employeeNumber;
+    private Integer employeeNumber;
+    //private int employeeNumber;
     private int positionId;
     private int isStopped;
     private Date createdDate;

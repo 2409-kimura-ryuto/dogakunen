@@ -5,7 +5,8 @@ body {
 
 .table {
     border-collapse: collapse;
-    border : 1px solid #000;
+    border-top : 1px solid #ddd;
+    border-bottom : 1px solid #ccc;
 }
 
 .header {
@@ -22,11 +23,11 @@ body {
 .table-systemManage tr th {
     width : 15%;
     text-align : left;
-    background-color : #ccc;
+    background-color : #ddd;
 }
 
 .table-systemManage tr{
-    border-bottom : 1px solid #000;
+    border-bottom : 1px solid #ccc;
 }
 .table-systemManage tr td{
     background-color : #fff;
@@ -34,11 +35,11 @@ body {
 
 .table-newUser tr th{
     text-align : left;
-    background-color : #ccc;
+    background-color : #ddd;
 }
 
 .table-newUser tr {
-    border-bottom : 1px solid #000;
+    border-bottom : 1px solid #ccc;
 }
 
 .table-newUser tr td{
