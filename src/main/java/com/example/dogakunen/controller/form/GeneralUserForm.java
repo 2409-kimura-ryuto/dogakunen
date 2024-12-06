@@ -1,22 +1,16 @@
-package com.example.dogakunen.repository.entity;
+package com.example.dogakunen.controller.form;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
-@Entity
-@Table(name = "users")
 @Getter
 @Setter
-
-public class User {
-
-    @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class GeneralUserForm {
     private int id;
 
     @Column
@@ -28,13 +22,8 @@ public class User {
     @Column(name = "employee_number")
     private Integer employeeNumber;
 
-    //システム管理画面表示
-    //Positionと多対一でリレーションを形成
-    @ManyToOne
-    @JoinColumn(name="position_id")
-    private Position position;
-    //@Column(name = "position_id")
-    //private Integer positionId;
+    @Column(name = "position_id")
+    private Integer positionId;
 
     @Column(name = "is_stopped")
     private int isStopped;
@@ -45,6 +34,14 @@ public class User {
 
     @Column(name = "updated_date", insertable = true, updatable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedDate = new Date();
+    private Date updatedDate;
 
+    //内部結合用に追加
+    @Column(name = "position_name")
+    private String positionName;
+
+    private Integer month;
+
+    @Column(name = "attendance_status")
+    private int attendanceStatus;
 }

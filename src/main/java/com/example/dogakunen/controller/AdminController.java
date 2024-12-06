@@ -5,6 +5,7 @@ import com.example.dogakunen.service.DateAttendanceService;
 import com.example.dogakunen.service.MonthAttendanceService;
 import com.example.dogakunen.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
@@ -130,6 +131,10 @@ public class AdminController {
         }
 
         //登録処理
+        //リクエストから取得したパスワードの暗号化
+        String encodedPwd = BCrypt.hashpw(userForm.getPassword(), BCrypt.gensalt());
+        //登録するユーザのパスワードを暗号化されたパスワードに変更
+        userForm.setPassword(encodedPwd);
         userForm.setPositionId(positionId);
         userService.saveUser(userForm);
 

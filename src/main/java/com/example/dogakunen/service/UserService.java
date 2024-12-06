@@ -1,10 +1,15 @@
 package com.example.dogakunen.service;
 
 import com.example.dogakunen.controller.form.UserForm;
+import com.example.dogakunen.controller.form.GeneralUserForm;
+import com.example.dogakunen.repository.GeneralUserRepository;
 import com.example.dogakunen.repository.UserRepository;
+import com.example.dogakunen.repository.entity.GeneralUser;
 import com.example.dogakunen.repository.entity.Position;
 import com.example.dogakunen.repository.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.example.dogakunen.repository.MonthAttendanceRepository;
+import org.springframework.beans.BeanUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +24,9 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    GeneralUserRepository generalUserRepository;
 
     /*
      * ログイン時のユーザ情報取得
@@ -61,6 +69,30 @@ public class UserService {
     }
 
     /*
+     * 申請対象者情報取得
+     */
+    public List<GeneralUserForm> findAllGeneralUser(Integer month) {
+        List<GeneralUser> results = generalUserRepository.findAllGeneralUserByOrderById(month);
+        List<GeneralUserForm> generalUsers = setGeneralUserForm(results);
+        return generalUsers;
+    }
+
+    /*
+     * DBから取得したgeneralUserをFormに変換
+     */
+    private List<GeneralUserForm> setGeneralUserForm(List<GeneralUser> results) {
+        List<GeneralUserForm> generalUsers = new ArrayList<>();
+
+        for (GeneralUser result : results) {
+            GeneralUserForm generalUser = new GeneralUserForm();
+            BeanUtils.copyProperties(result, generalUser);
+            generalUsers.add(generalUser);
+        }
+        return generalUsers;
+    }
+
+
+    /*
      *システム管理画面の表示（ユーザ取得）
      */
     public List<UserForm> findAllUser(){
@@ -71,7 +103,7 @@ public class UserService {
     }
 
     /*
-     *ユーザー編集・登録処理（ユーザー更新・登録）
+     *ユーザー登録処理（ユーザー更新・登録）
      */
     public void saveUser(UserForm reqUser) {
         //pwdの暗号化 新規登録の場合のみ

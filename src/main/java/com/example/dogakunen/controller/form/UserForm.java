@@ -18,11 +18,13 @@ public class UserForm {
 
     private String name;
     private Integer employeeNumber;
-    //private int employeeNumber;
     private int positionId;
     private int isStopped;
     private Date createdDate;
     private Date updatedDate;
 
+    //内部結合用に追加
     private String positionName;
+    private Integer month;
+    private int attendanceStatus;
 }
