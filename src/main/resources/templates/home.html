@@ -46,7 +46,7 @@
     </tr>
     <div class="attendance" th:each="attendance : ${attendances}">
         <tr>
-        　   <td><span th:text="${attendance.month} + '/' + ${attendance.date}"/></td>
+        　   <td><span th:text="${attendance.date}"/></td>
         　   <td><span th:text="${attendance.attendance}"/></td>
             <td><span th:text="${attendance.workTimeStart}"/></td>
             <td><span th:text="${attendance.workTimeFinish}"/></td>

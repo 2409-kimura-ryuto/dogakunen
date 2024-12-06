@@ -21,8 +21,9 @@ public class DateAttendance {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(name = "user_id")
-    private Integer userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column
     private Date date;
@@ -44,6 +45,9 @@ public class DateAttendance {
 
     @Column(name = "work_time")
     private Duration workTime;
+
+    @Column(name = "memo")
+    private String memo;
 
     @Column(name = "created_date", insertable = true, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
