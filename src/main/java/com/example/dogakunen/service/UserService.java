@@ -6,7 +6,10 @@ import com.example.dogakunen.repository.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -52,5 +55,33 @@ public class UserService {
             users.add(user);
         }
         return users;
+    }
+
+    /*
+     * ユーザ情報の追加・更新
+     */
+
+    public void saveUser(UserForm userForm){
+        //FormをEntityに詰める
+        User saveUser = setUserEntity(userForm);
+        //Entityを引数にレポジトリを呼び出す
+        userRepository.save(saveUser);
+    }
+
+    /*
+     * formからentityに詰める作業
+     */
+
+    public User setUserEntity(UserForm reqUser) {
+        User user = new User();
+        user.setId(reqUser.getId());
+        user.setPassword(reqUser.getPassword());
+        user.setName(reqUser.getName());
+        user.setEmployeeNumber(reqUser.getEmployeeNumber());
+        user.setPositionId(reqUser.getPositionId());
+        user.setIsStopped(reqUser.getIsStopped());
+        user.setCreatedDate(reqUser.getCreatedDate());
+
+        return user;
     }
 }

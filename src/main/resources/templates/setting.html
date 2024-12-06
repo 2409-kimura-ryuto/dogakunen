@@ -6,6 +6,25 @@
     <title>設定画面</title>
 </head>
 <body>
-
+<div class="login-header">
+    <h1>勤怠管理システム　設定画面</h1>
+</div>
+<div class="setting-contents">
+    <div class="employee_number">
+        <label>社員番号</label>：<a th:text="${employeeNumber}"></a>
+    </div>
+    <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
+        <p th:text="${errorMessage}"></p>
+    </div>
+    <form th:action="@{/settingProcess}" th:method="put">
+        <div class="password">
+            <label class="setting-conditions">パスワード</label>：<input type="text" name="password" th:value="${password}"><br/>
+        </div>
+        <div class="passwordConfirmation">
+            <label class="setting-conditions">確認用パスワード</label>：<input type="text" name="passwordConfirmation" th:value="${passwordConfirmation}"><br/>
+        </div>
+        <input type="submit" value="変更" class="setting-button" /><br/>
+    </form>
+</div>
 </body>
 </html>
