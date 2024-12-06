@@ -20,9 +20,6 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
     /*
      * ログイン時のユーザ情報取得
      */
@@ -78,8 +75,8 @@ public class UserService {
      */
     public void saveUser(UserForm reqUser) {
         //pwdの暗号化 新規登録の場合のみ
-        String encodedPwd = passwordEncoder.encode(reqUser.getPassword());
-        reqUser.setPassword(encodedPwd);
+        //String encodedPwd = passwordEncoder.encode(reqUser.getPassword());
+        //reqUser.setPassword(encodedPwd);
         //エンティティに詰めて登録
         User saveUser = setUserEntity(reqUser);
         userRepository.save(saveUser);
@@ -91,11 +88,10 @@ public class UserService {
     public User setUserEntity(UserForm reqUser) {
         User user = new User();
 
-        //branchIdをBranch型にする
+        //positionIdをPosition型にする
         Position position = new Position();
         position.setId(reqUser.getPositionId());
 
-        //Branch型のbranchIdと、Department型のdepartmentId
         user.setId(reqUser.getId());
         user.setEmployeeNumber(reqUser.getEmployeeNumber());
         user.setPassword(reqUser.getPassword());
