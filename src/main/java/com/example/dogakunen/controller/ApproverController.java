@@ -1,9 +1,6 @@
 package com.example.dogakunen.controller;
 
-import com.example.dogakunen.controller.form.DateAttendanceForm;
-import com.example.dogakunen.controller.form.GeneralUserForm;
-import com.example.dogakunen.controller.form.MonthAttendanceForm;
-import com.example.dogakunen.controller.form.UserForm;
+import com.example.dogakunen.controller.form.*;
 import com.example.dogakunen.service.DateAttendanceService;
 import com.example.dogakunen.service.MonthAttendanceService;
 import com.example.dogakunen.service.UserService;
@@ -21,6 +18,9 @@ public class ApproverController {
 
     @Autowired
     UserService userService;
+
+    @Autowired
+    DateAttendanceService dateAttendanceService;
 
     @Autowired
     MonthAttendanceService monthAttendanceService;
@@ -67,12 +67,16 @@ public class ApproverController {
         return mav;
     }
 
-//    /*
-//     * 勤怠状況確認画面
-//     */
-//    @GetMapping("/check_attendance/{id}")
-//    public ModelAndView checkAttendance(@PathVariable Integer id) {
-//        ModelAndView mav = new ModelAndView();
-//    }
+    /*
+     * 勤怠状況確認画面
+     */
+    @GetMapping("/check_attendance/{id}")
+    public ModelAndView checkAttendance(@PathVariable Integer id) {
+        ModelAndView mav = new ModelAndView();
+        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(id, 12);
+        mav.addObject("generalDateAttendances", generalDateAttendanceForms);
+        mav.setViewName("/check_attendance");
+        return mav;
+    }
 
 }

@@ -45,6 +45,9 @@ public class DateAttendance {
     @Column(name = "work_time")
     private Duration workTime;
 
+    @Column
+    private String memo;
+
     @Column(name = "created_date", insertable = true, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;

@@ -2,7 +2,6 @@ package com.example.dogakunen.controller.form;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.antlr.v4.runtime.misc.Interval;
 
 import java.sql.Time;
 import java.time.Duration;
@@ -10,7 +9,7 @@ import java.util.Date;
 
 @Getter
 @Setter
-public class DateAttendanceForm {
+public class GeneralDateAttendanceForm {
     private int id;
     private int userId;
     private Date date;
@@ -18,9 +17,12 @@ public class DateAttendanceForm {
     private int attendance;
     private Time workTimeStart;
     private Time workTimeFinish;
-    private Duration breakTime;
-    private Duration workTime;
+    private String breakTime;
+    private String workTime;
     private String memo;
     private Date createdDate;
     private Date updatedDate;
+
+    //内部結合用に追加
+    private Integer attendanceStatus;
 }

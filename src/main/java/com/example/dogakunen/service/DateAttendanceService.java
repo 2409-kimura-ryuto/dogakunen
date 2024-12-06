@@ -1,11 +1,14 @@
 package com.example.dogakunen.service;
 
 import com.example.dogakunen.controller.form.DateAttendanceForm;
+import com.example.dogakunen.controller.form.GeneralDateAttendanceForm;
 import com.example.dogakunen.controller.form.MonthAttendanceForm;
 import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.repository.DateAttendanceRepository;
+import com.example.dogakunen.repository.GeneralDateAttendanceRepository;
 import com.example.dogakunen.repository.UserRepository;
 import com.example.dogakunen.repository.entity.DateAttendance;
+import com.example.dogakunen.repository.entity.GeneralDateAttendance;
 import com.example.dogakunen.repository.entity.User;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,21 +23,29 @@ public class DateAttendanceService {
     @Autowired
     DateAttendanceRepository dateAttendanceRepository;
 
+    @Autowired
+    GeneralDateAttendanceRepository generalDateAttendanceRepository;
+
     /*
-     * 勤怠情報取得
+     * 社員の勤怠情報取得
      */
-    public DateAttendanceForm findDateAttendance(Integer id, Integer month) {
-        DateAttendance result = dateAttendanceRepository.findDateAttendanceByOrderByDate(id, month);
-        DateAttendanceForm DateAttendance = setDateAttendanceForm(result);
-        return DateAttendance;
+    public List<GeneralDateAttendanceForm> findGeneralDateAttendance(Integer id, Integer month) {
+        List<GeneralDateAttendance> results = generalDateAttendanceRepository.findDateAttendanceByOrderByDate(id, month);
+        List<GeneralDateAttendanceForm> generalDateAttendanceForm = setGeneralDateAttendanceForm(results);
+        return generalDateAttendanceForm;
     }
     /*
      * DBから取得したDateAttendanceをFormに変換
      */
-    private DateAttendanceForm setDateAttendanceForm(DateAttendance result) {
-        DateAttendanceForm dateAttendanceForm = new DateAttendanceForm();
-        BeanUtils.copyProperties(result, dateAttendanceForm);
-        return  dateAttendanceForm;
+    private List<GeneralDateAttendanceForm> setGeneralDateAttendanceForm(List<GeneralDateAttendance> results) {
+        List<GeneralDateAttendanceForm> generalDateAttendances = new ArrayList<>();
+
+        for (GeneralDateAttendance result : results) {
+            GeneralDateAttendanceForm generalDateAttendanceForm = new GeneralDateAttendanceForm();
+            BeanUtils.copyProperties(result, generalDateAttendanceForm);
+            generalDateAttendances.add(generalDateAttendanceForm);
+        }
+        return generalDateAttendances;
     }
 
 }

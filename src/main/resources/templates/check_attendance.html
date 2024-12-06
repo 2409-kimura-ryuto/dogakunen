@@ -6,6 +6,30 @@
     <title>勤怠状況確認画面</title>
 </head>
 <body>
-
+<!-- 勤怠状況表示 -->
+<table>
+    <thead>
+    <tr>
+        <th>日付</th>
+        <th>勤務区分</th>
+        <th>開始時間</th>
+        <th>終了時間</th>
+        <th>休憩時間</th>
+        <th>労働時間</th>
+        <th>メモ</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="generalDateAttendance: ${generalDateAttendances}">
+        <td th:text="${generalDateAttendance.date}"></td>
+        <td th:text="${generalDateAttendance.attendance}"></td>
+        <td th:text="${generalDateAttendance.workTimeStart}"></td>
+        <td th:text="${generalDateAttendance.workTimeFinish}"></td>
+        <td th:text="${generalDateAttendance.breakTime}"></td>
+        <td th:text="${generalDateAttendance.workTime}"></td>
+        <td th:text="${generalDateAttendance.memo}"></td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

@@ -40,5 +40,5 @@ public class User {
 
     @Column(name = "updated_date", insertable = true, updatable = true)
     @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedDate;
+    private Date updatedDate = new Date();
 }
