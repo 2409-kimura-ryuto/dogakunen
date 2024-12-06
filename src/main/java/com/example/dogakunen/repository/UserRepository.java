@@ -7,11 +7,22 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
 
 import java.util.List;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Integer> {
+
+    //ログイン時のユーザ情報取得
+    public List<User> findByEmployeeNumber(Integer employeeNumber);
+
     @Query(
 //            value = "SELECT " +
 //                    "u.employee_number AS employeeNumber, u.name AS name, p.name AS positionName, m.month AS month, m.attendance_status AS attendanceStatus " +

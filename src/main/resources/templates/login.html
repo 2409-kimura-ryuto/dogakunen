@@ -6,6 +6,24 @@
     <title>ログイン画面</title>
 </head>
 <body>
-
+<div class="login-header">
+    <h1>勤怠管理システム　ログイン</h1>
+</div>
+<div class="login-contents">
+    <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
+        <p th:text="${errorMessage}"></p>
+    </div>
+    <form th:action="@{/loginUser}" th:method="get">
+        <div class="employee_number">
+            <label>社員番号</label>
+            <input type="text" name="employeeNumber" th:value="${employeeNumber}"><br/>
+        </div>
+        <div class="password">
+            <label class="login-conditions">パスワード</label>
+            <input type="text" name="password" th:value="${password}"><br/>
+        </div>
+        <input type="submit" value="ログイン" class="login-button" /><br/>
+    </form>
+</div>
 </body>
 </html>
