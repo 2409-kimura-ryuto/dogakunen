@@ -9,6 +9,7 @@ import com.example.dogakunen.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -64,4 +65,13 @@ public class ApproverController {
         mav.setViewName("redirect:/show_users");
         return mav;
     }
+
+//    /*
+//     * 勤怠状況確認画面
+//     */
+//    @GetMapping("/check_attendance/{id}")
+//    public ModelAndView checkAttendance(@PathVariable Integer id) {
+//        ModelAndView mav = new ModelAndView();
+//    }
+
 }

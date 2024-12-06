@@ -34,8 +34,6 @@ public class UserService {
         for (User result : results) {
             UserForm generalUser = new UserForm();
             BeanUtils.copyProperties(result, generalUser);
-//            generalUser.setPositionName(result.getPosition().getName());
-//            generalUser.setAttendanceStatus(result.getMonthAttendance().getAttendanceStatus());
             generalUsers.add(generalUser);
         }
         return generalUsers;
