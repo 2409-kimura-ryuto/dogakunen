@@ -17,6 +17,7 @@ public class GeneralDateAttendanceForm {
     private int attendance;
     private Time workTimeStart;
     private Time workTimeFinish;
+    //Durationに戻す
     private String breakTime;
     private String workTime;
     private String memo;

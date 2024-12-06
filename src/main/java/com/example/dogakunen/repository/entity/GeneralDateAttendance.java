@@ -37,6 +37,7 @@ public class GeneralDateAttendance {
     @Column(name = "work_time_finish")
     private Time workTimeFinish ;
 
+    //Durationに戻す
     @Column(name = "break_time")
     private String breakTime;
 
