@@ -2,8 +2,10 @@ package com.example.dogakunen.controller;
 
 import com.example.dogakunen.controller.form.DateAttendanceForm;
 import com.example.dogakunen.controller.form.MonthAttendanceForm;
+import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.service.DateAttendanceService;
 import com.example.dogakunen.service.MonthAttendanceService;
+import com.example.dogakunen.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +16,9 @@ import java.util.List;
 
 @Controller
 public class ApproverController {
+
+    @Autowired
+    UserService userService;
 
     @Autowired
     MonthAttendanceService monthAttendanceService;
@@ -33,9 +38,14 @@ public class ApproverController {
 //        List<String> errorMessages = (List<String>) session.getAttribute("errorMessagesLoginFilter");
 //        mav.addObject("errorMessagesLoginFilter", errorMessages);
 //        session.removeAttribute("errorMessagesLoginFilter");
+        List<UserForm> generalUsers = userService.findAllGeneralUser(12);
+        mav.addObject("users", generalUsers);
         return mav;
     }
 
+    /*
+     * 完了申請処理
+     */
     @PutMapping("/request")
     public ModelAndView request() {
         ModelAndView mav = new ModelAndView();

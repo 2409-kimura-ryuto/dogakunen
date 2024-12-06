@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.misc.Interval;
 
 import java.sql.Time;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "month_attendances")
@@ -37,6 +38,7 @@ public class MonthAttendance {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
 
+    //更新時にupdated_dateを現在日時で更新
     @PreUpdate
     public  void  onPreUpdate () {
         Date date = new Date();

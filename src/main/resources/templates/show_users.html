@@ -10,5 +10,25 @@
 <form th:method="put" th:action="@{/request}" >
     <input type="submit" value="申請"/>
 </form>
+
+<!-- ユーザー一覧表示 -->
+<table>
+    <thead>
+    <tr>
+        <th>社員番号</th>
+        <th>氏名</th>
+        <th>役職名</th>
+        <th>勤怠ステータス</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user: ${users}">
+        <td th:text="${user.employeeNumber}"></td>
+        <td th:text="${user.name}"></td>
+        <td th:text="${user.positionName}"></td>
+        <td th:text="${user.attendanceStatus}"></td>
+    </tr>
+    </tbody>
+</table>
 </body>
 </html>

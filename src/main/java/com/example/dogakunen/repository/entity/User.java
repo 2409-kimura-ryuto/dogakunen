@@ -42,4 +42,13 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
 
+    //内部結合用に追加
+    @Column(name = "position_name")
+    private String positionName;
+
+    private Integer month;
+
+    @Column(name = "attendance_status")
+    private int attendanceStatus;
+
 }
