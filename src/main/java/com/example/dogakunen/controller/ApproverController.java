@@ -1,6 +1,7 @@
 package com.example.dogakunen.controller;
 
 import com.example.dogakunen.controller.form.DateAttendanceForm;
+import com.example.dogakunen.controller.form.GeneralUserForm;
 import com.example.dogakunen.controller.form.MonthAttendanceForm;
 import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.service.DateAttendanceService;
@@ -39,7 +40,7 @@ public class ApproverController {
 //        List<String> errorMessages = (List<String>) session.getAttribute("errorMessagesLoginFilter");
 //        mav.addObject("errorMessagesLoginFilter", errorMessages);
 //        session.removeAttribute("errorMessagesLoginFilter");
-        List<UserForm> generalUsers = userService.findAllGeneralUser(12);
+        List<GeneralUserForm> generalUsers = userService.findAllGeneralUser(12);
         mav.addObject("users", generalUsers);
         return mav;
     }

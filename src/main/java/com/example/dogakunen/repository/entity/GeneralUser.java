@@ -5,15 +5,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
-import java.util.List;
 
 @Entity
-@Table(name = "users")
 @Getter
 @Setter
-
-public class User {
-
+public class GeneralUser {
+    //参照のみのentity
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,4 +38,13 @@ public class User {
     @Column(name = "updated_date", insertable = true, updatable = true)
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
+
+    //内部結合用に追加
+    @Column(name = "position_name")
+    private String positionName;
+
+    private Integer month;
+
+    @Column(name = "attendance_status")
+    private int attendanceStatus;
 }

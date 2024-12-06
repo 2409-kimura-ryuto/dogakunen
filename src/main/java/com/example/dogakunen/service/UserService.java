@@ -1,7 +1,10 @@
 package com.example.dogakunen.service;
 
+import com.example.dogakunen.controller.form.GeneralUserForm;
 import com.example.dogakunen.controller.form.UserForm;
+import com.example.dogakunen.repository.GeneralUserRepository;
 import com.example.dogakunen.repository.UserRepository;
+import com.example.dogakunen.repository.entity.GeneralUser;
 import com.example.dogakunen.repository.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.dogakunen.controller.form.UserForm;
@@ -20,6 +23,9 @@ public class UserService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    GeneralUserRepository generalUserRepository;
 
     /*
      * ログイン時のユーザ情報取得
@@ -63,19 +69,19 @@ public class UserService {
     /*
      * 申請対象者情報取得
      */
-    public List<UserForm> findAllGeneralUser(Integer month) {
-        List<User> results = userRepository.findAllGeneralUserByOrderById(month);
-        List<UserForm> generalUsers = setGeneralUserForm(results);
+    public List<GeneralUserForm> findAllGeneralUser(Integer month) {
+        List<GeneralUser> results = generalUserRepository.findAllGeneralUserByOrderById(month);
+        List<GeneralUserForm> generalUsers = setGeneralUserForm(results);
         return generalUsers;
     }
     /*
      * DBから取得したgeneralUserをFormに変換
      */
-    private List<UserForm> setGeneralUserForm(List<User> results) {
-        List<UserForm> generalUsers = new ArrayList<>();
+    private List<GeneralUserForm> setGeneralUserForm(List<GeneralUser> results) {
+        List<GeneralUserForm> generalUsers = new ArrayList<>();
 
-        for (User result : results) {
-            UserForm generalUser = new UserForm();
+        for (GeneralUser result : results) {
+            GeneralUserForm generalUser = new GeneralUserForm();
             BeanUtils.copyProperties(result, generalUser);
             generalUsers.add(generalUser);
         }
