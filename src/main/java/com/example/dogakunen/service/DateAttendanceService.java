@@ -10,6 +10,9 @@ import com.example.dogakunen.repository.UserRepository;
 import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.repository.entity.GeneralDateAttendance;
 import com.example.dogakunen.repository.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.example.dogakunen.controller.form.DateAttendanceForm;
+import com.example.dogakunen.controller.form.MonthAttendanceForm;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -47,5 +50,12 @@ public class DateAttendanceService {
         }
         return generalDateAttendances;
     }
+
+    //勤怠マスタ(日)作成
+    public void saveNewDate(int newUserId) {
+
+        dateAttendanceRepository.saveNewUser(newUserId);
+    }
+
 
 }

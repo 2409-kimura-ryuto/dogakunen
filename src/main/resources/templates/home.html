@@ -18,11 +18,11 @@
                 <button type="submit">承認者用画面</button>
             </form>
         </div>
-        <div th:if="${positionId == 3}" class="header-item">
-            <form th:action="@{/aa}" method="get" class="header-item">
-                <button type="submit">管理権限者用画面</button>
+        <!--<div th:if="${positionId == 3}" class="header-item">-->
+            <form th:action="@{/systemManage}" method="get" class="header-item">
+                <button type="submit">システム管理</button>
             </form>
-        </div>
+        <!--</div>-->
         <form th:action="@{/setting}" method="get" class="header-item">
             <button type="submit">設定画面</button>
         </form>
