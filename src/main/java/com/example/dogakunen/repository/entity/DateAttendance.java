@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.misc.Interval;
 
 import java.sql.Time;
 import java.time.Duration;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Entity
@@ -35,16 +36,16 @@ public class DateAttendance {
     private Integer attendance;
 
     @Column(name = "work_time_start")
-    private Time workTimeStart;
+    private LocalTime workTimeStart;
 
     @Column(name = "work_time_finish")
-    private Time workTimeFinish ;
+    private LocalTime workTimeFinish ;
 
     @Column(name = "break_time")
-    private Duration breakTime;
+    private LocalTime breakTime;
 
     @Column(name = "work_time")
-    private Duration workTime;
+    private LocalTime workTime;
 
     @Column(name = "memo")
     private String memo;
