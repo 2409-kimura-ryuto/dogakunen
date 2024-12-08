@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "positions")
@@ -20,6 +21,11 @@ public class Position {
 
     @Column
     private String name;
+
+    //Userと一対多でリレーションを形成
+    //mappedByがある所は読み取り専用になり指定しているところposition(User.position)がリレーションシップのオーナーと言う意味
+    @OneToMany(mappedBy = "position", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<User> users;
 
     @Column(name = "created_date", insertable = true, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

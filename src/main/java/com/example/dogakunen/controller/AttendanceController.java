@@ -47,8 +47,12 @@ public class AttendanceController {
     }
 
     @PostMapping("/newAttendance")
-    public void postNewAttendance(@ModelAttribute(name = "formModel") DateAttendanceForm reqAttendance) throws ParseException {
+    public ModelAndView postNewAttendance(@ModelAttribute(name = "formModel") DateAttendanceForm reqAttendance) throws ParseException {
         UserForm loginUser = (UserForm)session.getAttribute("loginUser");
-        dateAttendanceService.postNew(reqAttendance, loginUser);
+        Integer employeeNumber = loginUser.getEmployeeNumber();
+        Calendar calender = Calendar.getInstance();
+        Integer month = calender.get(Calendar.MONTH) + 1;
+        dateAttendanceService.postNew(reqAttendance, employeeNumber, month);
+        return new ModelAndView("redirect:/");
     }
 }

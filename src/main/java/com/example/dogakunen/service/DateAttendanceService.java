@@ -1,5 +1,15 @@
 package com.example.dogakunen.service;
 
+import com.example.dogakunen.controller.form.UserForm;
+import com.example.dogakunen.repository.DateAttendanceRepository;
+import com.example.dogakunen.repository.UserRepository;
+import com.example.dogakunen.repository.entity.DateAttendance;
+import com.example.dogakunen.repository.entity.User;
+import org.springframework.beans.factory.annotation.Autowired;
+import com.example.dogakunen.controller.form.DateAttendanceForm;
+import com.example.dogakunen.controller.form.MonthAttendanceForm;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.example.dogakunen.controller.form.DateAttendanceForm;
 import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.repository.DateAttendanceRepository;
@@ -8,6 +18,9 @@ import com.example.dogakunen.repository.entity.User;
 import org.antlr.v4.runtime.misc.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import java.sql.Time;
 import java.text.ParseException;
@@ -22,14 +35,16 @@ import java.util.List;
 public class DateAttendanceService {
     @Autowired
     DateAttendanceRepository dateAttendanceRepository;
+    @Autowired
+    UserRepository userRepository;
 
-    public List<DateAttendanceForm> findALLAttendances(int month, Integer loginId){
+    public List<DateAttendanceForm> findALLAttendances(int month, Integer loginId) {
         List<DateAttendance> results = dateAttendanceRepository.findAllAttendances(month, loginId);
         List<DateAttendanceForm> dateAttendances = setDateAttendanceForm(results);
         return dateAttendances;
     }
 
-    public List<DateAttendanceForm> setDateAttendanceForm(List<DateAttendance> results){
+    public List<DateAttendanceForm> setDateAttendanceForm(List<DateAttendance> results) {
         List<DateAttendanceForm> dateAttendances = new ArrayList<>();
         for (int i = 0; i < results.size(); i++) {
             DateAttendanceForm dateAttendance = new DateAttendanceForm();
@@ -51,17 +66,18 @@ public class DateAttendanceService {
         return dateAttendances;
     }
 
-    public void postNew(DateAttendanceForm reqAttendance, UserForm loginUser) throws ParseException {
-        DateAttendance dateAttendance = setEntity(reqAttendance,loginUser);
+    public void postNew(DateAttendanceForm reqAttendance, Integer employeeNumber, Integer month) throws ParseException {
+        List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
+        DateAttendance dateAttendance = setEntity(reqAttendance, results.get(0), month);
         dateAttendanceRepository.save(dateAttendance);
     }
 
-    public DateAttendance setEntity(DateAttendanceForm reqAttendance, UserForm loginUser) throws ParseException {
+    public DateAttendance setEntity(DateAttendanceForm reqAttendance, User loginUser, Integer month) throws ParseException {
         DateAttendance dateAttendance = new DateAttendance();
 
         dateAttendance.setUser(loginUser);
+        dateAttendance.setMonth(month);
         dateAttendance.setDate(reqAttendance.getDate());
-        dateAttendance.setMonth(reqAttendance.getMonth());
         dateAttendance.setBreakTime(reqAttendance.getBreakTime());
         dateAttendance.setWorkTimeStart(reqAttendance.getWorkTimeStart());
         dateAttendance.setWorkTimeFinish(reqAttendance.getWorkTimeFinish());
@@ -77,4 +93,28 @@ public class DateAttendanceService {
 
         return dateAttendance;
     }
+    /*
+     * 勤怠情報取得
+     */
+    public DateAttendanceForm findDateAttendance(Integer id, Integer month) {
+        DateAttendance result = dateAttendanceRepository.findDateAttendanceByOrderByDate(id, month);
+        DateAttendanceForm DateAttendance = setDateAttendanceForm(result);
+        return DateAttendance;
+    }
+    /*
+     * DBから取得したDateAttendanceをFormに変換
+     */
+    private DateAttendanceForm setDateAttendanceForm(DateAttendance result) {
+        DateAttendanceForm dateAttendanceForm = new DateAttendanceForm();
+        BeanUtils.copyProperties(result, dateAttendanceForm);
+        return  dateAttendanceForm;
+    }
+
+    //勤怠マスタ(日)作成
+    public void saveNewDate(int newUserId) {
+
+        dateAttendanceRepository.saveNewUser(newUserId);
+    }
+
+
 }

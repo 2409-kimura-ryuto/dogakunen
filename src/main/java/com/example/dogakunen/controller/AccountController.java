@@ -2,11 +2,13 @@ package com.example.dogakunen.controller;
 
 import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.service.UserService;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -28,12 +30,8 @@ public class AccountController {
     @GetMapping("/login")
     public ModelAndView loginView() {
         ModelAndView mav = new ModelAndView();
-        // form用の空のentityを準備
-        UserForm userForm = new UserForm();
         // 画面遷移先を指定
         mav.setViewName("/login");
-        // 準備した空のFormを画面にバインド
-        //mav.addObject("formModel", userForm);
         //エラーメッセージ表示
         List<String> errorMessage = (List<String>) session.getAttribute("errorMessages");
         Integer employeeNumber = (Integer) session.getAttribute("employeeNumber");
@@ -102,6 +100,75 @@ public class AccountController {
         mav.setViewName("/login");
         return mav;
 
+    }
+
+    /*
+     * 設定画面表示
+     */
+    @GetMapping("/setting")
+    public ModelAndView setting() {
+        ModelAndView mav = new ModelAndView();
+        // 画面遷移先を指定
+        mav.setViewName("/setting");
+        //社員番号を表示
+        //セッションからログインユーザ情報を取得
+        UserForm loginUser = (UserForm)session.getAttribute("loginUser");
+        //ログインユーザ情報から社員番号のみを取り出す
+        Integer employeeNumber = loginUser.getEmployeeNumber();
+        //画面に社員番号をセット
+        mav.addObject("employeeNumber", employeeNumber);
+        //エラーメッセージ表示
+        //セッションからエラーメッセージを取得
+        List<String> errorMessage = (List<String>)session.getAttribute("errorMessages");
+        //エラーメッセージが存在した場合
+        if (errorMessage != null) {
+            //画面にエラーメッセージをセット
+            mav.addObject("errorMessages", errorMessage);
+            //セッションからエラーメッセージを削除
+            session.removeAttribute("errorMessages");
+        }
+        return mav;
+    }
+
+    /*
+     * パスワード変更処理
+     */
+    @PutMapping("/settingProcess")
+    public ModelAndView settingProcess(@RequestParam(name = "password", required = false) String password, @RequestParam(name = "passwordConfirmation", required = false) String passwordConfirmation) {
+        ModelAndView mav = new ModelAndView();
+        //エラーメッセージの準備
+        List<String> errorMessages = new ArrayList<String>();
+        //バリデーション
+        //パスワードと確認用パスワードが一致しない場合
+        if(!password.equals(passwordConfirmation)) {
+            //エラーメッセージを設定
+            errorMessages.add("パスワードと確認用パスワードが一致しません");
+        }
+        //入力されたパスワードが空欄または記号を含む半角文字6文字以上20文字以下でない場合
+        if(!password.matches("^[!-~]{6,20}$") || StringUtils.isBlank(password)){
+            //エラーメッセージを設定
+            errorMessages.add("パスワードは半角文字かつ6文字以上20文字以下で入力してください");
+        }
+        //エラーメッセージが存在する場合
+        if(errorMessages.size() != 0){
+            //セッションにエラーメッセージを設定
+            session.setAttribute("errorMessages", errorMessages);
+            //設定画面にリダイレクト
+            return new ModelAndView("redirect:/setting");
+        }
+        //パスワードの変更処理
+        //リクエストから取得したパスワードの暗号化
+        String encodedPwd = BCrypt.hashpw(password, BCrypt.gensalt());
+        //セッションからログインユーザ情報を取得
+        UserForm loginUser = (UserForm)session.getAttribute("loginUser");
+        //ログインユーザ情報のパスワードを入力されたパスワードに変更
+        loginUser.setPassword(encodedPwd);
+        //変更後のloginUserを引数にDBをupdate
+        userService.saveUser(loginUser);
+
+        // 画面遷移先を指定
+        mav.setViewName("/home");
+        return mav;
     }
 
 }

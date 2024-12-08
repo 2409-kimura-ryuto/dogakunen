@@ -18,11 +18,11 @@
                 <button type="submit">承認者用画面</button>
             </form>
         </div>
-        <div th:if="${positionId == 3}" class="header-item">
-            <form th:action="@{/aa}" method="get" class="header-item">
-                <button type="submit">管理権限者用画面</button>
+        <!--<div th:if="${positionId == 3}" class="header-item">-->
+            <form th:action="@{/systemManage}" method="get" class="header-item">
+                <button type="submit">システム管理</button>
             </form>
-        </div>
+        <!--</div>-->
         <form th:action="@{/setting}" method="get" class="header-item">
             <button type="submit">設定画面</button>
         </form>
@@ -34,30 +34,32 @@
         <input type="submit" value="新規勤怠登録">
     </form>
 </div>
-<div class="attendances">
-    <tr>
-        <th>日付</th>
-        <th>勤務区分</th>
-        <th>開始</th>
-        <th>終了</th>
-        <th>休憩時間</th>
-        <th>労働時間</th>
-        <th>メモ</th>
-    </tr>
-    <div class="attendance" th:each="attendance : ${attendances}">
+<table class="attendances" border="5">
+    <thead>
         <tr>
-        　   <td><span th:text="${attendance.date}"/></td>
-        　   <td><span th:text="${attendance.attendance}"/></td>
-            <td><span th:text="${attendance.workTimeStart}"/></td>
-            <td><span th:text="${attendance.workTimeFinish}"/></td>
-            <td><span th:text="${attendance.breakTime}"/></td>
-            <td><span th:text="${attendance.workTime}"/></td>
-            <td><span th:text="${attendance.memo}"/></td>
+            <th>日付</th>
+            <th>勤務区分</th>
+            <th>開始</th>
+            <th>終了</th>
+            <th>休憩時間</th>
+            <th>労働時間</th>
+            <th>メモ</th>
         </tr>
-    </div>
-</div>
+    </thead>
+    <tbody>
+        <tr th:each="attendance : ${attendances}" class="align-middle">
+            <td th:text="${#dates.format(attendance.date, 'yyyy年MM月dd日')}"></td>
+            <td th:text="${attendance.attendance}"></td>
+            <td th:text="${attendance.workTimeStart}"></td>
+            <td th:text="${attendance.workTimeFinish}"></td>
+            <td th:text="${attendance.breakTime}"></td>
+            <td th:text="${attendance.workTime}"></td>
+            <td th:text="${attendance.memo}"></td>
+        </tr>
+    </tbody>
+</table>
 <div class="request-button">
-    <form th:action="@{/newAttendance}" method="get" class="header-item">
+    <form th:action="@{/request}" th:method="put" class="header-item">
         <input type="submit" value="申請">
     </form>
 </div>
