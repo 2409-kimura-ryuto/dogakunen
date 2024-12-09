@@ -9,8 +9,9 @@ import java.util.Date;
 @Entity
 @Getter
 @Setter
+
 public class GeneralUser {
-    //参照のみのentity
+    //参照時の使用するentity
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -6,6 +6,10 @@ import com.example.dogakunen.repository.entity.User;
 import com.example.dogakunen.service.DateAttendanceService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import com.example.dogakunen.controller.form.UserForm;
+import com.example.dogakunen.service.MonthAttendanceService;
+import jakarta.servlet.http.HttpSession;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -18,8 +22,12 @@ import java.util.List;
 public class AttendanceController {
     @Autowired
     HttpSession session;
+
     @Autowired
     DateAttendanceService dateAttendanceService;
+
+    @Autowired
+    MonthAttendanceService monthAttendanceService;
 
     /*
      *　勤怠情報取得処理
@@ -38,6 +46,10 @@ public class AttendanceController {
 
         //勤怠記録の取得
         List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(month, loginId);
+
+        //勤怠状況ステータスによって申請ボタンの表示を切り替えるために勤怠状況ステータスを取得
+        int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUser.getId(), 12).getAttendanceStatus();
+        mav.addObject("attendanceStatus", attendanceStatus);
 
         //情報をセット
         mav.addObject("attendances",dateAttendances);
