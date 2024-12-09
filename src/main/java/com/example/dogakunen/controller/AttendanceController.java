@@ -1,6 +1,7 @@
 package com.example.dogakunen.controller;
 
 import com.example.dogakunen.controller.form.DateAttendanceForm;
+import com.example.dogakunen.controller.form.MonthAttendanceForm;
 import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.repository.entity.User;
 import com.example.dogakunen.service.DateAttendanceService;
@@ -44,6 +45,8 @@ public class AttendanceController {
         UserForm loginUser =(UserForm) session.getAttribute("loginUser");
         Integer loginId = loginUser.getId();
 
+        //勤怠月取得
+        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(loginId, month);
         //勤怠記録の取得
         List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(month, loginId);
 
@@ -53,6 +56,7 @@ public class AttendanceController {
 
         //情報をセット
         mav.addObject("attendances",dateAttendances);
+        mav.addObject("monthAttendance", monthAttendanceForm);
         mav.addObject("loginUser", loginUser);
         mav.setViewName("/home");
         return mav;
@@ -113,6 +117,17 @@ public class AttendanceController {
         reqAttendance.setId(id);
         reqAttendance.setMonth(month);
         dateAttendanceService.editAttendance(reqAttendance, employeeNumber);
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
+     * 勤怠削除処理
+     */
+    @PutMapping("/deleteAttendance{id}")
+    public ModelAndView deleteAttendance(@PathVariable Integer id) {
+        //リクエストから取得したIDを引数にサービスを呼び出す
+        dateAttendanceService.deleteAttendance(id);
+        // ホーム画面にリダイレクト
         return new ModelAndView("redirect:/");
     }
 }

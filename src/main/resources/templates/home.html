@@ -30,21 +30,22 @@
             <button type="submit">ログアウト</button>
         </form>
     </div>
-    <form th:action="@{/newAttendance}" method="get" class="new-button">
-        <input type="submit" value="新規勤怠登録">
-    </form>
+    <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
+        <form th:action="@{/newAttendance}" method="get" class="new-button">
+            <input type="submit" value="新規勤怠登録">
+        </form>
+    </div>
 </div>
 <table border="5" width="80%">
     <thead>
         <tr>
             <th>日付</th>
             <th>勤務区分</th>
-            <th>開始</th>
-            <th>終了</th>
+            <th>開始時刻</th>
+            <th>終了時刻</th>
             <th>休憩時間</th>
             <th>労働時間</th>
             <th>メモ</th>
-            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -62,7 +63,11 @@
             <td th:text="${attendance.breakTime}"></td>
             <td th:text="${attendance.workTime}"></td>
             <td th:text="${attendance.memo}"></td>
-            <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}" class="editAttendance-button">編集</a></td>
+            <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
+                <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}" class="editAttendance-button"><input type="submit" value="編集"></a></td>
+                <td><form th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="deleteAttendance-button"><input type="submit" value="削除"></form></td>
+            </div>
+        </tr>
         </tr>
     </tbody>
 </table>
