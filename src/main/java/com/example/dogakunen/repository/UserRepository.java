@@ -18,7 +18,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     //ログイン時のユーザ情報取得
     public List<User> findByEmployeeNumber(String employeeNumber);
 
-
     //ユーザーの取得（システム管理画面）
     @Query(value = "SELECT u.id AS id, u.employee_number AS employee_number, u.password AS password, u.name AS name, u.position_id AS position_id, u.is_stopped AS is_stopped, p.name AS positionName, u.created_date AS created_date, u.updated_date AS updated_date " +
             "FROM users u " +
