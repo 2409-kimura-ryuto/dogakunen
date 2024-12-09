@@ -11,7 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -68,15 +70,52 @@ public class ApproverController {
      * 勤怠状況確認画面
      */
     @GetMapping("/check_attendance/{id}")
-    public ModelAndView checkAttendance(@PathVariable Integer id) {
+    public ModelAndView checkAttendance(@PathVariable String id, RedirectAttributes redirectAttributes) {
         ModelAndView mav = new ModelAndView();
+
+        //idの正規表現チェック
+        List<String> errorMessages = new ArrayList<String>();
+        if((id == null) || (!id.matches("^[0-9]+$"))) {
+            errorMessages.add("不正なパラメータが入力されました");
+        }
+
+        //勤怠状況がが存在しないユーザのidが入力された際のバリデーション
+        if (id.matches("^[0-9]+$")) {
+            try {
+                monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 12).getId();
+            } catch (RuntimeException e) {
+                errorMessages.add("不正なパラメータが入力されました");
+            }
+        }
+
+        //エラーメッセージが存在する場合はエラーメッセージをセットし、承認対象者一覧画面にリダイレクト
+        if (errorMessages.size() > 0) {
+            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+            mav.setViewName("redirect:/show_users");
+            return mav;
+        }
+
         //勤怠情報取得
-        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(id, 12);
+        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(Integer.parseInt(id), 12);
         //ユーザ毎に月の勤怠状況ステータスを取得
-        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(id, 12);
+        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 12);
         mav.addObject("generalDateAttendances", generalDateAttendanceForms);
         mav.addObject("monthAttendanceForm", monthAttendanceForm);
         mav.setViewName("/check_attendance");
+        return mav;
+    }
+
+    /*
+     *　IDが空で渡ってきた場合
+     */
+    @GetMapping("/check_attendance/")
+    public ModelAndView returnShowUsers(RedirectAttributes redirectAttributes){
+        ModelAndView mav = new ModelAndView();
+        //バリデーション
+        List<String> errorMessages = new ArrayList<String>();
+        errorMessages.add("不正なパラメータが入力されました");
+        redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+        mav.setViewName("redirect:/show_users");
         return mav;
     }
 

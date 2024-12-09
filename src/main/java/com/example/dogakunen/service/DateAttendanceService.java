@@ -26,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+import java.time.LocalDate;
 import java.util.*;
 import java.sql.Time;
 import java.text.ParseException;
@@ -68,18 +69,37 @@ public class DateAttendanceService {
             dateAttendance.setAttendance(result.getAttendance());
             dateAttendance.setWorkTimeStart(result.getWorkTimeStart());
             dateAttendance.setWorkTimeFinish(result.getWorkTimeFinish());
+            dateAttendance.setWorkTime(result.getWorkTime());
             dateAttendance.setBreakTime(result.getBreakTime());
-
-            //労働時間を計算
-            if(result.getWorkTimeStart() != null && result.getWorkTimeFinish() != null) {
-                Duration duration = Duration.between(result.getWorkTimeStart(), result.getWorkTimeFinish());
-                dateAttendance.setWorkTime(duration.toHoursPart() + "時間" + duration.toMinutesPart() + "分");
-            }
             dateAttendance.setMemo(result.getMemo());
             dateAttendance.setUserName(result.getUser().getName());
             dateAttendance.setEmployeeNumber(result.getUser().getEmployeeNumber());
 
             dateAttendances.add(dateAttendance);
+            /*
+            //休憩時間のフォーマット変換
+            //休憩時間を取得
+            String breakTime = result.getBreakTime();
+            //休憩時間をduration型に変換
+            String[] parts = breakTime.split(":");
+            int hours = Integer.parseInt(parts[0]);
+            int minutes = Integer.parseInt(parts[1]);
+            Duration breakDuration = Duration.ofHours(hours).plusMinutes(minutes);
+            //休憩時間を「00:00」のフォーマットに変換
+            String formattedBreakTime = String.format("%d:%02d", breakDuration.toHoursPart(), breakDuration.toMinutesPart());
+            //休憩時間をセット
+            dateAttendance.setBreakTime(formattedBreakTime);
+
+            //労働時間を計算
+            if(result.getWorkTimeStart() != null && result.getWorkTimeFinish() != null) {
+                //労働開始時間と労働終了時間から労働時間を算出
+                Duration duration = Duration.between(result.getWorkTimeStart(), result.getWorkTimeFinish());
+                //労働時間から休憩時間を引いて純労働時間を算出
+                Duration workDuration = duration.minus(breakDuration);
+                //フォーマットを「00:00」に変換
+                String formattedTime = String.format("%d:%02d", workDuration.toHoursPart(), workDuration.toMinutesPart());
+                dateAttendance.setWorkTime(formattedTime);
+             */
         }
         return dateAttendances;
     }
@@ -93,8 +113,35 @@ public class DateAttendanceService {
         List<DateAttendance> findResults = dateAttendanceRepository.findByUserAndDate(results.get(0), reqAttendance.getDate());
         reqAttendance.setId(findResults.get(0).getId());
         reqAttendance.setMonth(month);
+
+        //労働時間を計算
+        //休憩時間を取得
+        String breakTime1 = reqAttendance.getBreakTime();
+        //休憩時間をduration型に変換
+        String[] parts = breakTime1.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int seconds = 0;
+        Duration breakDuration = Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
+        //労働開始時間と労働終了時間から労働時間を算出
+        Duration duration = Duration.between(reqAttendance.getWorkTimeStart(), reqAttendance.getWorkTimeFinish());
+        //労働時間から休憩時間を引いて純労働時間を算出
+        Duration workDuration = duration.minus(breakDuration);
+        //フォーマットを「00:00」に変換
+        String formattedWorkTime = String.format("%02d:%02d:%02d", workDuration.toHoursPart(), workDuration.toMinutesPart(), duration.toSecondsPart());
+        reqAttendance.setWorkTime(formattedWorkTime);
+        //算出した労働時間をセット
         DateAttendance dateAttendance = setEntity(reqAttendance, results.get(0));
-        dateAttendanceRepository.save(dateAttendance);
+
+        //entityから取り出した要素を引数にリポジトリを呼び出す
+        Integer id = dateAttendance.getId();
+        Integer attendance = dateAttendance.getAttendance();
+        LocalTime workTimeStart = dateAttendance.getWorkTimeStart();
+        LocalTime workTimeFinish = dateAttendance.getWorkTimeFinish();
+        String breakTime = dateAttendance.getBreakTime() + ":00";
+        String memo = dateAttendance.getMemo();
+
+        dateAttendanceRepository.addAttendance(id, attendance, workTimeStart, workTimeFinish, breakTime, formattedWorkTime, memo);
     }
     /*
      * 編集する勤怠情報を持ってくる
@@ -108,11 +155,39 @@ public class DateAttendanceService {
     /*
      * 勤怠編集処理
      */
-    public void editAttendance(DateAttendanceForm reqAttendance, String employeeNumber) throws ParseException {
+    public void updateAttendance(DateAttendanceForm reqAttendance, String employeeNumber, Integer month) throws ParseException {
         //社員番号からユーザ情報を持ってくる
         List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
+        reqAttendance.setMonth(month);
+
+        //労働時間を計算
+        //休憩時間を取得
+        String breakTime1 = reqAttendance.getBreakTime();
+        //休憩時間をduration型に変換
+        String[] parts = breakTime1.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int seconds = 0;
+        Duration breakDuration = Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
+        //労働開始時間と労働終了時間から労働時間を算出
+        Duration duration = Duration.between(reqAttendance.getWorkTimeStart(), reqAttendance.getWorkTimeFinish());
+        //労働時間から休憩時間を引いて純労働時間を算出
+        Duration workDuration = duration.minus(breakDuration);
+        //フォーマットを「00:00」に変換
+        String formattedWorkTime = String.format("%02d:%02d:%02d", workDuration.toHoursPart(), workDuration.toMinutesPart(), duration.toSecondsPart());
+        reqAttendance.setWorkTime(formattedWorkTime);
+        //算出した労働時間をセット
         DateAttendance dateAttendance = setEntity(reqAttendance, results.get(0));
-        dateAttendanceRepository.save(dateAttendance);
+
+        //entityから取り出した要素を引数にリポジトリを呼び出す
+        Integer id = dateAttendance.getId();
+        Integer attendance = dateAttendance.getAttendance();
+        LocalTime workTimeStart = dateAttendance.getWorkTimeStart();
+        LocalTime workTimeFinish = dateAttendance.getWorkTimeFinish();
+        String breakTime = dateAttendance.getBreakTime();
+        String memo = dateAttendance.getMemo();
+
+        dateAttendanceRepository.addAttendance(id, attendance, workTimeStart, workTimeFinish, breakTime, formattedWorkTime, memo);
     }
 
 
@@ -179,7 +254,7 @@ public class DateAttendanceService {
 
 
     /*
-     * 勤怠情報取得(勤怠削除時)
+     * 勤怠削除
      */
     public void deleteAttendance(Integer id) {
         //break_timeとwork_time用の0を用意

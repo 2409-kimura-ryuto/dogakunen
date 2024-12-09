@@ -13,6 +13,11 @@
     <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
         <p th:text="${errorMessage}"></p>
     </div>
+    <!-- ログインフィルターのエラーメッセージ表示 -->
+    <div th:if="${filterErrorMessages}" th:each="filterErrorMessage : ${filterErrorMessages}">
+        <p th:text="${filterErrorMessage}"></p>
+    </div>
+
     <form th:action="@{/loginUser}" th:method="get">
         <div class="employee_number">
             <label>社員番号</label>

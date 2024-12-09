@@ -1,5 +1,6 @@
 package com.example.dogakunen.controller.form;
 
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.antlr.v4.runtime.misc.Interval;
@@ -22,8 +23,9 @@ public class DateAttendanceForm {
     private int attendance;
     private LocalTime workTimeStart;
     private LocalTime workTimeFinish;
-    private LocalTime breakTime;
+    private String breakTime;
     private String workTime;
+    @Size(max = 140, message = "・140文字以下で入力してください")
     private String memo;
     private Date createdDate;
     private Date updatedDate;

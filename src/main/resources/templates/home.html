@@ -3,11 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <link th:href="@{/css/style.css}" rel="styleSheet">
+    <script th:src="@{/js/script.js}"></script>
     <title>ホーム画面</title>
 </head>
 <body>
 <div class="header-contents">
     <h1>勤怠管理システム</h1>
+
+    <!-- 承認者orシステム管理者フィルターのエラーメッセージ表示 -->
+    <ul>
+        <div th:if="${filterErrorMessages}" th:each="filterErrorMessage : ${filterErrorMessages}">
+            <li><div th:text="${filterErrorMessage}" /></li>
+        </div>
+    </ul>
+
     <div class="header">
         <div class="userInf" >
             社員番号：<span th:text="${loginUser.employeeNumber}"/><br>
@@ -57,6 +66,7 @@
                 <span th:case="2" th:text="社内業務（オフサイト）"></span>
                 <span th:case="3" th:text="顧客業務（オンサイト）"></span>
                 <span th:case="4" th:text="顧客業務（オフサイト）"></span>
+                <span th:case="5" th:text="休日"></span>
             </td>
             <td th:text="${attendance.workTimeStart}"></td>
             <td th:text="${attendance.workTimeFinish}"></td>

@@ -13,6 +13,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -188,12 +189,32 @@ public class AdminController {
      *アカウント編集画面表示
      */
     @GetMapping ("/editUser/{id}")
-    public ModelAndView editUser(@PathVariable String id) {
+    public ModelAndView editUser(@PathVariable String id, RedirectAttributes redirectAttributes) {
         ModelAndView mav = new ModelAndView();
+
+        //idの数字チェック
+        List<String> errorMessages = new ArrayList<>();
+        if(!id.matches("^[0-9]+$")) {
+            errorMessages.add("不正なパラメータが入力されました");
+            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+            //システム管理画面に遷移
+            return new ModelAndView("redirect:/systemManage");
+        }
+
 
         //編集ユーザー情報を取得
         Integer editUserId = Integer.parseInt(id);
         UserForm editUser = userService.selectEditUser(editUserId);
+
+        //idの存在チェック
+        if(editUser == null) {
+            errorMessages.add("不正なパラメータが入力されました");
+            //エラーメッセージを格納して、ユーザー管理画面へ遷移
+            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+            //ユーザー管理画面にリダイレクト
+            return new ModelAndView("redirect:/systemManage");
+        }
+
 
         //編集するユーザー情報を画面にバインド
         mav.addObject("user", editUser);
@@ -207,6 +228,19 @@ public class AdminController {
 
         //画面に遷移
         return mav;
+    }
+
+    /*
+     *編集画面のidが空の場合
+     */
+    @GetMapping("/editUser/")
+    public ModelAndView editUserInvalid(RedirectAttributes redirectAttributes) {
+        List<String> errorMessages = new ArrayList<String>();
+        errorMessages.add("不正なパラメータです");
+        //エラーメッセージを格納して、ユーザー管理画面へ遷移
+        redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+        //ユーザー管理画面にリダイレクト
+        return new ModelAndView("redirect:/systemManage");
     }
 
     /*
