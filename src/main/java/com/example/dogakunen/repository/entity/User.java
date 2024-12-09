@@ -48,6 +48,6 @@ public class User {
     private Date updatedDate = new Date();
 
     //DateAttendancesとリレーション形成
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<DateAttendance> dateAttendances;
 }

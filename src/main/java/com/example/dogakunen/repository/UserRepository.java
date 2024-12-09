@@ -27,4 +27,10 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             nativeQuery = true)
     public List<User> selectUser();
 
+    //アカウントの停止・復活のみ更新
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE users SET is_stopped = :isStoppedId, updated_date = CURRENT_TIMESTAMP WHERE id = :userId", nativeQuery = true)
+    public void editIsStopped(@Param("isStoppedId") Integer isStoppedId, @Param("userId")Integer userId);
+
 }

@@ -58,6 +58,27 @@ public class AdminController {
     }
 
     /*
+     *アカウント停止・復活処理
+     */
+    @GetMapping("/accountStop/{isStoppedId}")
+    public ModelAndView accountStop(@PathVariable Integer isStoppedId, @RequestParam(name="userId") Integer userId) {
+        ModelAndView mav = new ModelAndView();
+
+        if(isStoppedId == 0) {
+            isStoppedId = 1;
+        } else if (isStoppedId == 1) {
+            isStoppedId = 0;
+        }
+
+        //アカウント停止・復活の更新処理
+        userService.editIsStopped(isStoppedId, userId);
+
+        //システム管理画面へリダイレクト
+        return new ModelAndView("redirect:/systemManage");
+    }
+
+
+    /*
      *新規アカウント登録画面表示処理
      */
     @GetMapping("/newUser")
@@ -86,11 +107,6 @@ public class AdminController {
 
         ModelAndView mav = new ModelAndView();
 
-        //employeeNumberStr = employeeNumberStr.replaceAll(",$", "");
-        //String employeeNumberStr = Integer.toString(employeeNumber);
-
-        //userForm.getEmployeeNumber();
-
         //バリデーション　必須チェック
         List<String> errorMessages = new ArrayList<String>();
         if (userForm.getEmployeeNumber().isBlank()){
@@ -114,20 +130,15 @@ public class AdminController {
             errorMessages.add("・パスワードと確認用パスワードが一致しません");
         }
 
-        //社員番号を数値型に変換
-        //if(userForm.getEmployeeNumber().matches("^[0-9]{7}+$")){
-            //int employeeNum = Integer.parseInt(userForm.getEmployeeNumber());
-
-            //重複チェック
-            if(!userForm.getEmployeeNumber().isBlank()) {
-                UserForm selectedAccount = userService.findByEmployeeNumber(userForm.getEmployeeNumber());
-                if (selectedAccount != null){
-                    errorMessages.add("・アカウントが重複しています");
-                }
+        //重複チェック
+        if(!userForm.getEmployeeNumber().isBlank()) {
+            UserForm selectedAccount = userService.findByEmployeeNumber(userForm.getEmployeeNumber());
+            if (selectedAccount != null){
+                errorMessages.add("・アカウントが重複しています");
             }
-        //}
+        }
 
-        //パスワードの文字数チェック（アノテーションができなかった時用)
+        //パスワードの文字数チェック
         if((!userForm.getPassword().isBlank()) && !userForm.getPassword().matches("^[!-~]{6,20}+$")) {
             errorMessages.add("・パスワードは半角文字かつ6文字以上20文字以下で入力してください");
         }
@@ -186,6 +197,10 @@ public class AdminController {
 
         //編集するユーザー情報を画面にバインド
         mav.addObject("user", editUser);
+
+        //【追加】セッションからユーザIDを取得・画面にバインド
+        int loginUserId = ((UserForm) session.getAttribute("loginUser")).getId();
+        mav.addObject("loginUserId", loginUserId);
 
         //画面遷移先を指定
         mav.setViewName("/edit_user");
