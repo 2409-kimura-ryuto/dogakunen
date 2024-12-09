@@ -7,5 +7,44 @@
 </head>
 <body>
 
+<div class="header-contents">
+    <h2>アカウント編集</h2>
+</div>
+
+<div class="main-contents">
+
+    <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
+        <p th:text="${errorMessage}"></p>
+    </div>
+
+    <form th:method="put" th:action="@{/update/{id}(id=${user.id})}" th:object="${user}">
+
+        <table class="table table-newUser">
+            <tr><th>社員番号</th><td th:text="*{employeeNumber}"><input name="employeeNumber" th:value="${user.employeeNumber}"  type="hidden" /></td></tr>
+            <tr><th>氏名</th><td><input type="text" th:field="*{name}" /></td></tr>
+            <tr><th>役職</th>
+                <td>
+                    <select name="position">
+                        <option value="1" th:selected="${user.positionId == 1}">社員</option>
+                        <option value="2" th:selected="${user.positionId == 2}">グループ長</option>
+                        <option value="3" th:selected="${user.positionId == 3}">総務人事部</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+
+        <input type="submit" value="更新" class="updateUser-button" />
+
+    </form>
+
+    <div class="footer-contents">
+        <form th:action="@{/systemManage}">
+            <input type="submit" value="戻る" />
+        </form>
+    </div>
+
+</div>
+
+
 </body>
 </html>
