@@ -12,11 +12,16 @@ public class FilterConfig {
         FilterRegistrationBean<LoginFilter> bean = new FilterRegistrationBean<>();
 
         bean.setFilter(new LoginFilter());
-        //ホーム画面、勤怠登録画面、勤怠編集画面、設定画面にフィルターを設定
+        //login画面以外の全ての画面にフィルターを設定
         bean.addUrlPatterns("/home");
         bean.addUrlPatterns("/newAttendance");
         bean.addUrlPatterns("/editAttendance/*");
         bean.addUrlPatterns("/setting");
+        bean.addUrlPatterns("/show_users");
+        bean.addUrlPatterns("/check_attendance/*");
+        bean.addUrlPatterns("/systemManage");
+        bean.addUrlPatterns("/newUser");
+        bean.addUrlPatterns("/editUser/*");
         bean.setOrder(1);
         return bean;
     }
