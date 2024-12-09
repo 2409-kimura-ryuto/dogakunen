@@ -21,7 +21,7 @@
 
         <table class="table table-newUser">
             <tr><th>社員番号</th><td><input type="text" th:field="*{employeeNumber}" /><br/></td></tr>
-            <input name="employeeNumber" th:value="*{employeeNumber}"  type="hidden" />
+            <!--<input name="employeeNumber" th:value="${user.employeeNumber}"  type="hidden" />-->
             <tr><th>パスワード</th><td><input type="password" th:field="*{password}" /></td></tr>
             <tr><th>パスワード(確認用)</th><td><input type="password" th:field="*{passwordConfirmation}" /></td></tr>
             <tr><th>氏名</th><td><input type="text" th:field="*{name}" /></td></tr>

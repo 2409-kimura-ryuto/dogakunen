@@ -4,15 +4,14 @@ import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.service.DateAttendanceService;
 import com.example.dogakunen.service.MonthAttendanceService;
 import com.example.dogakunen.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
@@ -31,6 +30,9 @@ public class AdminController {
     @Autowired
     MonthAttendanceService monthAttendanceService;
 
+    @Autowired
+    HttpSession session;
+
     /*
      *システム管理画面表示処理
      */
@@ -43,6 +45,10 @@ public class AdminController {
 
         //ユーザーデータオブジェクトを保管
         mav.addObject("users", userData);
+
+        //【追加】セッションからログインユーザーのユーザーIdを取得
+        int loginUserId = ((UserForm) session.getAttribute("loginUser")).getId();
+        mav.addObject("loginUserId", loginUserId);
 
         //画面遷移先を指定
         mav.setViewName("/system_manage");
@@ -76,16 +82,22 @@ public class AdminController {
      */
     @PutMapping("/newUser")
     public ModelAndView entryUser(@ModelAttribute("user") @Validated UserForm userForm, BindingResult result,
-                                  @RequestParam(name="position") Integer positionId, @RequestParam(name="employeeNumber") String employeeNumberStr){
+                                  @RequestParam(name="position") Integer positionId){
 
         ModelAndView mav = new ModelAndView();
 
-        employeeNumberStr = employeeNumberStr.replaceAll(",$", "");
+        //employeeNumberStr = employeeNumberStr.replaceAll(",$", "");
+        //String employeeNumberStr = Integer.toString(employeeNumber);
+
+        //userForm.getEmployeeNumber();
 
         //バリデーション　必須チェック
         List<String> errorMessages = new ArrayList<String>();
-        if (userForm.getEmployeeNumber() == null || (Integer.toString(userForm.getEmployeeNumber()).isBlank())){
+        if (userForm.getEmployeeNumber().isBlank()){
             errorMessages.add("・社員番号を入力してください");
+        }
+        if((!userForm.getEmployeeNumber().isBlank()) && !userForm.getEmployeeNumber().matches("^[0-9]{7}+$")) {
+            errorMessages.add("・社員番号は半角数字7文字で入力してください");
         }
         if (userForm.getPassword().isBlank()){
             errorMessages.add("・パスワードを入力してください");
@@ -102,21 +114,32 @@ public class AdminController {
             errorMessages.add("・パスワードと確認用パスワードが一致しません");
         }
 
-        //重複チェック
-        if(userForm.getEmployeeNumber() != null) {
-            UserForm selectedAccount = userService.findByEmployeeNumber(userForm.getEmployeeNumber());
-            if (selectedAccount != null){
-                errorMessages.add("・アカウントが重複しています");
+        //社員番号を数値型に変換
+        //if(userForm.getEmployeeNumber().matches("^[0-9]{7}+$")){
+            //int employeeNum = Integer.parseInt(userForm.getEmployeeNumber());
+
+            //重複チェック
+            if(!userForm.getEmployeeNumber().isBlank()) {
+                UserForm selectedAccount = userService.findByEmployeeNumber(userForm.getEmployeeNumber());
+                if (selectedAccount != null){
+                    errorMessages.add("・アカウントが重複しています");
+                }
             }
-        }
+        //}
 
-
-        //社員番号・パスワードの文字数チェック（アノテーションができなかった時用)
-        if((userForm.getEmployeeNumber() != null) && (!Integer.toString(userForm.getEmployeeNumber()).isBlank()) && !employeeNumberStr.matches("^[0-9]{7}+$")) {
-            errorMessages.add("・社員番号は半角数字7文字で入力してください");
-        }
+        //パスワードの文字数チェック（アノテーションができなかった時用)
         if((!userForm.getPassword().isBlank()) && !userForm.getPassword().matches("^[!-~]{6,20}+$")) {
             errorMessages.add("・パスワードは半角文字かつ6文字以上20文字以下で入力してください");
+        }
+
+        if(result.hasErrors()) {
+            //エラーがあったら、エラーメッセージを格納する
+            //エラーメッセージの取得
+            for (FieldError error : result.getFieldErrors()) {
+                String message = error.getDefaultMessage();
+                //取得したエラーメッセージをエラーメッセージのリストに格納
+                errorMessages.add(message);
+            }
         }
 
         if(!errorMessages.isEmpty()) {
@@ -130,16 +153,16 @@ public class AdminController {
             return mav;
         }
 
-        //登録処理
         //リクエストから取得したパスワードの暗号化
         String encodedPwd = BCrypt.hashpw(userForm.getPassword(), BCrypt.gensalt());
         //登録するユーザのパスワードを暗号化されたパスワードに変更
         userForm.setPassword(encodedPwd);
         userForm.setPositionId(positionId);
+        //登録処理
         userService.saveUser(userForm);
 
         //勤怠マスタ(日)の作成(日付挿入）
-        UserForm newUser = userService.selectLoginUser(userForm.getEmployeeNumber());
+        UserForm newUser = userService.findByEmployeeNumber(userForm.getEmployeeNumber());
         int newUserId = newUser.getId();
         dateAttendanceService.saveNewDate(newUserId);
 
@@ -149,4 +172,84 @@ public class AdminController {
         //ユーザー管理画面へリダイレクト
         return new ModelAndView("redirect:/systemManage");
     }
+
+    /*
+     *アカウント編集画面表示
+     */
+    @GetMapping ("/editUser/{id}")
+    public ModelAndView editUser(@PathVariable String id) {
+        ModelAndView mav = new ModelAndView();
+
+        //編集ユーザー情報を取得
+        Integer editUserId = Integer.parseInt(id);
+        UserForm editUser = userService.selectEditUser(editUserId);
+
+        //編集するユーザー情報を画面にバインド
+        mav.addObject("user", editUser);
+
+        //画面遷移先を指定
+        mav.setViewName("/edit_user");
+
+        //画面に遷移
+        return mav;
+    }
+
+    /*
+     *アカウント編集処理
+     */
+    @PutMapping("/update/{id}")
+    public ModelAndView updateUser(@PathVariable Integer id,
+                                   @ModelAttribute("user") @Validated UserForm userForm, BindingResult result,
+                                   @RequestParam(name="position") Integer positionId){
+        ModelAndView mav = new ModelAndView();
+
+        //バリデーション　必須チェック
+        List<String> errorMessages = new ArrayList<>();
+        if (userForm.getName().isBlank()){
+            errorMessages.add("・氏名を入力してください");
+        }
+        if (Integer.toString(positionId).isBlank()){
+            errorMessages.add("・役職を選択してください");
+        }
+
+        if(result.hasErrors()) {
+            //エラーがあったら、エラーメッセージを格納する
+            //エラーメッセージの取得
+            for (FieldError error : result.getFieldErrors()) {
+                String message = error.getDefaultMessage();
+                //取得したエラーメッセージをエラーメッセージのリストに格納
+                errorMessages.add(message);
+            }
+        }
+
+        //idからユーザ情報参照
+        UserForm editUserForm = userService.selectEditUser(id);
+
+        if(!errorMessages.isEmpty()) {
+            //エラーメッセージに値があれば、エラーメッセージを画面にバインド
+            mav.addObject("errorMessages", errorMessages);
+            //入力した値を保管
+            userForm.setPositionId(positionId);
+            userForm.setEmployeeNumber(editUserForm.getEmployeeNumber());
+            mav.addObject("user", userForm);
+
+            //アカウント編集画面へフォワード処理
+            mav.setViewName("/edit_user");
+            return mav;
+        }
+
+
+        //更新処理
+        userForm.setId(id);
+        userForm.setPositionId(positionId);
+        userForm.setEmployeeNumber(editUserForm.getEmployeeNumber());
+        userForm.setPassword(editUserForm.getPassword());
+        userForm.setIsStopped(editUserForm.getIsStopped());
+        userService.saveUser(userForm);
+
+        //システム管理画面へリダイレクト
+        return new ModelAndView("redirect:/systemManage");
+
+    }
+
 }

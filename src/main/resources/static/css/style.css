@@ -13,6 +13,11 @@ body {
 	text-align: right;
 }
 
+.errorMessages {
+    color : red;
+    font-size : 14px;
+}
+
 .header-item {
     display : inline-block;
 }
@@ -20,30 +25,40 @@ body {
 .new-button {
     text-align: left;
 }
+
+.table-systemManage tr{
+    border-bottom : 1px solid #ccc;
+    height : 50px;
+}
+
 .table-systemManage tr th {
     width : 15%;
     text-align : left;
     background-color : #ddd;
+    padding-left : 2em;
 }
 
-.table-systemManage tr{
-    border-bottom : 1px solid #ccc;
-}
 .table-systemManage tr td{
     background-color : #fff;
+    padding-left : 2em;
+}
+
+.table-newUser tr {
+    border-bottom : 1px solid #ccc;
+    height : 40px;
 }
 
 .table-newUser tr th{
     text-align : left;
     background-color : #ddd;
-}
-
-.table-newUser tr {
-    border-bottom : 1px solid #ccc;
+    padding-left : 2em;
+    padding-right : 2em;
 }
 
 .table-newUser tr td{
     background-color : #fff;
+    padding-left : 2em;
+    padding-right : 2em;
 }
 
 .isStopped-button {
