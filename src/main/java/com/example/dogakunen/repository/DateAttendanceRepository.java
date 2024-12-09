@@ -62,8 +62,8 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
     @Query(
             value = "UPDATE date_attendances SET " +
                     "attendance = '0', " +
-                    "work_time_start = null, " +
-                    "work_time_finish = null, " +
+                    "work_time_start = '00:00:00', " +
+                    "work_time_finish = '00:00:00', " +
                     "break_time = CAST(:zero AS interval), " +
                     "work_time = CAST(:zero AS interval), " +
                     "memo = null " +

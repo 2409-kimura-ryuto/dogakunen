@@ -72,7 +72,7 @@
             <td th:text="${attendance.workTime}"></td>
             <td th:text="${attendance.memo}"></td>
             <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}" class="editAttendance-button"><input type="submit" value="編集"></a></td>
-            <td><form th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="deleteAttendance-button"><input type="submit" value="削除"></form></td>
+            <td><form th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="delete"><input type="submit" value="削除"></form></td>
         </tr>
         </tr>
     </tbody>
