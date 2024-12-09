@@ -26,7 +26,7 @@ public class User {
     private String name;
 
     @Column(name = "employee_number")
-    private Integer employeeNumber;
+    private String employeeNumber;
 
     @Column(name = "position_id")
     private Integer positionId;

@@ -40,10 +40,10 @@ public class DateAttendance {
     private Time workTimeFinish ;
 
     @Column(name = "break_time")
-    private Duration breakTime;
+    private String breakTime;
 
     @Column(name = "work_time")
-    private Duration workTime;
+    private String workTime;
 
     @Column(name = "created_date", insertable = true, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)

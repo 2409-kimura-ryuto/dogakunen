@@ -56,6 +56,9 @@
         </tr>
     </div>
 </div>
+<form th:action="@{/deleteAttendance{id}(id=1)}" th:method="put" class="header-item">
+    <input type="submit" value="削除">
+</form>
 <div class="request-button">
     <form th:action="@{/request}" th:method="put" class="header-item">
         <input type="submit" value="申請">

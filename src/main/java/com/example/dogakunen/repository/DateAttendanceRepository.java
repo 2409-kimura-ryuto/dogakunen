@@ -3,9 +3,13 @@ package com.example.dogakunen.repository;
 import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.repository.entity.MonthAttendance;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Duration;
 
 @Repository
 public interface DateAttendanceRepository extends JpaRepository<DateAttendance, Integer> {
@@ -30,5 +34,24 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
             nativeQuery = true
     )
     public DateAttendance findDateAttendanceByOrderByDate(@Param("userId") Integer userId, @Param("month") Integer month);
+
+
+    //勤怠削除時に使用
+    //各カラムを0もしくはnullでupdate
+    @Transactional
+    @Modifying
+    @Query(
+            value = "UPDATE date_attendances SET " +
+                    "attendance = '0', " +
+                    "work_time_start = null, " +
+                    "work_time_finish = null, " +
+                    "break_time = CAST(:zero AS interval), " +
+                    "work_time = CAST(:zero AS interval), " +
+                    "memo = null " +
+                    "WHERE id = :id" ,
+            nativeQuery = true
+    )
+    public void updateAttendance(@Param("id") Integer id, @Param("zero") String zero);
+
 
 }

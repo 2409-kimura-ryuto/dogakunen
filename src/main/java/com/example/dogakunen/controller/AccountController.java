@@ -34,7 +34,7 @@ public class AccountController {
         mav.setViewName("/login");
         //エラーメッセージ表示
         List<String> errorMessage = (List<String>) session.getAttribute("errorMessages");
-        Integer employeeNumber = (Integer) session.getAttribute("employeeNumber");
+        String employeeNumber = (String) session.getAttribute("employeeNumber");
         if (errorMessage != null) {
             mav.addObject("errorMessages", errorMessage);
             mav.addObject("employeeNumber", employeeNumber);
@@ -47,7 +47,7 @@ public class AccountController {
      * ログイン処理
      */
     @GetMapping("/loginUser")
-    public ModelAndView login(@RequestParam(name = "employeeNumber", required = false) Integer employeeNumber,
+    public ModelAndView login(@RequestParam(name = "employeeNumber", required = false) String employeeNumber,
                               @RequestParam(name = "password", required = false) String password) {
         //バリデーション
         //エラーメッセージの準備
@@ -114,7 +114,7 @@ public class AccountController {
         //セッションからログインユーザ情報を取得
         UserForm loginUser = (UserForm)session.getAttribute("loginUser");
         //ログインユーザ情報から社員番号のみを取り出す
-        Integer employeeNumber = loginUser.getEmployeeNumber();
+        String employeeNumber = loginUser.getEmployeeNumber();
         //画面に社員番号をセット
         mav.addObject("employeeNumber", employeeNumber);
         //エラーメッセージ表示

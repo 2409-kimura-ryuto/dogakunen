@@ -21,6 +21,6 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Integer> {
 
     //ログイン時のユーザ情報取得
-    public List<User> findByEmployeeNumber(Integer employeeNumber);
+    public List<User> findByEmployeeNumber(String employeeNumber);
 
 }

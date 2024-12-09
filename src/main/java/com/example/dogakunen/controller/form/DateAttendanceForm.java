@@ -19,7 +19,7 @@ public class DateAttendanceForm {
     private Time workTimeStart;
     private Time workTimeFinish;
     private Duration breakTime;
-    private Duration workTIme;
+    private Duration workTime;
     private String memo;
     private Date createdDate;
     private Date updatedDate;
