@@ -3,10 +3,10 @@ $(function() {
 	$('.delete').on('click', function() {
 		let result = confirm('削除しますか');
 
-		if (result) {
-			return true;
-		} else {
-			return false;
-		}
-	});
+	if (result) {
+    		return true;
+    	} else {
+    		return false;
+    	}
+    });
 });
