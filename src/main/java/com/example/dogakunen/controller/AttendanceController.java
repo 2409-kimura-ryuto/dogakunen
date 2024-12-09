@@ -7,10 +7,7 @@ import com.example.dogakunen.service.DateAttendanceService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.text.ParseException;
@@ -92,11 +89,18 @@ public class AttendanceController {
         return mav;
     }
 
-    /* 勤怠編集処理
+    /*
+     * 勤怠編集処理
+     */
     @PostMapping("/editAttendance")
-    public ModelAndView postEditAttendance(@ModelAttribute(name = "formModel") DateAttendanceForm reqAttendance){
-        dateAttendanceService.editAttendance(reqAttendance);
+    public ModelAndView postEditAttendance(@ModelAttribute(name = "formModel") DateAttendanceForm reqAttendance,
+                                           @RequestParam(name = "id") Integer id, @RequestParam(name = "month") Integer month) throws ParseException {
+        //ログインユーザ情報から社員番号取得
+        UserForm loginUser = (UserForm)session.getAttribute("loginUser");
+        String employeeNumber = loginUser.getEmployeeNumber();
+        reqAttendance.setId(id);
+        reqAttendance.setMonth(month);
+        dateAttendanceService.editAttendance(reqAttendance, employeeNumber);
         return new ModelAndView("redirect:/");
     }
-     */
 }

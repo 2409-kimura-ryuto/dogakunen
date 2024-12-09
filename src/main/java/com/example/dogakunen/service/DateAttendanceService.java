@@ -83,7 +83,10 @@ public class DateAttendanceService {
         //社員番号からユーザ情報を持ってくる
         List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
         //Duration duration = Duration.between(reqAttendance.getWorkTimeStart(), reqAttendance.getWorkTimeFinish());
-        DateAttendance dateAttendance = setEntity(reqAttendance, results.get(0), month);
+        List<DateAttendance> findResults = dateAttendanceRepository.findByUserAndDate(results.get(0), reqAttendance.getDate());
+        reqAttendance.setId(findResults.get(0).getId());
+        reqAttendance.setMonth(month);
+        DateAttendance dateAttendance = setEntity(reqAttendance, results.get(0));
         dateAttendanceRepository.save(dateAttendance);
     }
     /*
@@ -95,20 +98,26 @@ public class DateAttendanceService {
         List<DateAttendanceForm> dateAttendances = setDateAttendanceForm(results);
         return dateAttendances.get(0);
     }
-    /* 勤怠編集処理
-    public editAttendance(DateAttendanceForm reqAttendance){
-
-    }
+    /*
+     * 勤怠編集処理
      */
+    public void editAttendance(DateAttendanceForm reqAttendance, String employeeNumber) throws ParseException {
+        //社員番号からユーザ情報を持ってくる
+        List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
+        DateAttendance dateAttendance = setEntity(reqAttendance, results.get(0));
+        dateAttendanceRepository.save(dateAttendance);
+    }
+
 
     /*
      * formからentityに詰め替え
      */
-    public DateAttendance setEntity(DateAttendanceForm reqAttendance, User loginUser, Integer month) throws ParseException {
+    public DateAttendance setEntity(DateAttendanceForm reqAttendance, User loginUser) throws ParseException {
         DateAttendance dateAttendance = new DateAttendance();
 
         dateAttendance.setUser(loginUser);
-        dateAttendance.setMonth(month);
+        dateAttendance.setMonth(reqAttendance.getMonth());
+        dateAttendance.setId(reqAttendance.getId());
         dateAttendance.setDate(reqAttendance.getDate());
         dateAttendance.setBreakTime(reqAttendance.getBreakTime());
         dateAttendance.setWorkTimeStart(reqAttendance.getWorkTimeStart());

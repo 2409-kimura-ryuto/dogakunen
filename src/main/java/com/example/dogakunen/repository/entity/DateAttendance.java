@@ -45,7 +45,7 @@ public class DateAttendance {
     private LocalTime breakTime;
 
     @Column(name = "work_time")
-    private String workTime;
+    private LocalTime workTime;
 
     @Column(name = "memo")
     private String memo;

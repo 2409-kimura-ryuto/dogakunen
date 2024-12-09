@@ -36,8 +36,15 @@
             <div class="edit-memo">メモ
                 <textarea class="new-memo" th:field="*{memo}" size="1500" maxlength="1500" /></textarea>
             </div>
+            <input type="hidden" name="id" th:value="${formModel.id}">
+            <input type="hidden" name="month" th:value="${formModel.month}">
             <input type="submit" value="更新" />
         </div>
+    </form>
+</div>
+<div class="footer-contents">
+    <form th:action="@{/}">
+        <input type="submit" value="戻る" />
     </form>
 </div>
 </body>
