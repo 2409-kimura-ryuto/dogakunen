@@ -58,6 +58,27 @@ public class AdminController {
     }
 
     /*
+     *アカウント停止・復活処理
+     */
+    @GetMapping("/accountStop/{isStoppedId}")
+    public ModelAndView accountStop(@PathVariable Integer isStoppedId, @RequestParam(name="userId") Integer userId) {
+        ModelAndView mav = new ModelAndView();
+
+        if (isStoppedId == 0) {
+            isStoppedId = 1;
+        } else if (isStoppedId == 1) {
+            isStoppedId = 0;
+        }
+
+        //アカウント停止・復活の更新処理
+        userService.editIsStopped(isStoppedId, userId);
+
+        //システム管理画面へリダイレクト
+        return new ModelAndView("redirect:/systemManage");
+    }
+
+
+    /*
      *新規アカウント登録画面表示処理
      */
     @GetMapping("/newUser")
@@ -127,7 +148,7 @@ public class AdminController {
             }
         //}
 
-        //パスワードの文字数チェック（アノテーションができなかった時用)
+        //パスワードの文字数チェック
         if((!userForm.getPassword().isBlank()) && !userForm.getPassword().matches("^[!-~]{6,20}+$")) {
             errorMessages.add("・パスワードは半角文字かつ6文字以上20文字以下で入力してください");
         }

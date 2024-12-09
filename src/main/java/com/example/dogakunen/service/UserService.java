@@ -175,4 +175,11 @@ public class UserService {
         return users.get(0);
     }
 
+    /*
+     *アカウント停止・復活の更新処理
+     */
+    public void editIsStopped(Integer isStoppedId, Integer userId) {
+        userRepository.editIsStopped(isStoppedId, userId);
+    }
+
 }
