@@ -22,7 +22,7 @@ public class MonthAttendanceService {
     MonthAttendanceRepository monthAttendanceRepository;
 
     /*
-     * 勤怠状況ステータス変更
+     * 勤怠状況ステータス変更(完了申請、承認、差し戻し時に使用）
      */
     public void changeStatus(MonthAttendanceForm MonthAttendanceform) {
         MonthAttendance saveMonthAttendance = setMonthAttendanceEntity(MonthAttendanceform);
@@ -41,8 +41,8 @@ public class MonthAttendanceService {
     /*
      * 勤怠(月)から対象のカラムを取得
      */
-    public MonthAttendanceForm findByUserIdAndMonth(MonthAttendanceForm monthAttendanceForm) {
-        MonthAttendance result = monthAttendanceRepository.findByUserIdAndMonth(monthAttendanceForm.getUserId(), monthAttendanceForm.getMonth());
+    public MonthAttendanceForm findByUserIdAndMonth(Integer id, Integer month) {
+        MonthAttendance result = monthAttendanceRepository.findByUserIdAndMonth(id, month);
         MonthAttendanceForm monthAttendanceResult = setMonthAttendanceForm(result);
         return monthAttendanceResult;
     }

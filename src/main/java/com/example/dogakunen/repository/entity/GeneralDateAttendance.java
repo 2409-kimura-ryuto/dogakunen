@@ -38,11 +38,13 @@ public class GeneralDateAttendance {
     private Time workTimeFinish ;
 
     //Durationに戻す
+//    @Convert(converter = DurationConverter.class)
     @Column(name = "break_time")
-    private String breakTime;
+    private Time breakTime;
 
+//    @Convert(converter = DurationConverter.class)
     @Column(name = "work_time")
-    private String workTime;
+    private Time workTime;
 
     @Column
     private String memo;
@@ -56,6 +58,6 @@ public class GeneralDateAttendance {
     private Date updatedDate;
 
     //内部結合用に追加
-    @Column(name = "attendance_status")
-    private Integer attendanceStatus;
+//    @Column(name = "attendance_status")
+//    private Integer attendanceStatus;
 }

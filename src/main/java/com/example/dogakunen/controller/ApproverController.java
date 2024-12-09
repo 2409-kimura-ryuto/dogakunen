@@ -4,6 +4,7 @@ import com.example.dogakunen.controller.form.*;
 import com.example.dogakunen.service.DateAttendanceService;
 import com.example.dogakunen.service.MonthAttendanceService;
 import com.example.dogakunen.service.UserService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,21 +26,17 @@ public class ApproverController {
     @Autowired
     MonthAttendanceService monthAttendanceService;
 
+    @Autowired
+    HttpSession session;
+
     /*
      * 承認対象者一覧画面
      */
     @GetMapping("/show_users")
     public ModelAndView showUsers() {
         ModelAndView mav = new ModelAndView();
-//        // form用の空のentityを準備
-//        UserForm userForm = new UserForm();
         mav.setViewName("/show_users");
-//        // 準備した空のFormを保管
-//        mav.addObject("userForm", userForm);
-//        //ログインフィルターのエラーメッセージをmavに詰めてセッション削除
-//        List<String> errorMessages = (List<String>) session.getAttribute("errorMessagesLoginFilter");
-//        mav.addObject("errorMessagesLoginFilter", errorMessages);
-//        session.removeAttribute("errorMessagesLoginFilter");
+        //承認対象者情報取得
         List<GeneralUserForm> generalUsers = userService.findAllGeneralUser(12);
         mav.addObject("users", generalUsers);
         return mav;
@@ -51,19 +48,19 @@ public class ApproverController {
     @PutMapping("/request")
     public ModelAndView request() {
         ModelAndView mav = new ModelAndView();
-        //ログインユーザIDを取得
-//        UserForm userForm = (UserForm) session.getAttribute("user");
-        //取得したログインユーザIDをMonthAttendansFormのuserIdとにセットし
-        //対象月もセットしてserviceのsaveメソッドで更新処理
         MonthAttendanceForm monthAttendanceForm = new MonthAttendanceForm();
-        monthAttendanceForm.setUserId(1);
-        monthAttendanceForm.setMonth(12);
+        UserForm loginUser = (UserForm) session.getAttribute("loginUser");
+        int loginUserId = loginUser.getId();
         //更新したいカラムのIdを取得してmonthAttendanceFormにセット
-        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(monthAttendanceForm).getId());
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(loginUserId, 12).getId());
+        //勤怠状況ステータスを1:申請中にセット
         monthAttendanceForm.setAttendanceStatus(1);
+        //userIdとmonthもセットしないと0で更新されてしまう
+        monthAttendanceForm.setUserId(loginUserId);
+        monthAttendanceForm.setMonth(12);
         monthAttendanceService.changeStatus(monthAttendanceForm);
-        //ホーム画面にリダイレクトするように変更
-        mav.setViewName("redirect:/show_users");
+        //ホーム画面にリダイレクト
+        mav.setViewName("redirect:/");
         return mav;
     }
 
@@ -73,9 +70,55 @@ public class ApproverController {
     @GetMapping("/check_attendance/{id}")
     public ModelAndView checkAttendance(@PathVariable Integer id) {
         ModelAndView mav = new ModelAndView();
+        //勤怠情報取得
         List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(id, 12);
+        //ユーザ毎に月の勤怠状況ステータスを取得
+        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(id, 12);
         mav.addObject("generalDateAttendances", generalDateAttendanceForms);
+        mav.addObject("monthAttendanceForm", monthAttendanceForm);
         mav.setViewName("/check_attendance");
+        return mav;
+    }
+
+    /*
+     * 承認処理
+     */
+    @PutMapping("/approve/{id}")
+    public ModelAndView approve(@PathVariable Integer id) {
+        ModelAndView mav = new ModelAndView();
+        MonthAttendanceForm monthAttendanceForm = new MonthAttendanceForm();
+        //勤怠マスタから対象者の12月のレコードのidを取得し、monthAttendanceFormnにセット
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, 12).getId());
+        //2:承認済みをセット
+        monthAttendanceForm.setAttendanceStatus(2);
+        //userIdとmonthもセットしないと0で更新されてしまう
+        monthAttendanceForm.setUserId(id);
+        monthAttendanceForm.setMonth(12);
+        //勤怠記録ステータスを2:承認済みに更新
+        monthAttendanceService.changeStatus(monthAttendanceForm);
+        //承認対象者一覧画面にリダイレクト
+        mav.setViewName("redirect:/show_users");
+        return mav;
+    }
+
+    /*
+     * 差し戻し処理
+     */
+    @PutMapping("/sendBack/{id}")
+    public ModelAndView sendBack(@PathVariable Integer id) {
+        ModelAndView mav = new ModelAndView();
+        MonthAttendanceForm monthAttendanceForm = new MonthAttendanceForm();
+        //勤怠マスタから対象者の12月のレコードのidを取得し、monthAttendanceFormnにセット
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, 12).getId());
+        //0:申請前をセット
+        monthAttendanceForm.setAttendanceStatus(0);
+        //userIdとmonthもセットしないと0で更新されてしまう
+        monthAttendanceForm.setUserId(id);
+        monthAttendanceForm.setMonth(12);
+        //勤怠記録ステータスを0:申請前に更新
+        monthAttendanceService.changeStatus(monthAttendanceForm);
+        //承認対象者一覧画面にリダイレクト
+        mav.setViewName("redirect:/show_users");
         return mav;
     }
 

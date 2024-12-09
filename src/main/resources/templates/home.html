@@ -13,16 +13,16 @@
             社員番号：<!--<span th:text="${loginUser.employeeNumber}"/>--><br>
             　　氏名：<!--<span th:text="${loginUser.name}"/>--><br>
         </div>
-        <div th:if="${positionId == 2}" class="header-item">
-            <form th:action="@{/userManage}" method="get" class="header-item">
-                <button type="submit">承認者用画面</button>
-            </form>
+        <div th:if="${session.loginUser.positionId == 2}" class="header-item">
+            <a th:href="@{/show_users}" class="header-item">
+                <input type="button" value="承認者用画面">
+            </a>
         </div>
-        <!--<div th:if="${positionId == 3}" class="header-item">-->
-            <form th:action="@{/systemManage}" method="get" class="header-item">
-                <button type="submit">システム管理</button>
-            </form>
-        <!--</div>-->
+        <div th:if="${session.loginUser.positionId == 3}" class="header-item">
+            <a th:href="@{/systemManage}" class="header-item">
+                <input type="button" value="システム管理者用画面">
+            </a>
+        </div>
         <form th:action="@{/setting}" method="get" class="header-item">
             <button type="submit">設定画面</button>
         </form>
@@ -56,12 +56,25 @@
         </tr>
     </div>
 </div>
+<th:block th:switch="${attendanceStatus}" class="request-button">
+    <span th:case="0">
+        <form th:action="@{/request}" th:method="put" class="header-item" onSubmit="return CheckRequest()">
+            <input type="submit" value="申請">
+        </form>
+    </span>
+    <span th:case="1">
+        <button disabled>申請中</button>
+    </span>
+    <span th:case="2">
+        <button disabled>承認済み</button>
+    </span>
+</th:block>
+<!--
 <div class="request-button">
     <form th:action="@{/request}" th:method="put" class="header-item">
         <input type="submit" value="申請">
     </form>
 </div>
-
-
+-->
 </body>
 </html>

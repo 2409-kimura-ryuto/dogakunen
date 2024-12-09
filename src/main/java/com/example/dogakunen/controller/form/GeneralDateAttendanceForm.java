@@ -18,12 +18,12 @@ public class GeneralDateAttendanceForm {
     private Time workTimeStart;
     private Time workTimeFinish;
     //Durationに戻す
-    private String breakTime;
-    private String workTime;
+    private Time breakTime;
+    private Time workTime;
     private String memo;
     private Date createdDate;
     private Date updatedDate;
 
     //内部結合用に追加
-    private Integer attendanceStatus;
+//    private Integer attendanceStatus;
 }
