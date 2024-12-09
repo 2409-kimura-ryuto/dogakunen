@@ -32,7 +32,6 @@ public class UserService {
     /*
      * ログイン時のユーザ情報取得
      */
-
     public UserForm selectLoginUser(String employeeNumber){
         //社員番号をもとにユーザ情報取得
         List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
