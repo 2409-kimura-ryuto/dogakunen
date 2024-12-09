@@ -133,9 +133,9 @@ public class AdminController {
 
         //重複チェック
         if(!userForm.getEmployeeNumber().isBlank()) {
-            UserForm selectedAccount = userService.findByEmployeeNumber(userForm.getEmployeeNumber());
-            if (selectedAccount != null){
-                errorMessages.add("・アカウントが重複しています");
+            UserForm selectedEmployeeNumber = userService.findByEmployeeNumber(userForm.getEmployeeNumber());
+            if (selectedEmployeeNumber != null){
+                errorMessages.add("・社員番号が重複しています");
             }
         }
 
