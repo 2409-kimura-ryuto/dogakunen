@@ -25,8 +25,8 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
 
+import java.util.*;
 import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -34,6 +34,8 @@ import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.time.Duration.ZERO;
 
 @Service
 public class DateAttendanceService {
@@ -144,6 +146,7 @@ public class DateAttendanceService {
         List<GeneralDateAttendanceForm> generalDateAttendanceForm = setGeneralDateAttendanceForm(results);
         return generalDateAttendanceForm;
     }
+
     /*
      * DBから取得したDateAttendanceをFormに変換
      */
@@ -158,11 +161,22 @@ public class DateAttendanceService {
         return generalDateAttendances;
     }
 
-    //勤怠マスタ(日)作成
+    /*
+     * 勤怠マスタ(日)作成
+     */
     public void saveNewDate(int newUserId) {
 
         dateAttendanceRepository.saveNewUser(newUserId);
     }
 
 
+    /*
+     * 勤怠情報取得(勤怠削除時)
+     */
+    public void deleteAttendance(Integer id) {
+        //break_timeとwork_time用の0を用意
+        String zero = "0 hours 0 minutes 0 seconds";
+        //勤怠記録のIDと用意した0を引数にリポジトリを呼び出す
+        dateAttendanceRepository.updateAttendance(id, zero);
+    }
 }

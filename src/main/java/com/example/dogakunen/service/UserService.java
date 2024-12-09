@@ -4,6 +4,7 @@ import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.controller.form.GeneralUserForm;
 import com.example.dogakunen.repository.GeneralUserRepository;
 import com.example.dogakunen.repository.UserRepository;
+import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.repository.entity.GeneralUser;
 import com.example.dogakunen.repository.entity.Position;
 import com.example.dogakunen.repository.entity.User;
@@ -31,7 +32,6 @@ public class UserService {
     /*
      * ログイン時のユーザ情報取得
      */
-
     public UserForm selectLoginUser(String employeeNumber){
         //社員番号をもとにユーザ情報取得
         List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
@@ -131,6 +131,10 @@ public class UserService {
         user.setIsStopped(reqUser.getIsStopped());
         user.setPosition(position);
 
+        //UserエンティティにあるdateAttendancesをセットする
+        List<DateAttendance> dateAttendances = new ArrayList<>();
+        user.setDateAttendances(dateAttendances);
+
         Date nowDate = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentTime = sdf.format(nowDate);
@@ -173,6 +177,13 @@ public class UserService {
         }
         List<UserForm> users = setUserForm(results);
         return users.get(0);
+    }
+
+    /*
+     *アカウント停止・復活の更新処理
+     */
+    public void editIsStopped(Integer isStoppedId, Integer userId){
+        userRepository.editIsStopped(isStoppedId, userId);
     }
 
 }

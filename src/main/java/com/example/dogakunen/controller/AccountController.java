@@ -173,8 +173,7 @@ public class AccountController {
         userService.saveUser(loginUser);
 
         // 画面遷移先を指定
-        mav.setViewName("/home");
-        return mav;
+        return new ModelAndView("redirect:/");
     }
 
 }
