@@ -1,6 +1,7 @@
 package com.example.dogakunen.repository;
 
 import com.example.dogakunen.repository.entity.DateAttendance;
+import com.example.dogakunen.repository.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,6 +24,8 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
             "WHERE d.month = :month " + "AND d.user.id = :loginId " +
             "ORDER BY d.date ASC")
     public List<DateAttendance> findAllAttendances(@Param("month") int month, @Param("loginId") Integer loginID);
+
+    public List<DateAttendance> findByUserAndDate(User loginUser, Date date);
 
     @Query(
             value = "SELECT" +

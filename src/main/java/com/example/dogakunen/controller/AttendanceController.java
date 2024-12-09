@@ -1,6 +1,7 @@
 package com.example.dogakunen.controller;
 
 import com.example.dogakunen.controller.form.DateAttendanceForm;
+import com.example.dogakunen.controller.form.MonthAttendanceForm;
 import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.repository.entity.User;
 import com.example.dogakunen.service.DateAttendanceService;
@@ -10,36 +11,29 @@ import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.service.MonthAttendanceService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.text.ParseException;
-import java.util.Calendar;
-import com.example.dogakunen.repository.entity.DateAttendance;
-import com.example.dogakunen.service.DateAttendanceService;
-import com.example.dogakunen.service.UserService;
-import io.micrometer.common.util.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCrypt;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Objects;
 
 @Controller
 public class AttendanceController {
     @Autowired
     HttpSession session;
+
     @Autowired
     DateAttendanceService dateAttendanceService;
+
     @Autowired
     MonthAttendanceService monthAttendanceService;
 
@@ -58,8 +52,10 @@ public class AttendanceController {
         UserForm loginUser =(UserForm) session.getAttribute("loginUser");
         Integer loginId = loginUser.getId();
 
+        //勤怠月取得
+        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(loginId, month);
         //勤怠記録の取得
-        //List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(month, loginId);
+        List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(month, loginId);
 
         //勤怠状況ステータスによって申請ボタンの表示を切り替えるために勤怠状況ステータスを取得
         int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUser.getId(), 12).getAttendanceStatus();
@@ -70,7 +66,8 @@ public class AttendanceController {
         session.removeAttribute("filterErrorMessages");
 
         //情報をセット
-        //mav.addObject("attendances",dateAttendances);
+        mav.addObject("attendances",dateAttendances);
+        mav.addObject("monthAttendance", monthAttendanceForm);
         mav.addObject("loginUser", loginUser);
         mav.addObject("attendanceStatus", attendanceStatus);
         mav.setViewName("/home");
@@ -95,7 +92,8 @@ public class AttendanceController {
      * 新規勤怠登録処理
      */
     @PostMapping("/newAttendance")
-    public ModelAndView postNewAttendance(@ModelAttribute(name = "formModel") DateAttendanceForm reqAttendance) throws ParseException {
+    public ModelAndView postNewAttendance(@ModelAttribute(name = "formModel") @Validated DateAttendanceForm reqAttendance,
+                                          BindingResult result) throws ParseException {
         //ログインユーザ情報から社員番号取得
         UserForm loginUser = (UserForm)session.getAttribute("loginUser");
         String employeeNumber = loginUser.getEmployeeNumber();
@@ -103,6 +101,40 @@ public class AttendanceController {
         //アクセスした日付を取得
         Calendar calender = Calendar.getInstance();
         Integer month = calender.get(Calendar.MONTH) + 1;
+
+        //バリデーション
+        List<String> errorMessages = new ArrayList<>();
+        LocalTime startTime = reqAttendance.getWorkTimeStart();
+        LocalTime finishTime = reqAttendance.getWorkTimeFinish();
+        int attendanceNumber = reqAttendance.getAttendance();
+        if (Objects.isNull(startTime) && attendanceNumber != 5){
+            errorMessages.add("開始時刻を入力してください");
+        }
+        if (Objects.isNull(finishTime) && attendanceNumber != 5){
+            errorMessages.add("終了時刻を入力してください");
+        }
+        if (attendanceNumber == 0){
+            errorMessages.add("勤怠区分を登録してください");
+        }
+        if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime))){
+            errorMessages.add("無効な入力です");
+        }
+        if(result.hasErrors()) {
+            //エラーがあったら、エラーメッセージを格納する
+            //エラーメッセージの取得
+            for (FieldError error : result.getFieldErrors()) {
+                String message = error.getDefaultMessage();
+                //取得したエラーメッセージをエラーメッセージのリストに格納
+                errorMessages.add(message);
+            }
+        }
+        if (!errorMessages.isEmpty()){
+            ModelAndView mav = new ModelAndView();
+            mav.addObject("formModel", reqAttendance);
+            mav.addObject("errorMessages", errorMessages);
+            mav.setViewName("/new_attendance");
+            return mav;
+        }
 
         //勤怠登録処理
         dateAttendanceService.postNew(reqAttendance, employeeNumber, month);
@@ -120,13 +152,55 @@ public class AttendanceController {
         return mav;
     }
 
-    /* 勤怠編集処理
+    /*
+     * 勤怠編集処理
+     */
     @PostMapping("/editAttendance")
-    public ModelAndView postEditAttendance(@ModelAttribute(name = "formModel") DateAttendanceForm reqAttendance){
-        dateAttendanceService.editAttendance(reqAttendance);
+    public ModelAndView postEditAttendance(@ModelAttribute(name = "formModel") @Validated DateAttendanceForm reqAttendance,
+                                           BindingResult result, @RequestParam(name = "id") Integer id,
+                                           @RequestParam(name = "month") Integer month) throws ParseException {
+        //バリデーション
+        List<String> errorMessages = new ArrayList<>();
+        LocalTime startTime = reqAttendance.getWorkTimeStart();
+        LocalTime finishTime = reqAttendance.getWorkTimeFinish();
+        int attendanceNumber = reqAttendance.getAttendance();
+        if (Objects.isNull(startTime) && attendanceNumber != 5){
+            errorMessages.add("開始時刻を入力してください");
+        }
+        if (Objects.isNull(finishTime) && attendanceNumber != 5){
+            errorMessages.add("終了時刻を入力してください");
+        }
+        if (attendanceNumber == 0){
+            errorMessages.add("勤怠区分を登録してください");
+        }
+        if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime))){
+            errorMessages.add("無効な入力です");
+        }
+        if(result.hasErrors()) {
+            //エラーがあったら、エラーメッセージを格納する
+            //エラーメッセージの取得
+            for (FieldError error : result.getFieldErrors()) {
+                String message = error.getDefaultMessage();
+                //取得したエラーメッセージをエラーメッセージのリストに格納
+                errorMessages.add(message);
+            }
+        }
+        if (!errorMessages.isEmpty()){
+            ModelAndView mav = new ModelAndView();
+            mav.addObject("formModel", reqAttendance);
+            mav.addObject("errorMessages", errorMessages);
+            mav.setViewName("/edit_attendance");
+            return mav;
+        }
+
+        //ログインユーザ情報から社員番号取得
+        UserForm loginUser = (UserForm)session.getAttribute("loginUser");
+        String employeeNumber = loginUser.getEmployeeNumber();
+        reqAttendance.setId(id);
+        dateAttendanceService.updateAttendance(reqAttendance, employeeNumber,month);
         return new ModelAndView("redirect:/");
     }
-     */
+
 
     /*
      * 勤怠削除処理
