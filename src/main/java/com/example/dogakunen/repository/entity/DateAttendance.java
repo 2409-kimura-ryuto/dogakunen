@@ -50,9 +50,6 @@ public class DateAttendance {
     @Column(name = "memo")
     private String memo;
 
-    @Column
-    private String memo;
-
     @Column(name = "created_date", insertable = true, updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
     private Date createdDate;
