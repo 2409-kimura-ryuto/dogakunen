@@ -21,7 +21,7 @@ public class DateAttendanceForm {
     private int attendance;
     private LocalTime workTimeStart;
     private LocalTime workTimeFinish;
-    private LocalTime breakTime;
+    private String breakTime;
     private String workTime;
     private String memo;
     private Date createdDate;
