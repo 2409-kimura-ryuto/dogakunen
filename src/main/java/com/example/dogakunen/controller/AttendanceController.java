@@ -59,7 +59,7 @@ public class AttendanceController {
         Integer loginId = loginUser.getId();
 
         //勤怠記録の取得
-        List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(month, loginId);
+        //List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(month, loginId);
 
         //勤怠状況ステータスによって申請ボタンの表示を切り替えるために勤怠状況ステータスを取得
         int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUser.getId(), 12).getAttendanceStatus();
@@ -70,7 +70,7 @@ public class AttendanceController {
         session.removeAttribute("filterErrorMessages");
 
         //情報をセット
-        mav.addObject("attendances",dateAttendances);
+        //mav.addObject("attendances",dateAttendances);
         mav.addObject("loginUser", loginUser);
         mav.addObject("attendanceStatus", attendanceStatus);
         mav.setViewName("/home");
