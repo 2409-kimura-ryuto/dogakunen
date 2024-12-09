@@ -52,11 +52,16 @@ public class AttendanceController {
 
         //勤怠状況ステータスによって申請ボタンの表示を切り替えるために勤怠状況ステータスを取得
         int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUser.getId(), 12).getAttendanceStatus();
-        mav.addObject("attendanceStatus", attendanceStatus);
+
+        //承認者orシステム管理者フィルターのエラーメッセージをmavに詰めてセッション削除
+        List<String> filterErrorMessages = (List<String>) session.getAttribute("filterErrorMessages");
+        mav.addObject("filterErrorMessages", filterErrorMessages);
+        session.removeAttribute("filterErrorMessages");
 
         //情報をセット
         mav.addObject("attendances",dateAttendances);
         mav.addObject("loginUser", loginUser);
+        mav.addObject("attendanceStatus", attendanceStatus);
         mav.setViewName("/home");
         return mav;
     }

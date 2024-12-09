@@ -40,6 +40,12 @@ public class AccountController {
             mav.addObject("employeeNumber", employeeNumber);
             session.invalidate();
         }
+
+        //ログインフィルターのエラーメッセージをmavに詰めてセッション削除
+        List<String> filterErrorMessages = (List<String>) session.getAttribute("filterErrorMessages");
+        mav.addObject("filterErrorMessages", filterErrorMessages);
+        session.removeAttribute("filterErrorMessages");
+
         return mav;
     }
 
