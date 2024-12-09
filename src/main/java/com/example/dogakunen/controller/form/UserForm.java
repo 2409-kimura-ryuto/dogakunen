@@ -19,9 +19,7 @@ public class UserForm {
 
     @Size(max = 10, message = "・氏名は10文字以下で入力してください")
     private String name;
-
     private String employeeNumber;
-
     private int positionId;
 
     private int isStopped;

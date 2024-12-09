@@ -1,16 +1,24 @@
 package com.example.dogakunen.repository;
 
 import com.example.dogakunen.repository.entity.DateAttendance;
-import com.example.dogakunen.repository.entity.MonthAttendance;
-import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Date;
+import java.util.List;
 
 @Repository
 public interface DateAttendanceRepository extends JpaRepository<DateAttendance, Integer> {
+    @Transactional
+    @Query(value = "SELECT d FROM DateAttendance d JOIN FETCH d.user " +
+            "WHERE d.month = :month " + "AND d.user.id = :loginId " +
+            "ORDER BY d.date ASC")
+    public List<DateAttendance> findAllAttendances(@Param("month") int month, @Param("loginId") Integer loginID);
+
     @Query(
             value = "SELECT" +
                     "date_attendances.id AS id " +
@@ -34,11 +42,11 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
     public DateAttendance findDateAttendanceByOrderByDate(@Param("userId") Integer userId, @Param("month") Integer month);
 
     //勤怠マスタ(日)作成
-    @Transactional
+    @jakarta.transaction.Transactional
     @Modifying
     @Query(value = "INSERT INTO date_attendances(date, user_id, month) " +
-                "SELECT *, :newUserId, 12 " +
-                "FROM generate_series( cast('2024-12-01' as timestamp), date_trunc('month', cast('2024-12-01' as timestamp) + '1 months') + '-1 days', '1 days')",
-                nativeQuery = true)
+            "SELECT *, :newUserId, 12 " +
+            "FROM generate_series( cast('2024-12-01' as timestamp), date_trunc('month', cast('2024-12-01' as timestamp) + '1 months') + '-1 days', '1 days')",
+            nativeQuery = true)
     public void saveNewUser(@Param("newUserId") Integer newUserId);
 }

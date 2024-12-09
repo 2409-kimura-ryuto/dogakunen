@@ -3,28 +3,24 @@ package com.example.dogakunen.repository.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.antlr.v4.runtime.misc.Interval;
 
 import java.sql.Time;
 import java.time.Duration;
-import java.time.LocalTime;
 import java.util.Date;
 
 @Entity
-@Table(name = "date_attendances")
 @Getter
 @Setter
 
-public class DateAttendance {
-
+public class GeneralDateAttendance {
+    //参照時の使用するentity
     @Id
     @Column
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Integer userId;
 
     @Column
     private Date date;
@@ -36,18 +32,21 @@ public class DateAttendance {
     private Integer attendance;
 
     @Column(name = "work_time_start")
-    private LocalTime workTimeStart;
+    private Time workTimeStart;
 
     @Column(name = "work_time_finish")
-    private LocalTime workTimeFinish ;
+    private Time workTimeFinish ;
 
+    //Durationに戻す
+//    @Convert(converter = DurationConverter.class)
     @Column(name = "break_time")
-    private LocalTime breakTime;
+    private Time breakTime;
 
+//    @Convert(converter = DurationConverter.class)
     @Column(name = "work_time")
-    private String workTime;
+    private Time workTime;
 
-    @Column(name = "memo")
+    @Column
     private String memo;
 
     @Column(name = "created_date", insertable = true, updatable = false)
@@ -58,4 +57,7 @@ public class DateAttendance {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate;
 
+    //内部結合用に追加
+//    @Column(name = "attendance_status")
+//    private Integer attendanceStatus;
 }
