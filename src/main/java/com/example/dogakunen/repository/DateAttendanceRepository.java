@@ -39,7 +39,7 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
                     "date_attendances.created_date AS created_date " +
                     "date_attendances.updated_date AS updated_date " +
                     "date_attendances.attendance_status AS attendance_status " +
-                    " FROM month_attendances " +
+                    "FROM month_attendances " +
                     "WHERE user_id = :userId " +
                     "AND month = :month" ,
             nativeQuery = true
