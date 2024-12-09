@@ -33,8 +33,6 @@ public class User {
     @ManyToOne
     @JoinColumn(name="position_id")
     private Position position;
-    //@Column(name = "position_id")
-    //private Integer positionId;
 
     @Column(name = "is_stopped")
     private int isStopped;
