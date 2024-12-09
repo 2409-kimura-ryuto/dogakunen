@@ -79,7 +79,7 @@ public class ApproverController {
             errorMessages.add("不正なパラメータが入力されました");
         }
 
-        //勤怠状況がが存在しないユーザのidが入力された際のバリデーション
+        //勤怠状況が存在しないユーザのidが入力された際のバリデーション
         if (id.matches("^[0-9]+$")) {
             try {
                 monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 12).getId();
