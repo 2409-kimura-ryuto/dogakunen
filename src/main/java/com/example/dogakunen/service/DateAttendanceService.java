@@ -19,8 +19,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import java.sql.Time;
 import java.text.ParseException;
@@ -28,7 +27,6 @@ import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 @Service
@@ -37,13 +35,20 @@ public class DateAttendanceService {
     DateAttendanceRepository dateAttendanceRepository;
     @Autowired
     UserRepository userRepository;
-
+    /*
+     *　勤怠情報取得処理
+     */
     public List<DateAttendanceForm> findALLAttendances(int month, Integer loginId) {
+        //データ取得処理
         List<DateAttendance> results = dateAttendanceRepository.findAllAttendances(month, loginId);
+        //フォームに詰め替え
         List<DateAttendanceForm> dateAttendances = setDateAttendanceForm(results);
         return dateAttendances;
     }
 
+    /*
+     * entityからformに詰め替え
+     */
     public List<DateAttendanceForm> setDateAttendanceForm(List<DateAttendance> results) {
         List<DateAttendanceForm> dateAttendances = new ArrayList<>();
         for (int i = 0; i < results.size(); i++) {
@@ -56,7 +61,12 @@ public class DateAttendanceService {
             dateAttendance.setWorkTimeStart(result.getWorkTimeStart());
             dateAttendance.setWorkTimeFinish(result.getWorkTimeFinish());
             dateAttendance.setBreakTime(result.getBreakTime());
-            dateAttendance.setWorkTime(result.getWorkTime());
+
+            //労働時間を計算
+            if(result.getWorkTimeStart() != null && result.getWorkTimeFinish() != null) {
+                Duration duration = Duration.between(result.getWorkTimeStart(), result.getWorkTimeFinish());
+                dateAttendance.setWorkTime(duration.toHoursPart() + "時間" + duration.toMinutesPart() + "分");
+            }
             dateAttendance.setMemo(result.getMemo());
             dateAttendance.setUserName(result.getUser().getName());
             dateAttendance.setEmployeeNumber(result.getUser().getEmployeeNumber());
@@ -66,12 +76,34 @@ public class DateAttendanceService {
         return dateAttendances;
     }
 
-    public void postNew(DateAttendanceForm reqAttendance, Integer employeeNumber, Integer month) throws ParseException {
+    /*
+     *　新規勤怠登録処理
+     */
+    public void postNew(DateAttendanceForm reqAttendance, String employeeNumber, Integer month) throws ParseException {
+        //社員番号からユーザ情報を持ってくる
         List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
+        //Duration duration = Duration.between(reqAttendance.getWorkTimeStart(), reqAttendance.getWorkTimeFinish());
         DateAttendance dateAttendance = setEntity(reqAttendance, results.get(0), month);
         dateAttendanceRepository.save(dateAttendance);
     }
+    /*
+     * 編集する勤怠情報を持ってくる
+     */
+    public DateAttendanceForm findDateAttendanceById(Integer id){
+        List<DateAttendance> results = new ArrayList<>();
+        results.add(dateAttendanceRepository.findById(id).orElse(null));
+        List<DateAttendanceForm> dateAttendances = setDateAttendanceForm(results);
+        return dateAttendances.get(0);
+    }
+    /* 勤怠編集処理
+    public editAttendance(DateAttendanceForm reqAttendance){
 
+    }
+     */
+
+    /*
+     * formからentityに詰め替え
+     */
     public DateAttendance setEntity(DateAttendanceForm reqAttendance, User loginUser, Integer month) throws ParseException {
         DateAttendance dateAttendance = new DateAttendance();
 
@@ -84,6 +116,7 @@ public class DateAttendanceService {
         dateAttendance.setAttendance(reqAttendance.getAttendance());
         dateAttendance.setMemo(reqAttendance.getMemo());
 
+        //現在時刻の登録
         Date nowDate = new Date();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String currentTime = sdf.format(nowDate);
@@ -93,6 +126,7 @@ public class DateAttendanceService {
 
         return dateAttendance;
     }
+
     /*
      * 勤怠情報取得
      */

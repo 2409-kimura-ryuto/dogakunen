@@ -10,8 +10,8 @@
     <h1>勤怠管理システム</h1>
     <div class="header">
         <div class="userInf" >
-            社員番号：<!--<span th:text="${loginUser.employeeNumber}"/>--><br>
-            　　氏名：<!--<span th:text="${loginUser.name}"/>--><br>
+            社員番号：<span th:text="${loginUser.employeeNumber}"/><br>
+            　　氏名：<span th:text="${loginUser.name}"/><br>
         </div>
         <div th:if="${positionId == 2}" class="header-item">
             <form th:action="@{/userManage}" method="get" class="header-item">
@@ -34,7 +34,7 @@
         <input type="submit" value="新規勤怠登録">
     </form>
 </div>
-<table class="attendances" border="5">
+<table border="5" width="80%">
     <thead>
         <tr>
             <th>日付</th>
@@ -44,17 +44,25 @@
             <th>休憩時間</th>
             <th>労働時間</th>
             <th>メモ</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
         <tr th:each="attendance : ${attendances}" class="align-middle">
             <td th:text="${#dates.format(attendance.date, 'yyyy年MM月dd日')}"></td>
-            <td th:text="${attendance.attendance}"></td>
+            <td th:switch="${attendance.attendance}">
+                <span th:case="0" th:text="未登録"></span>
+                <span th:case="1" th:text="社内業務（オンサイト）"></span>
+                <span th:case="2" th:text="社内業務（オフサイト）"></span>
+                <span th:case="3" th:text="顧客業務（オンサイト）"></span>
+                <span th:case="4" th:text="顧客業務（オフサイト）"></span>
+            </td>
             <td th:text="${attendance.workTimeStart}"></td>
             <td th:text="${attendance.workTimeFinish}"></td>
             <td th:text="${attendance.breakTime}"></td>
             <td th:text="${attendance.workTime}"></td>
             <td th:text="${attendance.memo}"></td>
+            <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}" class="editAttendance-button">編集</a></td>
         </tr>
     </tbody>
 </table>

@@ -22,10 +22,10 @@ public class DateAttendanceForm {
     private LocalTime workTimeStart;
     private LocalTime workTimeFinish;
     private LocalTime breakTime;
-    private LocalTime workTime;
+    private String workTime;
     private String memo;
     private Date createdDate;
     private Date updatedDate;
     private String userName;
-    private Integer employeeNumber;
+    private String employeeNumber;
 }

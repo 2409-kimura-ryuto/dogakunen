@@ -26,7 +26,7 @@ public class User {
     private String name;
 
     @Column(name = "employee_number")
-    private Integer employeeNumber;
+    private String employeeNumber;
 
     //システム管理画面表示
     //Positionと多対一でリレーションを形成

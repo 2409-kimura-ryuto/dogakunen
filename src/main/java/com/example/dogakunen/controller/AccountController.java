@@ -114,7 +114,7 @@ public class AccountController {
         //セッションからログインユーザ情報を取得
         UserForm loginUser = (UserForm)session.getAttribute("loginUser");
         //ログインユーザ情報から社員番号のみを取り出す
-        Integer employeeNumber = loginUser.getEmployeeNumber();
+        String employeeNumber = loginUser.getEmployeeNumber();
         //画面に社員番号をセット
         mav.addObject("employeeNumber", employeeNumber);
         //エラーメッセージ表示
