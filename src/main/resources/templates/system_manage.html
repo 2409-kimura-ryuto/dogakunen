@@ -27,13 +27,18 @@
             <th>社員番号</th>
             <th>氏名</th>
             <th>役職</th>
-            <th>（編集）</th>
+            <th></th>
             <th>アカウント停止状況</th>
         </tr>
     </thead>
     <tbody>
         <tr th:each="user : ${users}">
-            <td th:text="${user.employeeNumber}"></td>
+            <span th:if="${loginUserId == user.id}" class="login-now">
+                <td th:text="${user.employeeNumber} + '&nbsp&nbsp(ログイン中)'"></td>
+            </span>
+            <span th:if="${loginUserId != user.id}" class="login-now">
+                <td th:text="${user.employeeNumber}"></td>
+            </span>
             <td th:text="${user.name}"></td>
             <td th:text="${user.positionName}"></td>
             <td>
@@ -45,22 +50,22 @@
             <td>
                 <span th:if="${user.isStopped} == 0">
                     <span>実行中</span>
-                    <!--<span th:if="${loginUserId != user.id}">-->
+                    <span th:if="${loginUserId != user.id}">
                         <form class="isStopped-button" method="put" th:action="@{/accountStop/{isStoppedId}(isStoppedId=${user.isStopped})}" >
                             <input type="submit" value="停止" />
                             <input name="userId" th:value="${user.id}" type="hidden" />
                         </form>
-                    <!--</span>-->
+                    </span>
                 </span>
 
                 <span th:if="${user.isStopped} == 1">
                     <span class="stop-now">停止中</span>
-                    <!--<span th:if="${loginUserId != user.id}">-->
+                    <span th:if="${loginUserId != user.id}">
                         <form class="revival-button" method="put" th:action="@{/accountStop/{isStoppedId}(isStoppedId=${user.isStopped})}" >
                             <input type="submit" value="復活" />
                             <input name="userId" th:value="${user.id}" type="hidden" />
                         </form>
-                    <!--</span>-->
+                    </span>
                 </span>
             </td>
         </tr>

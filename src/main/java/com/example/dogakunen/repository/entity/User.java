@@ -47,4 +47,7 @@ public class User {
     @Temporal(TemporalType.TIMESTAMP)
     private Date updatedDate = new Date();
 
+    //DateAttendancesとリレーション形成
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DateAttendance> dateAttendances;
 }

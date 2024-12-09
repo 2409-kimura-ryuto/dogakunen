@@ -6,6 +6,39 @@
     <title>勤怠編集画面</title>
 </head>
 <body>
-
+<div class="main-contents">
+    <form method="post" th:action="@{/editAttendance}" th:object="${formModel}">
+        <div class="form-area">
+            <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
+                <span th:text="${errorMessage}"></br></span>
+            </div>
+            <div class="edit-date">勤務日
+                <input type="date" th:value="${#dates.format(date, 'yyyy-MM-dd')}" th:field="*{date}" /><br/>
+            </div>
+            <div class="edit-attendance">勤務区分
+                <select name="attendance" th:field="*{attendance}">
+                    <option  th:value="0" th:text="未登録"></option>
+                    <option  th:value="1" th:text="社内業務（オンサイト）"></option>
+                    <option  th:value="2" th:text="社内業務（オフサイト）"></option>
+                    <option  th:value="3" th:text="顧客業務（オンサイト）"></option>
+                    <option  th:value="4" th:text="顧客業務（オフサイト）"></option>
+                </select>
+            </div>
+            <div class="edit-start">開始時間
+                <input type="time" th:field="*{workTimeStart}" >
+            </div>
+            <div class="edit-finish">終了時間
+                <input type="time" th:field="*{workTimeFinish}" >
+            </div>
+            <div class="edit-break">休憩時間
+                <input type="time" th:field="*{breakTime}" >
+            </div>
+            <div class="edit-memo">メモ
+                <textarea class="new-memo" th:field="*{memo}" size="1500" maxlength="1500" /></textarea>
+            </div>
+            <input type="submit" value="更新" />
+        </div>
+    </form>
+</div>
 </body>
 </html>

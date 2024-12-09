@@ -32,7 +32,7 @@ public class UserService {
      * ログイン時のユーザ情報取得
      */
 
-    public UserForm selectLoginUser(Integer employeeNumber){
+    public UserForm selectLoginUser(String employeeNumber){
         //社員番号をもとにユーザ情報取得
         List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
         //存在しないアカウントの場合nullを返す
@@ -150,7 +150,7 @@ public class UserService {
     /*
      * 重複チェック　入力された社員番号を検索
      */
-    public UserForm findByEmployeeNumber(int employeeNumber){
+    public UserForm findByEmployeeNumber(String employeeNumber){
         List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
         //存在しないアカウントの場合nullを返す
         if (results.size() == 0) {
@@ -158,6 +158,21 @@ public class UserService {
         }
         List<UserForm> selectedUser = setUserForm(results);
         return selectedUser.get(0);
+    }
+
+    /*
+     *ユーザー編集画面表示（ユーザー取得）
+     */
+    public UserForm selectEditUser(Integer id){
+        List<User> results = new ArrayList<>();
+        results.add(userRepository.findById(id).orElse(null));
+
+        //idの存在チェック(resultがnullであれば存在しないId)
+        if (results.get(0) == null) {
+            return null;
+        }
+        List<UserForm> users = setUserForm(results);
+        return users.get(0);
     }
 
 }
