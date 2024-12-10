@@ -179,7 +179,7 @@ public class AttendanceController {
         if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime))){
             errorMessages.add("無効な入力です");
         }
-        if (!startTime.isBefore(finishTime)){
+        if (Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)){
             errorMessages.add("無効な入力です");
         }
         if(result.hasErrors()) {
