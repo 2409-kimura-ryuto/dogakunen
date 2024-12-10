@@ -21,7 +21,9 @@ public class DateAttendanceForm {
     private Date date;
     private int month;
     private int attendance;
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime workTimeStart;
+    @DateTimeFormat(pattern = "HH:mm")
     private LocalTime workTimeFinish;
     private String breakTime;
     private String workTime;
