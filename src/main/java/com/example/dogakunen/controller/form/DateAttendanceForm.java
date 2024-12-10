@@ -16,21 +16,34 @@ import java.util.Date;
 @Setter
 public class DateAttendanceForm {
     private int id;
+
     private int userId;
+
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date;
+
     private int month;
+
     private int attendance;
+
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime workTimeStart;
+
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime workTimeFinish;
+
     private String breakTime;
+
     private String workTime;
+
     @Size(max = 140, message = "・140文字以下で入力してください")
     private String memo;
+
     private Date createdDate;
+
     private Date updatedDate;
+
     private String userName;
+
     private String employeeNumber;
 }

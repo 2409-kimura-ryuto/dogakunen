@@ -19,6 +19,10 @@
         <div th:if="${requestErrorMessages}" th:each="requestErrorMessage : ${requestErrorMessages}">
             <li><div th:text="${requestErrorMessage}" /></li>
         </div>
+        <!-- 勤怠編集画面の不正なパラメーターのエラーメッセージ表示 -->
+        <div th:if="${parameterErrorMessages}" th:each="parameterErrorMessage : ${parameterErrorMessages}">
+            <li><div th:text="${parameterErrorMessage}" /></li>
+        </div>
     </ul>
 
     <div class="header">
