@@ -119,6 +119,9 @@ public class AttendanceController {
         if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime))){
             errorMessages.add("無効な入力です");
         }
+        if (!startTime.isBefore(finishTime)){
+            errorMessages.add("無効な入力です");
+        }
         if(result.hasErrors()) {
             //エラーがあったら、エラーメッセージを格納する
             //エラーメッセージの取得
@@ -174,6 +177,9 @@ public class AttendanceController {
             errorMessages.add("勤怠区分を登録してください");
         }
         if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime))){
+            errorMessages.add("無効な入力です");
+        }
+        if (Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)){
             errorMessages.add("無効な入力です");
         }
         if(result.hasErrors()) {
