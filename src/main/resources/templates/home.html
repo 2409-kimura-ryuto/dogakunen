@@ -32,16 +32,16 @@
         </div>
         <div th:if="${session.loginUser.positionId == 2}" class="header-item">
             <a th:href="@{/show_users}" class="header-item">
-                <input type="button" value="承認者用画面">
+                <input type="button" value="承認一覧">
             </a>
         </div>
         <div th:if="${session.loginUser.positionId == 3}" class="header-item">
             <a th:href="@{/systemManage}" class="header-item">
-                <input type="button" value="システム管理者用画面">
+                <input type="button" value="システム管理">
             </a>
         </div>
         <form th:action="@{/setting}" method="get" class="header-item">
-            <button type="submit">設定画面</button>
+            <button type="submit">設定</button>
         </form>
         <form th:action="@{/logout}" method="get" class="header-item">
             <button type="submit">ログアウト</button>
