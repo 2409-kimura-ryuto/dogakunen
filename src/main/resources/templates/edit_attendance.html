@@ -5,9 +5,12 @@
           integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <meta charset="UTF-8">
     <link th:href="@{/css/style.css}" rel="styleSheet">
-    <title>勤怠編集画面</title>
+    <title>勤怠編集</title>
 </head>
 <body>
+<div class="header-contents">
+    <h2>勤怠編集</h2>
+</div>
 <div class="main-contents">
     <form method="post" th:action="@{/editAttendance}" th:object="${formModel}">
         <div class="form-area">
