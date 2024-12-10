@@ -100,15 +100,4 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
     )
     public void addAttendance(@Param("id") Integer id, @Param("attendance") Integer attendance, @Param("workTimeStart") LocalTime workTimeStart, @Param("workTimeFinish") LocalTime workTimeFinish, @Param("breakTime") String breakTime, @Param("workTime") String workTime, @Param("memo") String memo);
 
-    //休日の勤怠登録時に使用
-    @Transactional
-    @Modifying
-    @Query(
-            value = "UPDATE date_attendances SET " +
-                    "attendance = :attendanceNumber " +
-                    "WHERE id = :dateAttendanceId" ,
-            nativeQuery = true
-    )
-    public void addAttendanceHoliday(@Param("dateAttendanceId") Integer dateAttendanceId, @Param("attendanceNumber") Integer attendanceNumber);
-
 }

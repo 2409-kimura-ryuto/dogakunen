@@ -140,14 +140,7 @@ public class AttendanceController {
         }
 
         //勤怠登録処理
-
-        //休日以外の登録
-        if(attendanceNumber == 5){
-            int dateAttendanceId = reqAttendance.getId();
-            dateAttendanceService.postHoliday(dateAttendanceId, attendanceNumber);
-        } else {
-            dateAttendanceService.postNew(reqAttendance, employeeNumber, month);
-        }
+        dateAttendanceService.postNew(reqAttendance, employeeNumber, month);
 
         return new ModelAndView("redirect:/");
     }
