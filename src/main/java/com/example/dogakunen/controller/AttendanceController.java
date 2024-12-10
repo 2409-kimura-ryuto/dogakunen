@@ -18,6 +18,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.text.ParseException;
 import java.time.LocalTime;
@@ -147,12 +148,49 @@ public class AttendanceController {
 
     //編集画面表示
     @GetMapping("/editAttendance/{id}")
-    public ModelAndView getEditAttendance(@PathVariable Integer id){
+    public ModelAndView getEditAttendance(@PathVariable String id, RedirectAttributes redirectAttributes){
         ModelAndView mav = new ModelAndView();
+
+        //idの正規表現チェック
+        List<String> errorMessages = new ArrayList<String>();
+        if ((id == null) || (!id.matches("^[0-9]+$"))) {
+            errorMessages.add("不正なパラメータが入力されました");
+        }
+
+        //勤怠状況が存在しない勤怠(日)のidが入力された際のバリデーション
+        if (id.matches("^[0-9]+$")) {
+            try {
+                dateAttendanceService.findDateAttendanceById(Integer.parseInt(id));
+            } catch (RuntimeException e) {
+                errorMessages.add("不正なパラメータが入力されました");
+            }
+        }
+
+        //エラーメッセージが存在する場合はエラーメッセージをセットし、ホーム画面にリダイレクト
+        if (errorMessages.size() > 0) {
+            redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
+            mav.setViewName("redirect:/");
+            return mav;
+        }
+
         //IDから勤怠情報取得
-        DateAttendanceForm dateAttendanceForm = dateAttendanceService.findDateAttendanceById(id);
+        DateAttendanceForm dateAttendanceForm = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id));
         mav.addObject("formModel", dateAttendanceForm);
         mav.setViewName("/edit_attendance");
+        return mav;
+    }
+
+    /*
+     *　IDが空で渡ってきた場合
+     */
+    @GetMapping("/editAttendance/")
+    public ModelAndView returnEditAttendance(RedirectAttributes redirectAttributes){
+        ModelAndView mav = new ModelAndView();
+        //バリデーション
+        List<String> errorMessages = new ArrayList<String>();
+        errorMessages.add("不正なパラメータが入力されました");
+        redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
+        mav.setViewName("redirect:/");
         return mav;
     }
 
