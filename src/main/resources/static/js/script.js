@@ -15,3 +15,9 @@ function CheckSendBack(){
     let result = window.confirm("差し戻ししてもよろしいですか？");
     if (!result) return false;
 }
+
+//削除ボタンのアラート
+function CheckDelete(){
+    let result = window.confirm("削除してもよろしいですか？");
+    if (!result) return false;
+}
