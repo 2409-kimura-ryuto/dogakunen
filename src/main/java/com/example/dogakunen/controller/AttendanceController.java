@@ -84,6 +84,7 @@ public class AttendanceController {
 
         //空のformModelを入れる
         DateAttendanceForm dateAttendance = new DateAttendanceForm();
+        dateAttendance.setBreakTime("00:00");
         mav.addObject("formModel", dateAttendance);
         mav.setViewName("/new_attendance");
         return mav;
@@ -107,6 +108,7 @@ public class AttendanceController {
         List<String> errorMessages = new ArrayList<>();
         LocalTime startTime = reqAttendance.getWorkTimeStart();
         LocalTime finishTime = reqAttendance.getWorkTimeFinish();
+        String breakTime = reqAttendance.getBreakTime();
         int attendanceNumber = reqAttendance.getAttendance();
         if (Objects.isNull(startTime) && attendanceNumber != 5){
             errorMessages.add("開始時刻を入力してください");
@@ -117,10 +119,10 @@ public class AttendanceController {
         if (attendanceNumber == 0){
             errorMessages.add("勤怠区分を登録してください");
         }
-        if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime))){
+        if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime) || !breakTime.equals("00:00"))){
             errorMessages.add("無効な入力です");
         }
-        if (!startTime.isBefore(finishTime)){
+        if (Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)){
             errorMessages.add("無効な入力です");
         }
         if(result.hasErrors()) {
@@ -139,7 +141,11 @@ public class AttendanceController {
             mav.setViewName("/new_attendance");
             return mav;
         }
-
+        //勤務区分が休日の場合
+        if (reqAttendance.getAttendance() == 5){
+            reqAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
+            reqAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
+        }
         //勤怠登録処理
         dateAttendanceService.postNew(reqAttendance, employeeNumber, month);
         return new ModelAndView("redirect:/");
@@ -204,6 +210,7 @@ public class AttendanceController {
         List<String> errorMessages = new ArrayList<>();
         LocalTime startTime = reqAttendance.getWorkTimeStart();
         LocalTime finishTime = reqAttendance.getWorkTimeFinish();
+        String breakTime = reqAttendance.getBreakTime();
         int attendanceNumber = reqAttendance.getAttendance();
         if (Objects.isNull(startTime) && attendanceNumber != 5){
             errorMessages.add("開始時刻を入力してください");
@@ -214,10 +221,11 @@ public class AttendanceController {
         if (attendanceNumber == 0){
             errorMessages.add("勤怠区分を登録してください");
         }
-        if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime))){
+        if (attendanceNumber == 5 && (!startTime.equals(LocalTime.parse("00:00")) || !finishTime.equals(LocalTime.parse("00:00")) 
+                || (!breakTime.equals("00:00:00") && !breakTime.equals("00:00")))){
             errorMessages.add("無効な入力です");
         }
-        if (Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)){
+        if (attendanceNumber != 5 && Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)){
             errorMessages.add("無効な入力です");
         }
         if(result.hasErrors()) {
@@ -235,6 +243,12 @@ public class AttendanceController {
             mav.addObject("errorMessages", errorMessages);
             mav.setViewName("/edit_attendance");
             return mav;
+        }
+
+        //勤務区分が休日の場合
+        if (reqAttendance.getAttendance() == 5){
+            reqAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
+            reqAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
         }
 
         //ログインユーザ情報から社員番号取得
