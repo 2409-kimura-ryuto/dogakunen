@@ -145,6 +145,13 @@ public class DateAttendanceService {
         dateAttendanceRepository.addAttendance(id, attendance, workTimeStart, workTimeFinish, breakTime, formattedWorkTime, memo);
     }
     /*
+     * 休日の勤怠登録
+     */
+    public void postHoliday(Integer dateAttendanceId, Integer attendanceNumber) {
+        dateAttendanceRepository.addAttendanceHoliday(dateAttendanceId, attendanceNumber);
+    }
+
+    /*
      * 編集する勤怠情報を持ってくる
      */
     public DateAttendanceForm findDateAttendanceById(Integer id){

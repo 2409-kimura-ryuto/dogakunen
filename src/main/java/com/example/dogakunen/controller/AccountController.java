@@ -78,7 +78,7 @@ public class AccountController {
         UserForm loginUser = userService.selectLoginUser(employeeNumber);
         //バリデーション
         //ユーザが存在しないか停止中またはパスワードが違えばエラーメッセージをセット
-        if (loginUser == null || loginUser.getIsStopped() == 1 /*|| !BCrypt.checkpw(password, loginUser.getPassword())*/) {
+        if (loginUser == null || loginUser.getIsStopped() == 1 || !BCrypt.checkpw(password, loginUser.getPassword())) {
             errorMessages.add("ログインに失敗しました");
         }
         //エラーメッセージが１つ以上ある場合
