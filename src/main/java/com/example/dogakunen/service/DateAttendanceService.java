@@ -250,7 +250,13 @@ public class DateAttendanceService {
      */
     public void saveNewDate(int newUserId) {
 
-        dateAttendanceRepository.saveNewUser(newUserId);
+        Calendar calender = Calendar.getInstance();
+        int year = calender.get(Calendar.YEAR);
+        int month = calender.get(Calendar.MONTH) + 1;
+        String startDate = year + "-" + month + "-01 00:00:00";
+
+        dateAttendanceRepository.saveNewUser(newUserId, startDate);
+        dateAttendanceRepository.saveMonth();
     }
 
 
