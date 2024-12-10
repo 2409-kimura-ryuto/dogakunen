@@ -78,10 +78,9 @@
             <td th:text="${attendance.workTime}"></td>
             <td th:text="${attendance.memo}"></td>
             <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
-                <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}" class="editAttendance-button"><input type="submit" value="編集"></a></td>
-                <td><form th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="deleteAttendance-button"><input type="submit" value="削除"></form></td>
+                <td th:if="${attendance.attendance != 0}"><a th:href="@{/editAttendance/{id}(id=${attendance.id})}" class="editAttendance-button"><input type="submit" value="編集"></a></td>
+                <td th:if="${attendance.attendance != 0}"><form th:if="${attendance.attendance != 0}" th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="delete" onSubmit="return CheckDelete()"><input type="submit" value="削除"></form></td>
             </div>
-        </tr>
         </tr>
     </tbody>
 </table>
