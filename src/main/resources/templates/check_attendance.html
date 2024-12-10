@@ -30,7 +30,7 @@
     </thead>
     <tbody>
     <tr th:each="generalDateAttendance: ${generalDateAttendances}">
-        <td th:text="${#dates.format(generalDateAttendance.date, 'MM/d')}"></td>
+        <td th:text="${#dates.format(generalDateAttendance.date, 'yyyy年MM月dd日')}"></td>
         <td>
             <th:block th:switch="${generalDateAttendance.attendance}">
                 <span th:case="0">未登録</span>
@@ -42,8 +42,8 @@
         </td>
         <td th:text="${#dates.format(generalDateAttendance.workTimeStart, 'H:mm')}"></td>
         <td th:text="${#dates.format(generalDateAttendance.workTimeFinish, 'H:mm')}"></td>
-        <td th:text="${generalDateAttendance.breakTime}"></td>
-        <td th:text="${generalDateAttendance.workTime}"></td>
+        <td th:text="${#dates.format(generalDateAttendance.breakTime, 'H:mm')}"></td>
+        <td th:text="${#dates.format(generalDateAttendance.workTime, 'H:mm')}"></td>
         <td th:text="${generalDateAttendance.memo}"></td>
     </tr>
     </tbody>
