@@ -195,7 +195,7 @@ public class AdminController {
         //idの数字チェック
         List<String> errorMessages = new ArrayList<>();
         if(!id.matches("^[0-9]+$")) {
-            errorMessages.add("不正なパラメータが入力されました");
+            errorMessages.add("・不正なパラメータが入力されました");
             redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
             //システム管理画面に遷移
             return new ModelAndView("redirect:/systemManage");
@@ -208,7 +208,7 @@ public class AdminController {
 
         //idの存在チェック
         if(editUser == null) {
-            errorMessages.add("不正なパラメータが入力されました");
+            errorMessages.add("・不正なパラメータが入力されました");
             //エラーメッセージを格納して、ユーザー管理画面へ遷移
             redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
             //ユーザー管理画面にリダイレクト
@@ -236,7 +236,7 @@ public class AdminController {
     @GetMapping("/editUser/")
     public ModelAndView editUserInvalid(RedirectAttributes redirectAttributes) {
         List<String> errorMessages = new ArrayList<String>();
-        errorMessages.add("不正なパラメータです");
+        errorMessages.add("・不正なパラメータが入力されました");
         //エラーメッセージを格納して、ユーザー管理画面へ遷移
         redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
         //ユーザー管理画面にリダイレクト
