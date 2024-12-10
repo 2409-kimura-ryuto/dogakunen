@@ -83,6 +83,9 @@ public class AttendanceController {
 
         //空のformModelを入れる
         DateAttendanceForm dateAttendance = new DateAttendanceForm();
+        dateAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
+        dateAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
+        dateAttendance.setBreakTime("00:00");
         mav.addObject("formModel", dateAttendance);
         mav.setViewName("/new_attendance");
         return mav;
@@ -108,20 +111,20 @@ public class AttendanceController {
         LocalTime finishTime = reqAttendance.getWorkTimeFinish();
         int attendanceNumber = reqAttendance.getAttendance();
         if (Objects.isNull(startTime) && attendanceNumber != 5){
-            errorMessages.add("開始時刻を入力してください");
+            errorMessages.add("・開始時刻を入力してください");
         }
         if (Objects.isNull(finishTime) && attendanceNumber != 5){
-            errorMessages.add("終了時刻を入力してください");
+            errorMessages.add("・終了時刻を入力してください");
         }
         if (attendanceNumber == 0){
-            errorMessages.add("勤怠区分を登録してください");
+            errorMessages.add("・勤怠区分を登録してください");
         }
-        if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime))){
+        /*if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime))){
             errorMessages.add("無効な入力です");
-        }
-        if (!startTime.isBefore(finishTime)){
+        }*/
+        /*if (!startTime.isBefore(finishTime)){
             errorMessages.add("無効な入力です");
-        }
+        }*/
         if(result.hasErrors()) {
             //エラーがあったら、エラーメッセージを格納する
             //エラーメッセージの取得
@@ -137,6 +140,13 @@ public class AttendanceController {
             mav.addObject("errorMessages", errorMessages);
             mav.setViewName("/new_attendance");
             return mav;
+        }
+        //勤怠区分が休日のときは勤怠区分以外を0にする
+        if (attendanceNumber == 5){
+            reqAttendance.setWorkTimeStart(LocalTime.parse("00:00:00"));
+            reqAttendance.setWorkTimeFinish(LocalTime.parse("00:00:00"));
+            reqAttendance.setBreakTime("00:00");
+            reqAttendance.setWorkTime("00:00");
         }
 
         //勤怠登録処理

@@ -60,7 +60,7 @@ public class ApproverController {
         List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(loginUserId, 12);
         for (GeneralDateAttendanceForm generalDateAttendanceForm : generalDateAttendanceForms) {
             if(generalDateAttendanceForm.getAttendance() == 0) {
-                requestErrorMessages.add("全ての勤怠を登録してから申請してください");
+                requestErrorMessages.add("・全ての勤怠を登録してから申請してください");
                 break;
             }
         }
@@ -95,7 +95,7 @@ public class ApproverController {
         //idの正規表現チェック
         List<String> errorMessages = new ArrayList<String>();
         if ((id == null) || (!id.matches("^[0-9]+$"))) {
-            errorMessages.add("不正なパラメータが入力されました");
+            errorMessages.add("・不正なパラメータが入力されました");
         }
 
         //勤怠状況が存在しないユーザのidが入力された際のバリデーション
@@ -103,7 +103,7 @@ public class ApproverController {
             try {
                 monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 12).getId();
             } catch (RuntimeException e) {
-                errorMessages.add("不正なパラメータが入力されました");
+                errorMessages.add("・不正なパラメータが入力されました");
             }
         }
 
@@ -132,7 +132,7 @@ public class ApproverController {
         ModelAndView mav = new ModelAndView();
         //バリデーション
         List<String> errorMessages = new ArrayList<String>();
-        errorMessages.add("不正なパラメータが入力されました");
+        errorMessages.add("・不正なパラメータが入力されました");
         redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
         mav.setViewName("redirect:/show_users");
         return mav;

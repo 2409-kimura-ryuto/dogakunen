@@ -60,11 +60,11 @@ public class AccountController {
         List<String> errorMessages = new ArrayList<String>();
         //社員番号入力チェック
         if (employeeNumber.isBlank()) {
-            errorMessages.add("社員番号を入力してください");
+            errorMessages.add("・社員番号を入力してください");
         }
         //パスワード入力チェック
         if (password.isBlank()) {
-            errorMessages.add("パスワードを入力してください");
+            errorMessages.add("・パスワードを入力してください");
         }
         //エラーメッセージが１つ以上ある場合
         if (errorMessages.size() != 0) {
@@ -79,7 +79,7 @@ public class AccountController {
         //バリデーション
         //ユーザが存在しないか停止中またはパスワードが違えばエラーメッセージをセット
         if (loginUser == null || loginUser.getIsStopped() == 1 || !BCrypt.checkpw(password, loginUser.getPassword())) {
-            errorMessages.add("ログインに失敗しました");
+            errorMessages.add("・ログインに失敗しました");
         }
         //エラーメッセージが１つ以上ある場合
         if (errorMessages.size() != 0) {
@@ -148,12 +148,12 @@ public class AccountController {
         //パスワードと確認用パスワードが一致しない場合
         if(!password.equals(passwordConfirmation)) {
             //エラーメッセージを設定
-            errorMessages.add("パスワードと確認用パスワードが一致しません");
+            errorMessages.add("・パスワードと確認用パスワードが一致しません");
         }
         //入力されたパスワードが空欄または記号を含む半角文字6文字以上20文字以下でない場合
         if(!password.matches("^[!-~]{6,20}$") || StringUtils.isBlank(password)){
             //エラーメッセージを設定
-            errorMessages.add("パスワードは半角文字かつ6文字以上20文字以下で入力してください");
+            errorMessages.add("・パスワードは半角文字かつ6文字以上20文字以下で入力してください");
         }
         //エラーメッセージが存在する場合
         if(errorMessages.size() != 0){
