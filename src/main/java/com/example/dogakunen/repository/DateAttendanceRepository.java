@@ -42,7 +42,7 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
                     "date_attendances.created_date AS created_date " +
                     "date_attendances.updated_date AS updated_date " +
                     "date_attendances.attendance_status AS attendance_status " +
-                    " FROM month_attendances " +
+                    "FROM month_attendances " +
                     "WHERE user_id = :userId " +
                     "AND month = :month" ,
             nativeQuery = true
@@ -52,11 +52,19 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
     //勤怠マスタ(日)作成
     @jakarta.transaction.Transactional
     @Modifying
-    @Query(value = "INSERT INTO date_attendances(date, user_id, month) " +
-            "SELECT *, :newUserId, 12 " +
-            "FROM generate_series( cast('2024-12-01' as timestamp), date_trunc('month', cast('2024-12-01' as timestamp) + '1 months') + '-1 days', '1 days')",
+    @Query(value = "INSERT INTO date_attendances(date, user_id) " +
+            "SELECT *, :newUserId " +
+            "FROM generate_series( cast(:startDate as timestamp), date_trunc('month', cast(:startDate as timestamp) + '3 months') + '-1 days', '1 days')",
             nativeQuery = true)
-    public void saveNewUser(@Param("newUserId") Integer newUserId);
+    public void saveNewUser(@Param("newUserId") Integer newUserId, @Param("startDate") String startDate);
+
+    //勤怠マスタ(日)のmonthに値入れる
+    @jakarta.transaction.Transactional
+    @Modifying
+    @Query(value = "UPDATE date_attendances SET " +
+            "month = extract(month from date)" ,
+            nativeQuery = true)
+    public void saveMonth();
 
     //勤怠削除時に使用
     //各カラムを0もしくはnullでupdate
@@ -65,8 +73,8 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
     @Query(
             value = "UPDATE date_attendances SET " +
                     "attendance = '0', " +
-                    "work_time_start = null, " +
-                    "work_time_finish = null, " +
+                    "work_time_start = '00:00:00', " +
+                    "work_time_finish = '00:00:00', " +
                     "break_time = CAST(:zero AS interval), " +
                     "work_time = CAST(:zero AS interval), " +
                     "memo = null " +

@@ -129,7 +129,8 @@ public class DateAttendanceService {
         Duration workDuration = duration.minus(breakDuration);
         //フォーマットを「00:00」に変換
         String formattedWorkTime = String.format("%02d:%02d:%02d", workDuration.toHoursPart(), workDuration.toMinutesPart(), duration.toSecondsPart());
-        reqAttendance.setWorkTime(formattedWorkTime);
+        //フォーマットを
+
         //算出した労働時間をセット
         DateAttendance dateAttendance = setEntity(reqAttendance, results.get(0));
 
@@ -249,7 +250,13 @@ public class DateAttendanceService {
      */
     public void saveNewDate(int newUserId) {
 
-        dateAttendanceRepository.saveNewUser(newUserId);
+        Calendar calender = Calendar.getInstance();
+        int year = calender.get(Calendar.YEAR);
+        int month = calender.get(Calendar.MONTH) + 1;
+        String startDate = year + "-" + month + "-01 00:00:00";
+
+        dateAttendanceRepository.saveNewUser(newUserId, startDate);
+        dateAttendanceRepository.saveMonth();
     }
 
 

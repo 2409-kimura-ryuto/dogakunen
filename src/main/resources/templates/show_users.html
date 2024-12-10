@@ -15,7 +15,6 @@
         </div>
     </div>
 </div>
-
 <!-- 不正なパラメータが入力された際のエラーメッセージ表示 -->
 <ul>
     <div th:if="${errorMessages}" th:each="errorMessage : ${errorMessages}">
@@ -23,7 +22,7 @@
     </div>
 </ul>
 
-<table class="table">
+<table class="table table-hover">
     <thead class="table-light">
     <tr>
         <th>社員番号</th>

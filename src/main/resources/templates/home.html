@@ -10,10 +10,14 @@
 <div class="header-contents">
     <h1>勤怠管理システム</h1>
 
-    <!-- 承認者orシステム管理者フィルターのエラーメッセージ表示 -->
     <ul>
+        <!-- 承認者orシステム管理者フィルターのエラーメッセージ表示 -->
         <div th:if="${filterErrorMessages}" th:each="filterErrorMessage : ${filterErrorMessages}">
             <li><div th:text="${filterErrorMessage}" /></li>
+        </div>
+        <!-- 完了申請のエラーメッセージ表示 -->
+        <div th:if="${requestErrorMessages}" th:each="requestErrorMessage : ${requestErrorMessages}">
+            <li><div th:text="${requestErrorMessage}" /></li>
         </div>
     </ul>
 
@@ -74,10 +78,9 @@
             <td th:text="${attendance.workTime}"></td>
             <td th:text="${attendance.memo}"></td>
             <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
-                <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}" class="editAttendance-button"><input type="submit" value="編集"></a></td>
-                <td><form th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="deleteAttendance-button"><input type="submit" value="削除"></form></td>
+                <td th:if="${attendance.attendance != 0}"><a th:href="@{/editAttendance/{id}(id=${attendance.id})}" class="editAttendance-button"><input type="submit" value="編集"></a></td>
+                <td th:if="${attendance.attendance != 0}"><form th:if="${attendance.attendance != 0}" th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="delete" onSubmit="return CheckDelete()"><input type="submit" value="削除"></form></td>
             </div>
-        </tr>
         </tr>
     </tbody>
 </table>
