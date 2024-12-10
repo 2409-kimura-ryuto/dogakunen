@@ -12,15 +12,15 @@
 
     <ul>
         <!-- 承認者orシステム管理者フィルターのエラーメッセージ表示 -->
-        <div th:if="${filterErrorMessages}" th:each="filterErrorMessage : ${filterErrorMessages}">
+        <div th:if="${filterErrorMessages}" th:each="filterErrorMessage : ${filterErrorMessages}" class="errorMessages">
             <li><div th:text="${filterErrorMessage}" /></li>
         </div>
         <!-- 完了申請のエラーメッセージ表示 -->
-        <div th:if="${requestErrorMessages}" th:each="requestErrorMessage : ${requestErrorMessages}">
+        <div th:if="${requestErrorMessages}" th:each="requestErrorMessage : ${requestErrorMessages}" class="errorMessages">
             <li><div th:text="${requestErrorMessage}" /></li>
         </div>
         <!-- 勤怠編集画面の不正なパラメーターのエラーメッセージ表示 -->
-        <div th:if="${parameterErrorMessages}" th:each="parameterErrorMessage : ${parameterErrorMessages}">
+        <div th:if="${parameterErrorMessages}" th:each="parameterErrorMessage : ${parameterErrorMessages}" class="errorMessages">
             <li><div th:text="${parameterErrorMessage}" /></li>
         </div>
     </ul>
