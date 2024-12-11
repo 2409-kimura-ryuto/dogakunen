@@ -90,8 +90,7 @@ public class UserService {
         }
         return generalUsers;
     }
-
-
+    
     /*
      *システム管理画面の表示（ユーザ取得）
      */
