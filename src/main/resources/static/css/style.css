@@ -28,6 +28,9 @@ body {
     font-size : 14px;
 }
 
+.alert-danger{
+    height: 50px;
+}
 
 .header-item {
     display : inline-block;

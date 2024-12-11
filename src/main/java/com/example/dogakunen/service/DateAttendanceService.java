@@ -2,27 +2,14 @@ package com.example.dogakunen.service;
 
 import com.example.dogakunen.controller.form.DateAttendanceForm;
 import com.example.dogakunen.controller.form.GeneralDateAttendanceForm;
-import com.example.dogakunen.controller.form.MonthAttendanceForm;
-import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.repository.DateAttendanceRepository;
 import com.example.dogakunen.repository.UserRepository;
 import com.example.dogakunen.repository.GeneralDateAttendanceRepository;
-import com.example.dogakunen.repository.UserRepository;
 import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.repository.entity.GeneralDateAttendance;
 import com.example.dogakunen.repository.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.example.dogakunen.controller.form.DateAttendanceForm;
-import com.example.dogakunen.controller.form.MonthAttendanceForm;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import com.example.dogakunen.controller.form.DateAttendanceForm;
-import com.example.dogakunen.controller.form.UserForm;
-import com.example.dogakunen.repository.DateAttendanceRepository;
-import com.example.dogakunen.repository.entity.DateAttendance;
-import com.example.dogakunen.repository.entity.User;
-import org.antlr.v4.runtime.misc.Interval;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
@@ -64,6 +51,7 @@ public class DateAttendanceService {
             DateAttendanceForm dateAttendance = new DateAttendanceForm();
             DateAttendance result = results.get(i);
             dateAttendance.setId(result.getId());
+            dateAttendance.setUserId(result.getUser().getId());
             dateAttendance.setDate(result.getDate());
             dateAttendance.setMonth(result.getMonth());
             dateAttendance.setAttendance(result.getAttendance());

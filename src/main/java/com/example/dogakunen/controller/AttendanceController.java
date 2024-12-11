@@ -10,7 +10,6 @@ import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.service.MonthAttendanceService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.stereotype.Controller;
@@ -158,12 +157,7 @@ public class AttendanceController {
     @GetMapping("/editAttendance/{id}")
     public ModelAndView getEditAttendance(@PathVariable String id, RedirectAttributes redirectAttributes){
         ModelAndView mav = new ModelAndView();
-
-        //idの正規表現チェック
         List<String> errorMessages = new ArrayList<String>();
-        if ((id == null) || (!id.matches("^[0-9]+$"))) {
-            errorMessages.add("・不正なパラメータが入力されました");
-        }
 
         //勤怠状況が存在しない勤怠(日)のidが入力された際のバリデーション
         if (id.matches("^[0-9]+$")) {
@@ -171,7 +165,27 @@ public class AttendanceController {
                 dateAttendanceService.findDateAttendanceById(Integer.parseInt(id));
             } catch (RuntimeException e) {
                 errorMessages.add("・不正なパラメータが入力されました");
+                redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
+                mav.setViewName("redirect:/");
+                return mav;
             }
+        }
+
+        //URLのIDの勤怠(日)のユーザIDが自分以外のユーザIDの場合のバリデーションと
+        //未登録or申請中/承認済みの場合に編集画面に遷移できないようにするバリデーション
+        UserForm loginUser = (UserForm)session.getAttribute("loginUser");
+        int loginUserId = loginUser.getId();
+        int useId = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getUserId();
+        int attendance = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getAttendance();
+        int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUserId, 12).getAttendanceStatus();
+
+        if (loginUserId != useId || attendance == 0 || attendanceStatus != 0) {
+            errorMessages.add("・不正なパラメータが入力されました");
+        }
+
+        //idの正規表現チェック
+        if ((id == null) || (!id.matches("^[0-9]+$"))) {
+            errorMessages.add("・不正なパラメータが入力されました");
         }
 
         //エラーメッセージが存在する場合はエラーメッセージをセットし、ホーム画面にリダイレクト
