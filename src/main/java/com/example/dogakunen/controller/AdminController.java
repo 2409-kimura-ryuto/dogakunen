@@ -141,7 +141,7 @@ public class AdminController {
 
         //パスワードの文字数チェック
         if((!userForm.getPassword().isBlank()) && !userForm.getPassword().matches("^[!-~]{6,20}+$")) {
-            errorMessages.add("・パスワードは半角文字かつ6文字以上20文字以下で入力してください");
+            errorMessages.add("・パスワードは6文字以上20文字以下で入力してください");
         }
 
         if(result.hasErrors()) {

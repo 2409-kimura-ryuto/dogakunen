@@ -153,7 +153,7 @@ public class AccountController {
         //入力されたパスワードが空欄または記号を含む半角文字6文字以上20文字以下でない場合
         if(!password.matches("^[!-~]{6,20}$") || StringUtils.isBlank(password)){
             //エラーメッセージを設定
-            errorMessages.add("・パスワードは半角文字かつ6文字以上20文字以下で入力してください");
+            errorMessages.add("・パスワードは6文字以上20文字以下で入力してください");
         }
         //エラーメッセージが存在する場合
         if(errorMessages.size() != 0){

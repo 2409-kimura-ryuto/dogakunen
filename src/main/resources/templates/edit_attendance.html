@@ -9,48 +9,43 @@
 </head>
 <body>
 <div class="header-contents">
-    <h2>勤怠編集</h2>
+    <h2 class="text-center my-3">勤怠編集</h2>
 </div>
-<div class="main-contents">
+<div class="main-contents mx-auto">
+    <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
+        <p th:text="${errorMessage}"></p>
+    </div>
     <form method="post" th:action="@{/editAttendance}" th:object="${formModel}">
-        <div class="form-area">
-            <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
-                <span th:text="${errorMessage}"></br></span>
-            </div>
-            <label class="form-label">勤務日
-                <input type="date" th:value="${#dates.format(date, 'yyyy-MM-dd')}" th:field="*{date}" readonly class="form-control"/>
-            </label><br/>
-            <label class="form-label">勤務区分
-                <select name="attendance" th:field="*{attendance}" class="form-select" aria-label="Default select example">
-                    <option  th:value="0" th:text="未登録"></option>
-                    <option  th:value="1" th:text="社内業務（オンサイト）"></option>
-                    <option  th:value="2" th:text="社内業務（オフサイト）"></option>
-                    <option  th:value="3" th:text="顧客業務（オンサイト）"></option>
-                    <option  th:value="4" th:text="顧客業務（オフサイト）"></option>
-                    <option  th:value="5" th:text="休日" class="dropdown-item"></option>
-                </select>
-            </label><br/>
-            <label class="form-label">開始時間
-                <input type="time" th:field="*{workTimeStart}" class="form-control">
-            </label>
-            <label class="form-label">終了時間
-                <input type="time" th:field="*{workTimeFinish}" class="form-control">
-            </label>
-            <label class="form-label">休憩時間
-                <input type="time" th:field="*{breakTime}" class="form-control">
-            </label><br/>
-            <label class="form-label">メモ
-                <textarea th:field="*{memo}" size="1500" maxlength="1500" class="form-control"></textarea>
-            </label><br/>
-            <input type="hidden" name="id" th:value="${formModel.id}">
-            <input type="hidden" name="month" th:value="${formModel.month}">
-            <input type="submit" value="更新" class="btn btn-primary update-button"/>
+        <table class="table table-newUser">
+            <tr><th>日付</th><td><input type="date" th:value="${#dates.format(date, 'yyyy-MM-dd')}"
+                                        th:field="*{date}" class="form-control" readonly/></td></tr>
+            <tr><th>勤務区分</th>
+                <td>
+                    <select name="attendance" th:field="*{attendance}" class="form-select" aria-label="Default select example">
+                        <option  th:value="0" th:text="未登録"></option>
+                        <option  th:value="1" th:text="社内業務（オンサイト）"></option>
+                        <option  th:value="2" th:text="社内業務（オフサイト）"></option>
+                        <option  th:value="3" th:text="顧客業務（オンサイト）"></option>
+                        <option  th:value="4" th:text="顧客業務（オフサイト）"></option>
+                        <option  th:value="5" th:text="休日" class="dropdown-item"></option>
+                    </select>
+                </td>
+            </tr>
+            <tr><th>開始時刻</th><td><input type="time" th:field="*{workTimeStart}" class="form-control"></td></tr>
+            <tr><th>終了時刻</th><td><input type="time" th:field="*{workTimeFinish}" class="form-control"></td></tr>
+            <tr><th>休憩時間</th><td><input type="time" th:field="*{breakTime}" class="form-control"></td></tr>
+            <tr><th>メモ</th><td><textarea th:field="*{memo}" size="1500" maxlength="1500" class="form-control"/></textarea></td></tr>
+        </table>
+        <input type="hidden" name="id" th:value="${formModel.id}">
+        <input type="hidden" name="month" th:value="${formModel.month}">
+        <input type="submit" value="更新" class="btn btn-primary update-button"/>
 
-        </div>
     </form>
-    <form th:action="@{/}">
-        <input type="submit" value="戻る" class="btn btn-secondary btn-sm"/>
-    </form>
+    <div class="footer-contents">
+        <form th:action="@{/}">
+            <input type="submit" value="戻る" class="btn btn-secondary btn-sm"/>
+        </form>
+    </div>
 </div>
 </body>
 </html>
