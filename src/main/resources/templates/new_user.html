@@ -10,16 +10,16 @@
 <body>
 
 <div class="header-contents">
-    <h2>アカウント登録</h2>
+    <h2 class="text-center my-3">アカウント登録</h2>
 </div>
 
-<div class="main-contents">
+<div class="main-contents mx-auto">
 
-    <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
+    <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
         <p th:text="${errorMessage}"></p>
     </div>
 
-    <form th:method="put" th:action="@{/newUser}" th:object="${user}">
+    <form th:method="put" th:action="@{/newUser}" th:object="${user}" class="text-center" >
 
         <table class="table table-newUser">
             <tr><th>社員番号</th><td><input type="text" th:field="*{employeeNumber}" class="form-control" /></td></tr>
@@ -37,7 +37,9 @@
             </tr>
         </table>
 
+
         <input type="submit" value="追加" class="btn btn-primary update-button" />
+
 
     </form>
 

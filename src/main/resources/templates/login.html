@@ -1,33 +1,41 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.w3.org/1999/xhtml" >
 <head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <meta charset="UTF-8">
     <link th:href="@{/css/style.css}" rel="styleSheet">
     <title>ログイン画面</title>
 </head>
 <body>
 <div class="login-header">
-    <h1>勤怠管理システム　ログイン</h1>
+    <h2 class="text-center my-3">勤怠管理システム　ログイン</h2>
 </div>
-<div class="login-contents">
-    <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
+<div class="main-contents mx-auto">
+    <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
         <p th:text="${errorMessage}"></p>
     </div>
     <!-- ログインフィルターのエラーメッセージ表示 -->
-    <div th:if="${filterErrorMessages}" th:each="filterErrorMessage : ${filterErrorMessages}">
+    <div class="alert alert-danger" th:if="${filterErrorMessages}" th:each="filterErrorMessage : ${filterErrorMessages}">
         <p th:text="${filterErrorMessage}"></p>
     </div>
 
-    <form th:action="@{/loginUser}" th:method="get">
-        <div class="employee_number">
-            <label>社員番号</label>
-            <input type="text" name="employeeNumber" th:value="${employeeNumber}"><br/>
-        </div>
-        <div class="password">
-            <label class="login-conditions">パスワード</label>
-            <input type="password" name="password" th:value="${password}"><br/>
-        </div>
-        <input type="submit" value="ログイン" class="login-button" /><br/>
+    <form th:action="@{/loginUser}" th:method="get" class="text-center">
+        <!--<label class="form-label">社員番号
+            <input class="form-control" type="text" name="employeeNumber" th:value="${employeeNumber}">
+        </label><br/>
+        <label class="form-label">パスワード
+            <input class="form-control" type="password" name="password" th:value="${password}">
+        </label><br/>-->
+
+        <!--テーブルバージョン-->
+        <table class="table table-newUser">
+            <tr><th>社員番号</th><td><input type="text" name="employeeNumber" th:value="${employeeNumber}" class="form-control setting-password"></td></tr>
+            <tr><th>パスワード</th><td><input type="password" name="password" th:value="${password}" class="form-control setting-password"></td></tr>
+        </table>
+
+        <input type="submit" value="ログイン" class="btn btn-primary update-button" />
+
     </form>
 </div>
 </body>

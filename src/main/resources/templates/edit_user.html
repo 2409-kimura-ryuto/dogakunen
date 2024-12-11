@@ -10,19 +10,19 @@
 <body>
 
 <div class="header-contents">
-    <h2>アカウント編集</h2>
+    <h2 class="text-center my-3">アカウント編集</h2>
 </div>
 
-<div class="main-contents">
+<div class="main-contents mx-auto">
 
-    <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
+    <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
         <p th:text="${errorMessage}"></p>
     </div>
 
-    <form th:method="put" th:action="@{/update/{id}(id=${user.id})}" th:object="${user}">
+    <form th:method="put" th:action="@{/update/{id}(id=${user.id})}" th:object="${user}" class="text-center">
 
         <table class="table table-newUser">
-            <tr><th>社員番号</th><td th:text="*{employeeNumber}"><input name="employeeNumber" th:value="${user.employeeNumber}"  type="hidden" /></td></tr>
+            <tr><th>社員番号</th><td th:text="*{employeeNumber}" class="text-start"><input name="employeeNumber" th:value="${user.employeeNumber}"  type="hidden" /></td></tr>
             <tr><th>氏名</th><td><input type="text" th:field="*{name}" class="form-control" /></td></tr>
             <tr><th>役職</th>
                 <td>
@@ -35,8 +35,8 @@
                     </span>
 
                     <span th:if="${loginUserId == user.id}">
-	                        <div th:text="${user.positionName}"></div>
-	                        <input name="position" th:value="${user.positionId}" type="hidden" />
+	                        <div th:text="${user.positionName}" class="text-start" ></div>
+	                        <input name="position" th:value="${user.positionId}" type="hidden"/>
                     </span>
                 </td>
             </tr>
