@@ -10,7 +10,7 @@
 </head>
 <body>
 <div class="header-contents">
-    <h1>勤怠管理システム</h1>
+    <h1 class="container text-center my-3">勤怠管理システム</h1>
 
     <ul>
         <!-- 承認者orシステム管理者フィルターのエラーメッセージ表示 -->
@@ -28,30 +28,31 @@
     </ul>
 
     <div class="header">
-        <div class="userInf" >
+        <div class="me-3 fs-6">
             社員番号：<span th:text="${loginUser.employeeNumber}"/><br>
             　　氏名：<span th:text="${loginUser.name}"/><br>
         </div>
+        <br/>
         <div th:if="${session.loginUser.positionId == 2}" class="header-item">
             <a th:href="@{/show_users}" class="header-item">
-                <input type="button" value="承認一覧">
+                <input type="button" value="承認一覧" class="btn btn-secondary me-3">
             </a>
         </div>
         <div th:if="${session.loginUser.positionId == 3}" class="header-item">
             <a th:href="@{/systemManage}" class="header-item">
-                <input type="button" value="システム管理">
+                <input type="button" value="システム管理" class="btn btn-secondary me-3">
             </a>
         </div>
         <form th:action="@{/setting}" method="get" class="header-item">
-            <button type="submit" class="btn btn-secondary">設定</button>
+            <button type="submit" class="btn btn-secondary me-3">設定</button>
         </form>
         <form th:action="@{/logout}" method="get" class="header-item">
-            <button type="submit" class="btn btn-secondary">ログアウト</button>
+            <button type="submit" class="btn btn-secondary me-3">ログアウト</button>
         </form>
     </div>
     <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
         <form th:action="@{/newAttendance}" method="get" class="new-button">
-            <input type="submit" value="新規勤怠登録" class="btn btn-primary">
+            <input type="submit" value="新規勤怠登録" class="btn btn-secondary btn-lg">
         </form>
     </div>
 </div>
@@ -66,6 +67,8 @@
             <th>休憩時間</th>
             <th>労働時間</th>
             <th>メモ</th>
+            <th></th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -86,9 +89,22 @@
             <td th:text="${attendance.workTime != null && attendance.workTime.startsWith('0') ? #strings.substring(attendance.workTime, 1, 5) : #strings.substring(attendance.workTime, 0, 5)}"></td>
             <td th:text="${attendance.memo}"></td>
             <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
-                <td th:if="${attendance.attendance != 0}"><a th:href="@{/editAttendance/{id}(id=${attendance.id})}"><input type="submit" value="編集" class="btn btn-secondary"></a></td>
-                <td th:if="${attendance.attendance != 0}"><form th:if="${attendance.attendance != 0}" th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="delete" onSubmit="return CheckDelete()"><input type="submit" value="削除" class="btn btn-danger"></form></td>
+                <td th:if="${attendance.attendance != 0}"><a th:href="@{/editAttendance/{id}(id=${attendance.id})}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
+                <td th:if="${attendance.attendance != 0}"><form th:if="${attendance.attendance != 0}" th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="delete" onSubmit="return CheckDelete()"><input type="submit" value="削除" class="btn btn-outline-danger"></form></td>
             </div>
+            <!-- 未登録の時と申請中/承認済みの時の編集/削除ボタンの表示 -->
+            <td th:if="${attendance.attendance == 0}">
+                <button disabled class="btn btn-outline-secondary">編集</button>
+            </td>
+            <td th:if="${attendance.attendance == 0}">
+                <button disabled class="btn btn-outline-secondary">削除</button>
+            </td>
+            <td th:if="${monthAttendance.attendanceStatus != 0}">
+                <button disabled class="btn btn-outline-secondary">編集</button>
+            </td>
+            <td th:if="${monthAttendance.attendanceStatus != 0}">
+                <button disabled class="btn btn-outline-secondary">削除</button>
+            </td>
         </tr>
     </tbody>
 </table>
@@ -98,14 +114,14 @@
     <th:block th:switch="${attendanceStatus}">
         <span th:case="0">
             <form th:action="@{/request}" th:method="put" class="header-item" onSubmit="return CheckRequest()">
-                <input type="submit" value="申請" class="btn btn-primary">
+                <input type="submit" value="申請" class="btn btn-primary btn-lg">
             </form>
         </span>
         <span th:case="1">
-            <button disabled class="btn btn-secondary">申請中</button>
+            <button disabled class="btn btn-secondary btn-lg">申請中</button>
         </span>
         <span th:case="2">
-            <button disabled class="btn btn-secondary">承認済み</button>
+            <button disabled class="btn btn-secondary btn-lg">承認済み</button>
         </span>
     </th:block>
 </div>

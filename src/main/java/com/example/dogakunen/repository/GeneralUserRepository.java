@@ -13,16 +13,6 @@ import java.util.List;
 public interface GeneralUserRepository extends JpaRepository<GeneralUser, Integer> {
 
     @Query(
-//            value = "SELECT " +
-//                    "u.employee_number AS employeeNumber, u.name AS name, p.name AS positionName, m.month AS month, m.attendance_status AS attendanceStatus " +
-//                    "FROM users u " +
-//                    "INNER JOIN positions p ON u.position_id = p.id " +
-//                    "INNER JOIN month_attendances m ON u.id = m.user_id " +
-//                    "WHERE u.position_id= 1 " +
-//                    "AND m.month= :month " +
-//                    "ORDER BY u.id ASC " ,
-//            nativeQuery = true
-
             /*passwordやis_stoppedはviewで表示させないが、Userにフィールドとして定義されているため
               取得しないとエラーになってしまう*/
             value = "SELECT " +
