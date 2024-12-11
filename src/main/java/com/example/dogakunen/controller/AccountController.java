@@ -172,7 +172,7 @@ public class AccountController {
         //変更後のloginUserを引数にDBをupdate
         userService.saveUser(loginUser);
 
-        // 画面遷移先を指定
+        //画面遷移先を指定
         return new ModelAndView("redirect:/");
     }
 
