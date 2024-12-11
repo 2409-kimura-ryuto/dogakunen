@@ -36,7 +36,7 @@ public class DateAttendanceForm {
 
     private String workTime;
 
-    @Size(max = 140, message = "・140文字以下で入力してください")
+    @Size(max = 60, message = "・60文字以下で入力してください")
     private String memo;
 
     private Date createdDate;
