@@ -26,12 +26,8 @@ body {
 .errorMessages {
     color : red;
     font-size : 14px;
-    width: 50px;
 }
 
-.alert-danger{
-    width: 400px;
-}
 
 .header-item {
     display : inline-block;

@@ -9,15 +9,14 @@
 </head>
 <body>
 <div class="header-contents">
-    <h2>新規勤怠登録</h2>
+    <h2 class="text-center my-3">新規勤怠登録</h2>
 </div>
-<div class="main-contents">
+<div class="main-contents mx-auto">
+    <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
+        <p th:text="${errorMessage}"></p>
+    </div>
     <form method="post" th:action="@{/newAttendance}" th:object="${formModel}">
-        <div class="table table-newUser">
-            <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
-                <span th:text="${errorMessage}"></br></span>
-            </div>
-            <table class="table table-hover">
+            <table class="table table-newUser">
                 <tr><th>日付</th><td><input type="date" th:value="${#dates.format(date, 'yyyy-MM-dd')}"
                                             th:field="*{date}" class="form-control"/></td></tr>
                 <tr><th>勤務区分</th>
@@ -38,7 +37,7 @@
                 <tr><th>メモ</th><td><textarea th:field="*{memo}" size="1500" maxlength="1500" class="form-control"/></textarea></td></tr>
             </table>
             <input type="submit" value="登録" class="btn btn-primary update-button"/>
-        </div>
+
     </form>
     <div class="footer-contents">
         <form th:action="@{/}">
