@@ -5,6 +5,7 @@ import com.example.dogakunen.controller.form.MonthAttendanceForm;
 import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.repository.entity.User;
 import com.example.dogakunen.service.DateAttendanceService;
+import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.dogakunen.controller.form.UserForm;
@@ -22,10 +23,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.text.ParseException;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 public class AttendanceController {
@@ -106,24 +104,28 @@ public class AttendanceController {
 
         //バリデーション
         List<String> errorMessages = new ArrayList<>();
+        Date date = reqAttendance.getDate();
         LocalTime startTime = reqAttendance.getWorkTimeStart();
         LocalTime finishTime = reqAttendance.getWorkTimeFinish();
         String breakTime = reqAttendance.getBreakTime();
         int attendanceNumber = reqAttendance.getAttendance();
+        if(date == null){
+            errorMessages.add("・日付を入力してください");
+        }
         if (Objects.isNull(startTime) && attendanceNumber != 5){
-            errorMessages.add("開始時刻を入力してください");
+            errorMessages.add("・開始時刻を入力してください");
         }
         if (Objects.isNull(finishTime) && attendanceNumber != 5){
-            errorMessages.add("終了時刻を入力してください");
+            errorMessages.add("・終了時刻を入力してください");
         }
         if (attendanceNumber == 0){
-            errorMessages.add("勤怠区分を登録してください");
+            errorMessages.add("・勤怠区分を登録してください");
         }
         if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime) || !breakTime.equals("00:00"))){
-            errorMessages.add("無効な入力です");
+            errorMessages.add("・無効な入力です");
         }
         if (Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)){
-            errorMessages.add("無効な入力です");
+            errorMessages.add("・無効な入力です");
         }
         if(result.hasErrors()) {
             //エラーがあったら、エラーメッセージを格納する
@@ -148,6 +150,7 @@ public class AttendanceController {
         }
         //勤怠登録処理
         dateAttendanceService.postNew(reqAttendance, employeeNumber, month);
+
         return new ModelAndView("redirect:/");
     }
 
@@ -159,7 +162,7 @@ public class AttendanceController {
         //idの正規表現チェック
         List<String> errorMessages = new ArrayList<String>();
         if ((id == null) || (!id.matches("^[0-9]+$"))) {
-            errorMessages.add("不正なパラメータが入力されました");
+            errorMessages.add("・不正なパラメータが入力されました");
         }
 
         //勤怠状況が存在しない勤怠(日)のidが入力された際のバリデーション
@@ -167,7 +170,7 @@ public class AttendanceController {
             try {
                 dateAttendanceService.findDateAttendanceById(Integer.parseInt(id));
             } catch (RuntimeException e) {
-                errorMessages.add("不正なパラメータが入力されました");
+                errorMessages.add("・不正なパラメータが入力されました");
             }
         }
 
@@ -193,7 +196,7 @@ public class AttendanceController {
         ModelAndView mav = new ModelAndView();
         //バリデーション
         List<String> errorMessages = new ArrayList<String>();
-        errorMessages.add("不正なパラメータが入力されました");
+        errorMessages.add("・不正なパラメータが入力されました");
         redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
         mav.setViewName("redirect:/");
         return mav;
@@ -213,20 +216,20 @@ public class AttendanceController {
         String breakTime = reqAttendance.getBreakTime();
         int attendanceNumber = reqAttendance.getAttendance();
         if (Objects.isNull(startTime) && attendanceNumber != 5){
-            errorMessages.add("開始時刻を入力してください");
+            errorMessages.add("・開始時刻を入力してください");
         }
         if (Objects.isNull(finishTime) && attendanceNumber != 5){
-            errorMessages.add("終了時刻を入力してください");
+            errorMessages.add("・終了時刻を入力してください");
         }
         if (attendanceNumber == 0){
-            errorMessages.add("勤怠区分を登録してください");
+            errorMessages.add("・勤怠区分を登録してください");
         }
         if (attendanceNumber == 5 && (!startTime.equals(LocalTime.parse("00:00")) || !finishTime.equals(LocalTime.parse("00:00")) 
                 || (!breakTime.equals("00:00:00") && !breakTime.equals("00:00")))){
-            errorMessages.add("無効な入力です");
+            errorMessages.add("・無効な入力です");
         }
         if (attendanceNumber != 5 && Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)){
-            errorMessages.add("無効な入力です");
+            errorMessages.add("・無効な入力です");
         }
         if(result.hasErrors()) {
             //エラーがあったら、エラーメッセージを格納する

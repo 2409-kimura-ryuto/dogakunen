@@ -2,6 +2,7 @@ package com.example.dogakunen.repository;
 
 import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.repository.entity.User;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -76,6 +77,5 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
          nativeQuery = true
     )
     public void addAttendance(@Param("id") Integer id, @Param("attendance") Integer attendance, @Param("workTimeStart") LocalTime workTimeStart, @Param("workTimeFinish") LocalTime workTimeFinish, @Param("breakTime") String breakTime, @Param("workTime") String workTime, @Param("memo") String memo);
-
 
 }
