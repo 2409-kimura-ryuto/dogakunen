@@ -15,7 +15,7 @@
     <div class="employee_number text-center">
         <label>社員番号</label>：<a th:text="${employeeNumber}"></a>
     </div>
-    <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
+    <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
         <p th:text="${errorMessage}"></p>
     </div>
     <form th:action="@{/settingProcess}" th:method="put" class="text-center">
