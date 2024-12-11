@@ -23,11 +23,11 @@
 
         <table class="table table-newUser">
             <tr><th>社員番号</th><td th:text="*{employeeNumber}"><input name="employeeNumber" th:value="${user.employeeNumber}"  type="hidden" /></td></tr>
-            <tr><th>氏名</th><td><input type="text" th:field="*{name}" /></td></tr>
+            <tr><th>氏名</th><td><input type="text" th:field="*{name}" class="form-control" /></td></tr>
             <tr><th>役職</th>
                 <td>
                     <span th:if="${loginUserId != user.id}">
-                        <select name="position">
+                        <select name="position" class="form-select">
                             <option value="1" th:selected="${user.positionId == 1}">社員</option>
                             <option value="2" th:selected="${user.positionId == 2}">グループ長</option>
                             <option value="3" th:selected="${user.positionId == 3}">システム管理者</option>
@@ -42,13 +42,13 @@
             </tr>
         </table>
 
-        <input type="submit" value="更新" class="updateUser-button" />
+        <input type="submit" value="更新" class="btn btn-primary update-button" />
 
     </form>
 
     <div class="footer-contents">
         <form th:action="@{/systemManage}">
-            <input type="submit" value="戻る" class="return-button" />
+            <input type="submit" value="戻る" class="btn btn-secondary btn-sm" />
         </form>
     </div>
 

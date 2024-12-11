@@ -13,7 +13,8 @@
 <body>
 
 <div class="header-contents">
-    <h2>システム管理</h2>
+    <h2 class="text-center mb-4">システム管理</h2>
+    <p class="text-center">ユーザ一覧</p>
 </div>
 
 <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
@@ -21,10 +22,8 @@
 </div>
 
 <form th:action="@{/newUser}">
-    <input type="submit" value="新規登録" class="btn btn-secondary"/>
+    <input type="submit" value="新規登録" class="btn btn-secondary newUser-button"/>
 </form>
-
-<p class="userList-title">ユーザ一覧</p>
 
 <table class="table table-hover table-systemManage">
     <thead>
@@ -79,7 +78,7 @@
 
 <div class="footer-contents">
     <form th:action="@{/}">
-        <input type="submit" value="戻る" class="btn btn-secondary" />
+        <input type="submit" value="戻る" class="btn btn-secondary btn-sm" />
     </form>
 </div>
 

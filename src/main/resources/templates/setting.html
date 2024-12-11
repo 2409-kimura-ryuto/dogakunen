@@ -19,16 +19,23 @@
         <p th:text="${errorMessage}"></p>
     </div>
     <form th:action="@{/settingProcess}" th:method="put">
-        <div class="password">
-            <label class="setting-conditions">パスワード</label>：<input type="password" name="password" th:value="${password}"><br/>
+        <!--<div class="password">
+            <label class="setting-conditions">パスワード</label><input type="password" name="password" th:value="${password}" class="form-control setting-password"><br/>
         </div>
         <div class="passwordConfirmation">
-            <label class="setting-conditions">確認用パスワード</label>：<input type="password" name="passwordConfirmation" th:value="${passwordConfirmation}"><br/>
-        </div>
-        <input type="submit" value="変更" class="setting-button" /><br/>
+            <label class="setting-conditions">確認用パスワード</label><input type="password" name="passwordConfirmation" th:value="${passwordConfirmation}" class="form-control setting-password"><br/>
+        </div>-->
+
+        <!-- テーブル表記バージョン-->
+        <table class="table table-newUser">
+            <tr><th>パスワード</th><td><input type="password" name="password" th:value="${password}" class="form-control setting-password"></td></tr>
+            <tr><th>パスワード(確認用)</th><td><input type="password" name="passwordConfirmation" th:value="${passwordConfirmation}" class="form-control setting-password"></td></tr>
+        </table>
+
+        <input type="submit" value="変更" class="btn btn-primary update-button" /><br/>
     </form>
     <form th:action="@{/}">
-        <input type="submit" value="戻る" class="btn btn-secondary" />
+        <input type="submit" value="戻る" class="btn btn-secondary btn-sm" />
     </form>
 </div>
 </body>

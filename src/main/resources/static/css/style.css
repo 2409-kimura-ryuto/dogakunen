@@ -10,6 +10,11 @@ body {
     border-bottom : 1px solid #ccc;
 }
 
+.header-contents {
+    margin-top : 1.5rem;
+    margin-bottom : 1.5rem;
+}
+
 .header {
 	text-align: right;
 }
@@ -44,6 +49,10 @@ body {
     padding-left : 2em;
 }
 
+.table-newUser {
+    width : 500px;
+}
+
 .table-newUser tr {
     border-bottom : 1px solid #ccc;
     height : 40px;
@@ -76,4 +85,22 @@ body {
 
 .return-button {
     margin-top : 20px;
+}
+
+.update-button {
+    width : 70px;
+    margin-bottom : 20px;
+}
+
+.newUser-button {
+    margin-bottom : 20px;
+}
+
+.setting-password {
+    width : 200px;
+}
+
+.employee_number {
+    margin : 20px 0 20px 0;
+    font-weight : bold;
 }
