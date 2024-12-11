@@ -15,7 +15,7 @@
     <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
         <p th:text="${errorMessage}"></p>
     </div>
-    <form method="post" th:action="@{/newAttendance}" th:object="${formModel}">
+    <form method="post" th:action="@{/newAttendance}" th:object="${formModel}" class="text-center">
             <table class="table table-newUser">
                 <tr><th>日付</th><td><input type="date" th:value="${#dates.format(date, 'yyyy-MM-dd')}"
                                             th:field="*{date}" class="form-control"/></td></tr>
