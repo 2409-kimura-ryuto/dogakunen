@@ -185,5 +185,4 @@ public class UserService {
     public void editIsStopped(Integer isStoppedId, Integer userId){
         userRepository.editIsStopped(isStoppedId, userId);
     }
-
 }
