@@ -171,6 +171,14 @@ public class AttendanceController {
             }
         }
 
+        //idの正規表現チェック
+        if ((id == null) || (!id.matches("^[0-9]+$"))) {
+            errorMessages.add("・不正なパラメータが入力されました");
+            redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
+            mav.setViewName("redirect:/");
+            return mav;
+        }
+
         //URLのIDの勤怠(日)のユーザIDが自分以外のユーザIDの場合のバリデーションと
         //未登録or申請中/承認済みの場合に編集画面に遷移できないようにするバリデーション
         UserForm loginUser = (UserForm)session.getAttribute("loginUser");
@@ -180,11 +188,6 @@ public class AttendanceController {
         int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUserId, 12).getAttendanceStatus();
 
         if (loginUserId != useId || attendance == 0 || attendanceStatus != 0) {
-            errorMessages.add("・不正なパラメータが入力されました");
-        }
-
-        //idの正規表現チェック
-        if ((id == null) || (!id.matches("^[0-9]+$"))) {
             errorMessages.add("・不正なパラメータが入力されました");
         }
 
