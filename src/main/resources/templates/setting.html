@@ -8,24 +8,17 @@
     <title>設定画面</title>
 </head>
 <body>
-<div class="login-header">
-    <h1>勤怠管理システム　設定画面</h1>
+<div class="header-contents">
+    <h2 class="text-center my-3">勤怠管理システム　設定画面</h2>
 </div>
-<div class="setting-contents">
-    <div class="employee_number">
+<div class="main-contents mx-auto">
+    <div class="employee_number text-center">
         <label>社員番号</label>：<a th:text="${employeeNumber}"></a>
     </div>
     <div class="errorMessages" th:each="errorMessage : ${errorMessages}">
         <p th:text="${errorMessage}"></p>
     </div>
-    <form th:action="@{/settingProcess}" th:method="put">
-        <!--<div class="password">
-            <label class="setting-conditions">パスワード</label><input type="password" name="password" th:value="${password}" class="form-control setting-password"><br/>
-        </div>
-        <div class="passwordConfirmation">
-            <label class="setting-conditions">確認用パスワード</label><input type="password" name="passwordConfirmation" th:value="${passwordConfirmation}" class="form-control setting-password"><br/>
-        </div>-->
-
+    <form th:action="@{/settingProcess}" th:method="put" class="text-center">
         <!-- テーブル表記バージョン-->
         <table class="table table-newUser">
             <tr><th>パスワード</th><td><input type="password" name="password" th:value="${password}" class="form-control setting-password"></td></tr>

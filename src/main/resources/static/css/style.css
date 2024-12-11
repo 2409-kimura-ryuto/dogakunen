@@ -19,6 +19,10 @@ body {
 	text-align: right;
 }
 
+.main-contents {
+    width : 500px;
+}
+
 .errorMessages {
     color : red;
     font-size : 14px;
@@ -56,6 +60,7 @@ body {
 
 .table-newUser {
     width : 500px;
+    margin : 0 auto;
 }
 
 .table-newUser tr {
@@ -93,8 +98,9 @@ body {
 }
 
 .update-button {
-    width : 70px;
+    width : 120px;
     margin-bottom : 20px;
+    margin-top : 20px;
 }
 
 .newUser-button {
