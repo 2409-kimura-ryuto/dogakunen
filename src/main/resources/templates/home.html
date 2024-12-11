@@ -12,20 +12,18 @@
 <div class="header-contents">
     <h1 class="container text-center my-3">勤怠管理システム</h1>
 
-    <ul>
         <!-- 承認者orシステム管理者フィルターのエラーメッセージ表示 -->
-        <div th:if="${filterErrorMessages}" th:each="filterErrorMessage : ${filterErrorMessages}" class="errorMessages">
-            <li><div th:text="${filterErrorMessage}" /></li>
+        <div th:if="${filterErrorMessages}" th:each="filterErrorMessage : ${filterErrorMessages}" class="alert alert-danger">
+            <span><div th:text="${filterErrorMessage}" /></span>
         </div>
         <!-- 完了申請のエラーメッセージ表示 -->
-        <div th:if="${requestErrorMessages}" th:each="requestErrorMessage : ${requestErrorMessages}" class="errorMessages">
-            <li><div th:text="${requestErrorMessage}" /></li>
+        <div th:if="${requestErrorMessages}" th:each="requestErrorMessage : ${requestErrorMessages}" class="alert alert-danger">
+            <span><div th:text="${requestErrorMessage}" /></span>
         </div>
         <!-- 勤怠編集画面の不正なパラメーターのエラーメッセージ表示 -->
-        <div th:if="${parameterErrorMessages}" th:each="parameterErrorMessage : ${parameterErrorMessages}" class="errorMessages">
-            <li><div th:text="${parameterErrorMessage}" /></li>
+        <div th:if="${parameterErrorMessages}" th:each="parameterErrorMessage : ${parameterErrorMessages}" class="alert alert-danger">
+            <span><div th:text="${parameterErrorMessage}" /></span>
         </div>
-    </ul>
 
     <div class="header">
         <div class="me-3 fs-6">
@@ -114,14 +112,14 @@
     <th:block th:switch="${attendanceStatus}">
         <span th:case="0">
             <form th:action="@{/request}" th:method="put" class="header-item" onSubmit="return CheckRequest()">
-                <input type="submit" value="申請" class="btn btn-primary btn-lg">
+                <input type="submit" value="申請" class="btn btn-primary">
             </form>
         </span>
         <span th:case="1">
-            <button disabled class="btn btn-secondary btn-lg">申請中</button>
+            <button disabled class="btn btn-secondary">申請中</button>
         </span>
         <span th:case="2">
-            <button disabled class="btn btn-secondary btn-lg">承認済み</button>
+            <button disabled class="btn btn-secondary">承認済み</button>
         </span>
     </th:block>
 </div>

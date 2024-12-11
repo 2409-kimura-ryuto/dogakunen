@@ -34,7 +34,7 @@ public class AdminFilter implements Filter {
             httpSession = httpRequest.getSession(true);
             //エラーメッセージをセット
             List<String> errorMessages = new ArrayList<>();
-            errorMessages.add("無効なアクセスです");
+            errorMessages.add("・無効なアクセスです");
             httpSession.setAttribute("filterErrorMessages", errorMessages);
             //ホーム画面にリダイレクト
             httpResponse.sendRedirect("/");

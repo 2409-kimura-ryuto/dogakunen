@@ -8,19 +8,12 @@
     <title>承認対象者一覧画面</title>
 </head>
 <body>
-<div class="container mt-5">
-    <div class="row justify-content-center h-100">
-        <div class="col-12 col-md-8">
-            <h1 class="text-center mb-4">承認対象者一覧</h1><br/>
-        </div>
-    </div>
-</div>
+<h1 class="container text-center my-3">承認対象者一覧</h1><br/>
+
 <!-- 不正なパラメータが入力された際のエラーメッセージ表示 -->
-<ul>
-    <div th:if="${errorMessages}" th:each="errorMessage : ${errorMessages}" class="errorMessages">
-        <li><div th:text="${errorMessage}" /></li>
+    <div th:if="${errorMessages}" th:each="errorMessage : ${errorMessages}" class="alert alert-danger">
+        <span><div th:text="${errorMessage}" /></span>
     </div>
-</ul>
 
 <table class="table table-hover">
     <thead class="table-light">
@@ -53,7 +46,7 @@
     </tbody>
 </table>
 <a th:href="@{/}">
-    <input type="button" value="戻る" class="btn btn-secondary">
+    <input type="button" value="戻る" class="btn btn-secondary btn-sm">
 </a>
 </body>
 </html>
