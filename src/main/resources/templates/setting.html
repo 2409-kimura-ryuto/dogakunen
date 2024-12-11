@@ -12,15 +12,16 @@
     <h2 class="text-center my-3">勤怠管理システム　設定画面</h2>
 </div>
 <div class="main-contents mx-auto">
-    <div class="employee_number text-center">
+    <!--<div class="employee_number text-center">
         <label>社員番号</label>：<a th:text="${employeeNumber}"></a>
-    </div>
+    </div>-->
     <div class="alert alert-danger" th:each="errorMessage : ${errorMessages}">
         <p th:text="${errorMessage}"></p>
     </div>
     <form th:action="@{/settingProcess}" th:method="put" class="text-center">
         <!-- テーブル表記バージョン-->
         <table class="table table-newUser">
+            <tr><th>社員番号</th><td th:text="${employeeNumber}" class="text-start" ></td></tr>
             <tr><th>パスワード</th><td><input type="password" name="password" th:value="${password}" class="form-control setting-password"></td></tr>
             <tr><th>パスワード(確認用)</th><td><input type="password" name="passwordConfirmation" th:value="${passwordConfirmation}" class="form-control setting-password"></td></tr>
         </table>
