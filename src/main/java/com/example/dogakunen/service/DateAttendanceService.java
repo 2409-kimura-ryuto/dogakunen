@@ -14,6 +14,8 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.BeanUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 
@@ -38,6 +40,12 @@ public class DateAttendanceService {
     public List<DateAttendanceForm> findALLAttendances(int month, Integer loginId) {
         //データ取得処理
         List<DateAttendance> results = dateAttendanceRepository.findAllAttendances(month, loginId);
+
+        //【追加②】resultsのサイズが0の時、nullを返す
+        if (results.isEmpty()) {
+            return null;
+        }
+
         //フォームに詰め替え
         List<DateAttendanceForm> dateAttendances = setDateAttendanceForm(results);
         return dateAttendances;
@@ -341,4 +349,5 @@ public class DateAttendanceService {
             return "00:00:00";
         }
     }
+
 }
