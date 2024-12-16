@@ -48,11 +48,13 @@
             <button type="submit" class="btn btn-secondary me-3">ログアウト</button>
         </form>
     </div>
+    <!--新規登録は非表示
     <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
         <form th:action="@{/newAttendance}" method="get" class="new-button">
             <input type="submit" value="新規勤怠登録" class="btn btn-secondary btn-lg">
         </form>
     </div>
+    -->
 </div>
 <br/>
 <table class="table table-hover">
@@ -65,7 +67,6 @@
             <th>休憩時間</th>
             <th>労働時間</th>
             <th>メモ</th>
-            <th></th>
             <th></th>
         </tr>
     </thead>
@@ -87,21 +88,15 @@
             <td th:text="${attendance.workTime != null && attendance.workTime.startsWith('0') ? #strings.substring(attendance.workTime, 1, 5) : #strings.substring(attendance.workTime, 0, 5)}"></td>
             <td th:text="${attendance.memo}"></td>
             <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
-                <td th:if="${attendance.attendance != 0}"><a th:href="@{/editAttendance/{id}(id=${attendance.id})}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
-                <td th:if="${attendance.attendance != 0}"><form th:if="${attendance.attendance != 0}" th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="delete" onSubmit="return CheckDelete()"><input type="submit" value="削除" class="btn btn-outline-danger"></form></td>
+                <td><form th:action="@{/newOrEdit}" th:method="get"><input type="submit" value="編集" class="btn btn-outline-secondary">
+                <!--idとdateの渡し方は調整が必要-->
+                <input type="hidden" name="id" th:value="${attendance.id}">
+                <input type="hidden" name="date" th:value="2024-12-16">
+                </form></td>
             </div>
-            <!-- 未登録の時と申請中/承認済みの時の編集/削除ボタンの表示 -->
-            <td th:if="${attendance.attendance == 0}">
-                <button disabled class="btn btn-outline-secondary">編集</button>
-            </td>
-            <td th:if="${attendance.attendance == 0}">
-                <button disabled class="btn btn-outline-secondary">削除</button>
-            </td>
+            <!-- 承認済みの時の編集ボタンの表示 -->
             <td th:if="${monthAttendance.attendanceStatus != 0}">
                 <button disabled class="btn btn-outline-secondary">編集</button>
-            </td>
-            <td th:if="${monthAttendance.attendanceStatus != 0}">
-                <button disabled class="btn btn-outline-secondary">削除</button>
             </td>
         </tr>
     </tbody>

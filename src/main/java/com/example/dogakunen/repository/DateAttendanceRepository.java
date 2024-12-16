@@ -2,7 +2,6 @@ package com.example.dogakunen.repository;
 
 import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.repository.entity.User;
-import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
-import java.time.Duration;
 
 
 @Repository
@@ -78,4 +76,19 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
     )
     public void addAttendance(@Param("id") Integer id, @Param("attendance") Integer attendance, @Param("workTimeStart") LocalTime workTimeStart, @Param("workTimeFinish") LocalTime workTimeFinish, @Param("breakTime") String breakTime, @Param("workTime") String workTime, @Param("memo") String memo);
 
+    //【整地前】全社員の総労働時間取得(CSVファイル出力用)
+    @Transactional
+    @Query(
+            value = "SELECT u.name AS name," +
+            "u.employee_number AS employeeNumber," +
+            "SUM(d.work_time) AS totalWorkTime " +
+            "FROM date_attendances d " +
+            "INNER JOIN users u ON d.user_id = u.id " +
+            "WHERE d.month = :month " +
+            "AND d.year = :year " +
+            "GROUP BY u.name, u.employee_number " +
+            "ORDER BY u.employee_number ASC" ,
+            nativeQuery = true
+    )
+    public List<Object[]> selectWorkTime(@Param("year") int year, @Param("month") int month);
 }

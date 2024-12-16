@@ -3,15 +3,13 @@ package com.example.dogakunen.controller;
 import com.example.dogakunen.controller.form.DateAttendanceForm;
 import com.example.dogakunen.controller.form.MonthAttendanceForm;
 import com.example.dogakunen.controller.form.UserForm;
-import com.example.dogakunen.repository.entity.User;
+import com.example.dogakunen.repository.entity.AdministratorCSV;
 import com.example.dogakunen.service.DateAttendanceService;
-import io.micrometer.common.util.StringUtils;
+import com.opencsv.exceptions.CsvException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.service.MonthAttendanceService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.Banner;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -20,6 +18,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.*;
@@ -47,7 +49,7 @@ public class AttendanceController {
         int month = calender.get(Calendar.MONTH) + 1;
 
         //ログインユーザ情報取得
-        UserForm loginUser =(UserForm) session.getAttribute("loginUser");
+        UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         Integer loginId = loginUser.getId();
 
         //勤怠月取得
@@ -64,7 +66,7 @@ public class AttendanceController {
         session.removeAttribute("filterErrorMessages");
 
         //情報をセット
-        mav.addObject("attendances",dateAttendances);
+        mav.addObject("attendances", dateAttendances);
         mav.addObject("monthAttendance", monthAttendanceForm);
         mav.addObject("loginUser", loginUser);
         mav.addObject("attendanceStatus", attendanceStatus);
@@ -73,10 +75,10 @@ public class AttendanceController {
     }
 
     /*
-     * 新規勤怠登録画面表示
-     */
+     * 新規勤怠登録画面表示(古いバージョンなのでコメントアウト)
+     *
     @GetMapping("/newAttendance")
-    public ModelAndView getNewAttendance(){
+    public ModelAndView getNewAttendance() {
         ModelAndView mav = new ModelAndView();
 
         //空のformModelを入れる
@@ -85,16 +87,16 @@ public class AttendanceController {
         mav.addObject("formModel", dateAttendance);
         mav.setViewName("/new_attendance");
         return mav;
-    }
+    } */
 
     /*
-     * 新規勤怠登録処理
-     */
+     * 新規勤怠登録処理(古いバージョンなのでコメントアウト)
+     *
     @PostMapping("/newAttendance")
     public ModelAndView postNewAttendance(@ModelAttribute(name = "formModel") @Validated DateAttendanceForm reqAttendance,
                                           BindingResult result) throws ParseException {
         //ログインユーザ情報から社員番号取得
-        UserForm loginUser = (UserForm)session.getAttribute("loginUser");
+        UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         String employeeNumber = loginUser.getEmployeeNumber();
 
         //アクセスした日付を取得
@@ -108,25 +110,25 @@ public class AttendanceController {
         LocalTime finishTime = reqAttendance.getWorkTimeFinish();
         String breakTime = reqAttendance.getBreakTime();
         int attendanceNumber = reqAttendance.getAttendance();
-        if(date == null){
+        if (date == null) {
             errorMessages.add("・日付を入力してください");
         }
-        if (Objects.isNull(startTime) && attendanceNumber != 5){
+        if (Objects.isNull(startTime) && attendanceNumber != 5) {
             errorMessages.add("・開始時刻を入力してください");
         }
-        if (Objects.isNull(finishTime) && attendanceNumber != 5){
+        if (Objects.isNull(finishTime) && attendanceNumber != 5) {
             errorMessages.add("・終了時刻を入力してください");
         }
-        if (attendanceNumber == 0){
+        if (attendanceNumber == 0) {
             errorMessages.add("・勤怠区分を登録してください");
         }
-        if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime) || !breakTime.equals("00:00"))){
+        if (attendanceNumber == 5 && (Objects.nonNull(startTime) || Objects.nonNull(finishTime) || !breakTime.equals("00:00"))) {
             errorMessages.add("・無効な入力です");
         }
-        if (Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)){
+        if (Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)) {
             errorMessages.add("・無効な入力です");
         }
-        if(result.hasErrors()) {
+        if (result.hasErrors()) {
             //エラーがあったら、エラーメッセージを格納する
             //エラーメッセージの取得
             for (FieldError error : result.getFieldErrors()) {
@@ -135,7 +137,7 @@ public class AttendanceController {
                 errorMessages.add(message);
             }
         }
-        if (!errorMessages.isEmpty()){
+        if (!errorMessages.isEmpty()) {
             ModelAndView mav = new ModelAndView();
             mav.addObject("formModel", reqAttendance);
             mav.addObject("errorMessages", errorMessages);
@@ -143,7 +145,7 @@ public class AttendanceController {
             return mav;
         }
         //勤務区分が休日の場合
-        if (reqAttendance.getAttendance() == 5){
+        if (reqAttendance.getAttendance() == 5) {
             reqAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
             reqAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
         }
@@ -151,65 +153,82 @@ public class AttendanceController {
         dateAttendanceService.postNew(reqAttendance, employeeNumber, month);
 
         return new ModelAndView("redirect:/");
-    }
+    } */
 
-    //編集画面表示
-    @GetMapping("/editAttendance/{id}")
-    public ModelAndView getEditAttendance(@PathVariable String id, RedirectAttributes redirectAttributes){
+    /*
+     * 勤怠登録・編集画面表示
+     */
+    @GetMapping("/newOrEdit")
+    public ModelAndView getEditAttendance(@RequestParam(name = "id", required = false) String id , @RequestParam(name = "date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date, RedirectAttributes redirectAttributes) {
         ModelAndView mav = new ModelAndView();
         List<String> errorMessages = new ArrayList<String>();
+        UserForm loginUser = (UserForm) session.getAttribute("loginUser");
 
-        //勤怠状況が存在しない勤怠(日)のidが入力された際のバリデーション
-        if (id.matches("^[0-9]+$")) {
-            try {
-                dateAttendanceService.findDateAttendanceById(Integer.parseInt(id));
-            } catch (RuntimeException e) {
+        //新規登録画面の表示テスト用
+        //id = null;
+
+        //idが画面から渡されているかで条件分岐
+        //idが渡されてきた場合はバリデーション後に勤怠編集画面に遷移
+        if (id != null) {
+            //勤怠状況が存在しない勤怠(日)のidが入力された際のバリデーション
+            if (id.matches("^[0-9]+$")) {
+                try {
+                    dateAttendanceService.findDateAttendanceById(Integer.parseInt(id));
+                } catch (RuntimeException e) {
+                    errorMessages.add("・不正なパラメータが入力されました");
+                    redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
+                    mav.setViewName("redirect:/");
+                    return mav;
+                }
+            }
+            //idの正規表現チェック
+            if ((id == null) || (!id.matches("^[0-9]+$"))) {
                 errorMessages.add("・不正なパラメータが入力されました");
                 redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
                 mav.setViewName("redirect:/");
                 return mav;
             }
-        }
+            //URLのIDの勤怠(日)のユーザIDが自分以外のユーザIDの場合のバリデーションと
+            //未登録or申請中/承認済みの場合に編集画面に遷移できないようにするバリデーション
+            int loginUserId = loginUser.getId();
+            int useId = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getUserId();
+            int attendance = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getAttendance();
+            int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUserId, 12).getAttendanceStatus();
 
-        //idの正規表現チェック
-        if ((id == null) || (!id.matches("^[0-9]+$"))) {
-            errorMessages.add("・不正なパラメータが入力されました");
-            redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
-            mav.setViewName("redirect:/");
+            if (loginUserId != useId /*|| attendance == 0*/ || attendanceStatus != 0) {
+                errorMessages.add("・不正なパラメータが入力されました");
+            }
+
+            //エラーメッセージが存在する場合はエラーメッセージをセットし、ホーム画面にリダイレクト
+            if (errorMessages.size() > 0) {
+                redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
+                mav.setViewName("redirect:/");
+                return mav;
+            }
+
+            //IDから勤怠情報取得
+            DateAttendanceForm dateAttendanceForm = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id));
+            mav.addObject("formModel", dateAttendanceForm);
+            mav.setViewName("/edit_attendance");
+            return mav;
+
+        //idが渡されていない場合は、勤怠登録画面に遷移
+        }else{
+            //日付と休憩時間のデフォルト値を詰めたformModelを入れる
+            DateAttendanceForm dateAttendance = new DateAttendanceForm();
+            dateAttendance.setDate(date);
+            dateAttendance.setBreakTime("00:00");
+            mav.addObject("formModel", dateAttendance);
+            mav.setViewName("/new_attendance");
             return mav;
         }
-
-        //URLのIDの勤怠(日)のユーザIDが自分以外のユーザIDの場合のバリデーションと
-        //未登録or申請中/承認済みの場合に編集画面に遷移できないようにするバリデーション
-        UserForm loginUser = (UserForm)session.getAttribute("loginUser");
-        int loginUserId = loginUser.getId();
-        int useId = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getUserId();
-        int attendance = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getAttendance();
-        int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUserId, 12).getAttendanceStatus();
-
-        if (loginUserId != useId || attendance == 0 || attendanceStatus != 0) {
-            errorMessages.add("・不正なパラメータが入力されました");
-        }
-
-        //エラーメッセージが存在する場合はエラーメッセージをセットし、ホーム画面にリダイレクト
-        if (errorMessages.size() > 0) {
-            redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
-            mav.setViewName("redirect:/");
-            return mav;
-        }
-
-        //IDから勤怠情報取得
-        DateAttendanceForm dateAttendanceForm = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id));
-        mav.addObject("formModel", dateAttendanceForm);
-        mav.setViewName("/edit_attendance");
-        return mav;
     }
 
     /*
      *　IDが空で渡ってきた場合
      */
     @GetMapping("/editAttendance/")
-    public ModelAndView returnEditAttendance(RedirectAttributes redirectAttributes){
+    public ModelAndView returnEditAttendance(RedirectAttributes redirectAttributes) {
         ModelAndView mav = new ModelAndView();
         //バリデーション
         List<String> errorMessages = new ArrayList<String>();
@@ -232,23 +251,23 @@ public class AttendanceController {
         LocalTime finishTime = reqAttendance.getWorkTimeFinish();
         String breakTime = reqAttendance.getBreakTime();
         int attendanceNumber = reqAttendance.getAttendance();
-        if (Objects.isNull(startTime) && attendanceNumber != 5){
+        if (Objects.isNull(startTime) && attendanceNumber != 5) {
             errorMessages.add("・開始時刻を入力してください");
         }
-        if (Objects.isNull(finishTime) && attendanceNumber != 5){
+        if (Objects.isNull(finishTime) && attendanceNumber != 5) {
             errorMessages.add("・終了時刻を入力してください");
         }
-        if (attendanceNumber == 0){
+        if (attendanceNumber == 0) {
             errorMessages.add("・勤怠区分を登録してください");
         }
-        if (attendanceNumber == 5 && (!startTime.equals(LocalTime.parse("00:00")) || !finishTime.equals(LocalTime.parse("00:00")) 
-                || (!breakTime.equals("00:00:00") && !breakTime.equals("00:00")))){
+        if (attendanceNumber == 5 && (!startTime.equals(LocalTime.parse("00:00")) || !finishTime.equals(LocalTime.parse("00:00"))
+                || (!breakTime.equals("00:00:00") && !breakTime.equals("00:00")))) {
             errorMessages.add("・無効な入力です");
         }
-        if (attendanceNumber != 5 && Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)){
+        if (attendanceNumber != 5 && Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)) {
             errorMessages.add("・無効な入力です");
         }
-        if(result.hasErrors()) {
+        if (result.hasErrors()) {
             //エラーがあったら、エラーメッセージを格納する
             //エラーメッセージの取得
             for (FieldError error : result.getFieldErrors()) {
@@ -257,7 +276,7 @@ public class AttendanceController {
                 errorMessages.add(message);
             }
         }
-        if (!errorMessages.isEmpty()){
+        if (!errorMessages.isEmpty()) {
             ModelAndView mav = new ModelAndView();
             mav.addObject("formModel", reqAttendance);
             mav.addObject("errorMessages", errorMessages);
@@ -266,28 +285,50 @@ public class AttendanceController {
         }
 
         //勤務区分が休日の場合
-        if (reqAttendance.getAttendance() == 5){
+        if (reqAttendance.getAttendance() == 5) {
             reqAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
             reqAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
         }
 
         //ログインユーザ情報から社員番号取得
-        UserForm loginUser = (UserForm)session.getAttribute("loginUser");
+        UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         String employeeNumber = loginUser.getEmployeeNumber();
         reqAttendance.setId(id);
-        dateAttendanceService.updateAttendance(reqAttendance, employeeNumber,month);
+        dateAttendanceService.updateAttendance(reqAttendance, employeeNumber, month);
         return new ModelAndView("redirect:/");
     }
 
 
     /*
-     * 勤怠削除処理
-     */
+     * 勤怠削除処理(なくす機能のためコメントアウト)
+     *
     @PutMapping("/deleteAttendance{id}")
     public ModelAndView deleteAttendance(@PathVariable Integer id) {
         //リクエストから取得したIDを引数にサービスを呼び出す
         dateAttendanceService.deleteAttendance(id);
         // ホーム画面にリダイレクト
         return new ModelAndView("redirect:/");
+    } */
+
+    /*
+     * 【整地前】CSVファイル出力（システム管理者用）
+     */
+    @GetMapping("/csv")
+    public ModelAndView csv(/*@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month*/) {       ModelAndView mav = new ModelAndView();
+
+        //全アカウントの労働時間を取得
+        List<AdministratorCSV> results = dateAttendanceService.selectWorkTime(2024, 12/*year, month*/);
+        //結果をもとにCSVファイル出力
+        try (Writer writer = Files.newBufferedWriter(Paths.get(/*"C:\\Users\\trainee0957\\Desktop\\" + year + "年" + month + "月.csv"*/"C:\\Users\\trainee0957\\Desktop\\2024年12月.csv"))) {
+            dateAttendanceService.write(writer, results);
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (CsvException e) {
+            e.printStackTrace();
+        }
+
+        // ホーム画面にリダイレクト
+        return new ModelAndView("redirect:/");
     }
+
 }
