@@ -33,9 +33,10 @@ public interface GeneralUserRepository extends JpaRepository<GeneralUser, Intege
                     "INNER JOIN month_attendances " +
                     "ON users.id = month_attendances.user_id " +
                     "WHERE users.position_id= 1 " +
+                    "AND month_attendances.year= :year " +
                     "AND month_attendances.month= :month " +
                     "ORDER BY users.id" ,
             nativeQuery = true
     )
-    public List<GeneralUser> findAllGeneralUserByOrderById(@Param("month") Integer month);
+    public List<GeneralUser> findAllGeneralUserByOrderById(@Param("year") Integer year, @Param("month") Integer month);
 }

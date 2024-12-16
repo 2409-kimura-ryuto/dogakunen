@@ -10,11 +10,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Controller
 public class ApproverController {
@@ -35,12 +40,39 @@ public class ApproverController {
      * 承認対象者一覧画面
      */
     @GetMapping("/show_users")
-    public ModelAndView showUsers() {
+    public ModelAndView showUsers(@RequestParam(name = "date", required = false) String reqDate) {
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/show_users");
-        //承認対象者情報取得
-        List<GeneralUserForm> generalUsers = userService.findAllGeneralUser(12);
+        /*
+         *承認対象者情報取得
+         */
+        //アクセス年月取得→リクエストがあればリクエストされた年月に変更
+        YearMonth accessDate = YearMonth.now();
+        YearMonth getDate = null;
+        if (reqDate != null) {
+            getDate = YearMonth.parse(reqDate);
+        } else {
+            getDate = accessDate;
+        }
+        /*
+        YearMonth getDate = null;
+        if (reqDate != null){
+            int num = Integer.parseInt(reqDate);
+            getDate = accessDate.plusMonths(num);
+        } else {
+            getDate = accessDate;
+        }
+         */
+        //アクセスもしくはリクエスト年月をもとに承認者一覧を取得
+        List<GeneralUserForm> generalUsers = userService.findAllGeneralUser(getDate.getYear(),getDate.getMonthValue());
         mav.addObject("users", generalUsers);
+
+        //プルダウン表示
+        YearMonth finalGetDate = getDate;
+        List<String> availableDates = IntStream.rangeClosed(-6, 6)
+                .mapToObj(i -> finalGetDate.plusMonths(i).toString())
+                .collect(Collectors.toList());
+        mav.addObject("availableDates", availableDates);
         return mav;
     }
 

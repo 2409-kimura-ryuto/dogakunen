@@ -32,6 +32,7 @@
                 <span th:case="2">社内業務（オフサイト）</span>
                 <span th:case="3">顧客業務（オンサイト）</span>
                 <span th:case="4">顧客業務（オフサイト）</span>
+                <span th:case="5">休日</span>
             </th:block>
         </td>
         <td th:text="${#dates.format(generalDateAttendance.workTimeStart, 'H:mm')}"></td>

@@ -7,6 +7,7 @@ import com.example.dogakunen.repository.entity.User;
 import com.example.dogakunen.service.DateAttendanceService;
 import io.micrometer.common.util.StringUtils;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.service.MonthAttendanceService;
@@ -24,6 +25,10 @@ import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.*;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+@Slf4j
 @Controller
 public class AttendanceController {
     @Autowired
@@ -34,6 +39,8 @@ public class AttendanceController {
 
     @Autowired
     MonthAttendanceService monthAttendanceService;
+
+    //private static final Logger log = LoggerFactory.getLogger(AttendanceController.class);
 
     /*
      *　勤怠情報取得処理
@@ -69,6 +76,7 @@ public class AttendanceController {
         mav.addObject("loginUser", loginUser);
         mav.addObject("attendanceStatus", attendanceStatus);
         mav.setViewName("/home");
+        log.info("hello");
         return mav;
     }
 
