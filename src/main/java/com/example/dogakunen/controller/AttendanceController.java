@@ -3,6 +3,7 @@ package com.example.dogakunen.controller;
 import com.example.dogakunen.controller.form.DateAttendanceForm;
 import com.example.dogakunen.controller.form.MonthAttendanceForm;
 import com.example.dogakunen.controller.form.UserForm;
+import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.repository.entity.User;
 import com.example.dogakunen.service.DateAttendanceService;
 import io.micrometer.common.util.StringUtils;
@@ -12,6 +13,9 @@ import com.example.dogakunen.controller.form.UserForm;
 import com.example.dogakunen.service.MonthAttendanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -21,6 +25,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
 
@@ -35,16 +41,66 @@ public class AttendanceController {
     @Autowired
     MonthAttendanceService monthAttendanceService;
 
+    public static Date accessDate = new Date();
+
     /*
      *　勤怠情報取得処理
      */
     @GetMapping
-    public ModelAndView top() {
+    public ModelAndView top() throws ParseException {
         ModelAndView mav = new ModelAndView();
 
         //アクセスした日付の取得（実際の月の値を出すときは1を加算する必要がある）
         Calendar calender = Calendar.getInstance();
+        //accessDateをセッションに入れる
+        //session.setAttribute("accessDate", accessDate);
+        //Date accessDateSession = (Date) session.getAttribute("accessDate");
+        calender.setTime(accessDate);
         int month = calender.get(Calendar.MONTH) + 1;
+        int year = calender.get(Calendar.YEAR);
+
+        //【追加⑤】
+        calender.set(Calendar.DAY_OF_MONTH, 1);
+        calender.set(Calendar.HOUR_OF_DAY, 0);
+        calender.set(Calendar.MINUTE, 0);
+        calender.set(Calendar.SECOND, 0);
+        //Date型のフォーマット揃える（dateAttendancesのdateと）
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.s");
+        String start = sdf.format(calender.getTime());
+        Date startDate = sdf.parse(start);
+
+        //Date startDate = calender.getTime();
+        int endDay = calender.getActualMaximum(Calendar.DAY_OF_MONTH);
+        calender.set(Calendar.DAY_OF_MONTH, endDay);
+        //Date型のフォーマット揃える（dateAttendancesのdateと）
+        String end = sdf.format(calender.getTime());
+        Date endDate = sdf.parse(end);
+        //Date endDate = calender.getTime();
+
+        List<Date> dates = new ArrayList<Date>();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(startDate);
+
+        while (calendar.getTime().before(endDate))
+        {
+            Date result = calendar.getTime();
+            dates.add(result);
+            calendar.add(Calendar.DATE, 1);
+        }
+        dates.add(endDate);
+
+        /*
+        Date n;
+        while(startDate.before(endDate)) {
+            Calendar calendar1 = Calendar.getInstance();
+            calendar1.setTime(startDate);
+            calendar1.add(Calendar.DAY_OF_MONTH, 1);
+            List<Date> monthdates = new ArrayList<>();
+            monthdates.add(calendar1.getTime());
+
+        }
+         */
+
 
         //ログインユーザ情報取得
         UserForm loginUser =(UserForm) session.getAttribute("loginUser");
@@ -53,10 +109,41 @@ public class AttendanceController {
         //勤怠月取得
         MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(loginId, month);
         //勤怠記録の取得
-        List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(month, loginId);
+        List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances (month, loginId);
+        //サンプルで一時的に追加（あとで消します）
+        //Date sampleDate = dateAttendances.get(0).getDate();
+        //int sample = sampleDate.compareTo(dates.get(0));
 
         //勤怠状況ステータスによって申請ボタンの表示を切り替えるために勤怠状況ステータスを取得
-        int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUser.getId(), 12).getAttendanceStatus();
+        //int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUser.getId(), 12).getAttendanceStatus();
+        //【追加③】勤怠記録ステータスはデフォルトで0(申請前)を設定。monthAttendanceFormがnullじゃない時、int attendanceStatusを取得
+        int attendanceStatus = 0;
+        if(monthAttendanceForm != null) {
+            attendanceStatus = monthAttendanceForm.getAttendanceStatus();
+        }
+        //【追加④】勤怠記録と、勤怠(月)の情報が無いとき（勤怠登録全くしていない）はそれぞれ空のFormを設定する
+        if(dateAttendances == null) {
+            dateAttendances = new ArrayList<>();
+            /*
+            //dateAttendanceにデフォルト値の設定
+            DateAttendanceForm dateAttendance = new DateAttendanceForm();
+            dateAttendance.setAttendance(0);
+            dateAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
+            dateAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
+            dateAttendance.setBreakTime("00:00");
+            dateAttendance.setWorkTime("00:00");
+            dateAttendance.setMemo("");
+
+            dateAttendances.add(dateAttendance);
+            */
+
+
+        }
+        if(monthAttendanceForm == null) {
+            monthAttendanceForm = new MonthAttendanceForm();
+        }
+
+
 
         //承認者orシステム管理者フィルターのエラーメッセージをmavに詰めてセッション削除
         List<String> filterErrorMessages = (List<String>) session.getAttribute("filterErrorMessages");
@@ -68,8 +155,40 @@ public class AttendanceController {
         mav.addObject("monthAttendance", monthAttendanceForm);
         mav.addObject("loginUser", loginUser);
         mav.addObject("attendanceStatus", attendanceStatus);
+        //【追加】月の日付を画面にバインド
+        mav.addObject("monthDates", dates);
         mav.setViewName("/home");
         return mav;
+    }
+
+    /*
+     * 「前月へ」リンク押下時
+     */
+    @GetMapping("/prevMonth")
+    public ModelAndView prevMonth() {
+        ModelAndView mav = new ModelAndView();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(accessDate);
+        calendar.add(Calendar.MONTH, -1);
+        accessDate = calendar.getTime();
+
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
+     * 「次月へ」リンク押下時
+     */
+    @GetMapping("/nextMonth")
+    public ModelAndView nextMonth() {
+        ModelAndView mav = new ModelAndView();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(accessDate);
+        calendar.add(Calendar.MONTH, 1);
+        accessDate = calendar.getTime();
+
+        return new ModelAndView("redirect:/");
     }
 
     /*

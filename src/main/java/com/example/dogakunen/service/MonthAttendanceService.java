@@ -43,6 +43,12 @@ public class MonthAttendanceService {
      */
     public MonthAttendanceForm findByUserIdAndMonth(Integer id, Integer month) {
         MonthAttendance result = monthAttendanceRepository.findByUserIdAndMonth(id, month);
+
+        //【追加①】resultがnullの時、nullを返す
+        if (result == null) {
+            return null;
+        }
+
         MonthAttendanceForm monthAttendanceResult = setMonthAttendanceForm(result);
         return monthAttendanceResult;
     }
