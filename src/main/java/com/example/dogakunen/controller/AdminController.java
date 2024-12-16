@@ -174,12 +174,15 @@ public class AdminController {
         userService.saveUser(userForm);
 
         //勤怠マスタ(日)の作成(日付挿入）
+        /*
         UserForm newUser = userService.findByEmployeeNumber(userForm.getEmployeeNumber());
         int newUserId = newUser.getId();
         dateAttendanceService.saveNewDate(newUserId);
 
         //勤怠マスタ(月)の作成
         monthAttendanceService.saveNewMonth(newUserId);
+
+         */
 
         //ユーザー管理画面へリダイレクト
         return new ModelAndView("redirect:/systemManage");

@@ -10,6 +10,12 @@ body {
     border-bottom : 1px solid #ccc;
 }
 
+.table:empty {
+    border-collapse: collapse;
+    border-top : 1px solid #ddd;
+    border-bottom : 1px solid #ccc;
+}
+
 .header-contents {
     margin-top : 1.5rem;
     margin-bottom : 1.5rem;

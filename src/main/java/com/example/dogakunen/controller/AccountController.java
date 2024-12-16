@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import static com.example.dogakunen.controller.AttendanceController.accessDate;
 
 @Controller
 public class AccountController {
@@ -101,6 +104,10 @@ public class AccountController {
     public ModelAndView logout() {
         //セッションのログイン情報を破棄
         session.invalidate();
+
+        //【追加】
+        accessDate = new Date();
+
         //ログイン画面にフォワード
         ModelAndView mav = new ModelAndView();
         mav.setViewName("/login");

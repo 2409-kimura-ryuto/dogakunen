@@ -48,13 +48,103 @@
             <button type="submit" class="btn btn-secondary me-3">ログアウト</button>
         </form>
     </div>
-    <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
+    <!--<div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">-->
+    <div class="judge-status" th:if="${attendanceStatus == 0}">
         <form th:action="@{/newAttendance}" method="get" class="new-button">
             <input type="submit" value="新規勤怠登録" class="btn btn-secondary btn-lg">
         </form>
     </div>
 </div>
 <br/>
+
+<select class="form-control">
+    <option value="" disabled selected>選択してください</option>
+    <option value="">選択してください</option>
+</select>
+
+<a th:href="@{/prevMonth}">
+    <input type="button" value="前月へ">
+</a>
+<a th:href="@{/nextMonth}">
+    <input type="button" value="翌月へ">
+</a>
+
+<table class="table table-hover">
+    <thead class="table-light">
+    <tr>
+        <th>日付</th>
+        <th>勤務区分</th>
+        <th>開始時刻</th>
+        <th>終了時刻</th>
+        <th>休憩時間</th>
+        <th>労働時間</th>
+        <th>メモ</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="monthDate : ${monthDates}" class="align-middle">
+        <td th:text="${#dates.format(monthDate, 'yyyy年MM月dd日')}"></td>
+        <!--<span th:each="attendance : ${attendances}">-->
+            <!--<span th:if="${(attendance.date).compareTo(monthDate) == 0}">-->
+            <span th:switch="${monthDate}">
+                <span th:each="attendance : ${attendances}">
+                    <p th:case="${attendance.date}">
+                        <td th:switch="${attendance.attendance}">
+                            <span th:case="0" th:text="未登録">未登録</span>
+                            <span th:case="1" th:text="社内業務（オンサイト）">未登録</span>
+                            <span th:case="2" th:text="社内業務（オフサイト）">未登録</span>
+                            <span th:case="3" th:text="顧客業務（オンサイト）">未登録</span>
+                            <span th:case="4" th:text="顧客業務（オフサイト）">未登録</span>
+                            <span th:case="5" th:text="休日"></span>
+                        </td>
+                        <td th:text="${#temporals.format(attendance.workTimeStart, 'H:mm')}"></td>
+                        <td th:text="${#temporals.format(attendance.workTimeFinish, 'H:mm')}"></td>
+                        <!-- 時間が0から始まる場合(ex.08:00:00)は2文字目から5文字目で切り取り。そうでないとき(ex.16:00:00)は1文字目から5文字目で切り取る -->
+                        <td th:text="${attendance.breakTime != null && attendance.breakTime.startsWith('0') ? #strings.substring(attendance.breakTime, 1, 5) : #strings.substring(attendance.breakTime, 0, 5)}"></td>
+                        <td th:text="${attendance.workTime != null && attendance.workTime.startsWith('0') ? #strings.substring(attendance.workTime, 1, 5) : #strings.substring(attendance.workTime, 0, 5)}"></td>
+                        <td th:text="${attendance.memo}"></td>
+                        <div class="judge-status" th:if="${attendanceStatus == 0}">
+                            <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
+                        </div>
+                    </p>
+                </span>
+                <p th:case="*">
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <div class="judge-status" th:if="${attendanceStatus == 0}">
+                        <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
+                    </div>
+                </p>
+
+                <!-- 申請中/承認済みの時の編集ボタンの表示 -->
+                <td th:if="${attendanceStatus != 0}">
+                    <button disabled class="btn btn-outline-secondary">編集</button>
+                </td>
+            </span>
+            <!--
+            <span th:unless="${(attendance.date).compareTo(monthDate) == 0}"></span>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </span>
+            -->
+
+
+        </span>
+    </tr>
+    </tbody>
+</table>
+
+<!--勤怠登録updateにしてた時の表示。表記確認のために残している状態です-->
 <table class="table table-hover">
     <thead class="table-light">
         <tr>
