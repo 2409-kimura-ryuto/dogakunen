@@ -14,14 +14,20 @@
     <div th:if="${errorMessages}" th:each="errorMessage : ${errorMessages}" class="alert alert-danger">
         <span><div th:text="${errorMessage}" /></span>
     </div>
+<a th:href="@{/show_users(date=${preMonth})}">
+    <input type="button" th:value="${preMonth}">
+</a>
+<a th:href="@{/show_users(date=${nextMonth})}">
+    <input type="button" th:value="${nextMonth}">
+</a>
 <form th:action="@{/show_users}" method="get" class="form-control">
-    <select class="form-control">
+    <select class="form-control" name="date">
         <option value="" disabled selected>選択してください</option>
         <th:block th:each="date : ${availableDates}">
             <option th:value="${date}">[[${date}]]</option>
         </th:block>
     </select>
-    <input type="submit" value="表示" class="btn btn-secondary btn-lg"/>
+    <input type="submit" value="表示" class="btn btn-secondary btn-lg">
 </form>
 <table class="table table-hover">
     <thead class="table-light">

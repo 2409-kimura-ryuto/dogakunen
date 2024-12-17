@@ -73,6 +73,20 @@ public class ApproverController {
                 .mapToObj(i -> finalGetDate.plusMonths(i).toString())
                 .collect(Collectors.toList());
         mav.addObject("availableDates", availableDates);
+
+        //前月・次月表示
+        YearMonth preMonth = null;
+        YearMonth nextMonth = null;
+        if (reqDate != null) {
+            preMonth = YearMonth.parse(reqDate).plusMonths(1);
+            nextMonth = YearMonth.parse(reqDate).plusMonths(-1);
+        } else {
+            preMonth = accessDate.plusMonths(1);
+            nextMonth = accessDate.plusMonths(-1);
+        }
+        mav.addObject("preMonth", preMonth);
+        mav.addObject("nextMonth", nextMonth);
+
         return mav;
     }
 

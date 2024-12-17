@@ -104,9 +104,14 @@
                         <td th:text="${attendance.breakTime != null && attendance.breakTime.startsWith('0') ? #strings.substring(attendance.breakTime, 1, 5) : #strings.substring(attendance.breakTime, 0, 5)}"></td>
                         <td th:text="${attendance.workTime != null && attendance.workTime.startsWith('0') ? #strings.substring(attendance.workTime, 1, 5) : #strings.substring(attendance.workTime, 0, 5)}"></td>
                         <td th:text="${attendance.memo}"></td>
-                        <div class="judge-status" th:if="${attendanceStatus == 0}">
+                        <td th:if="${attendanceStatus == 0}"><a th:href="@{/editAttendance}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
+                        <!--<div class="judge-status" th:if="${attendanceStatus == 0}">
                             <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
-                        </div>
+                        </div>-->
+                        <!-- 申請中/承認済みの時の編集ボタンの表示 -->
+                        <td th:if="${attendanceStatus != 0}">
+                        <button disabled class="btn btn-outline-secondary">編集</button>
+                        </td>
                     </p>
                 </span>
                 <p th:case="*">
@@ -116,15 +121,12 @@
                     <td></td>
                     <td></td>
                     <td></td>
-                    <div class="judge-status" th:if="${attendanceStatus == 0}">
-                        <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
-                    </div>
+                    <td th:if="${attendanceStatus == 0}"><a th:href="@{/editAttendance}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
+                    <!-- 申請中/承認済みの時の編集ボタンの表示 -->
+                    <td th:if="${attendanceStatus != 0}">
+                        <button disabled class="btn btn-outline-secondary">編集</button>
+                    </td>
                 </p>
-
-                <!-- 申請中/承認済みの時の編集ボタンの表示 -->
-                <td th:if="${attendanceStatus != 0}">
-                    <button disabled class="btn btn-outline-secondary">編集</button>
-                </td>
             </span>
             <!--
             <span th:unless="${(attendance.date).compareTo(monthDate) == 0}"></span>
@@ -137,9 +139,6 @@
                 <td></td>
             </span>
             -->
-
-
-        </span>
     </tr>
     </tbody>
 </table>
