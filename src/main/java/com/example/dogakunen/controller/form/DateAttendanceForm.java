@@ -25,6 +25,8 @@ public class DateAttendanceForm {
 
     private int month;
 
+    private int year;
+
     private int attendance;
 
     @DateTimeFormat(pattern = "HH:mm")

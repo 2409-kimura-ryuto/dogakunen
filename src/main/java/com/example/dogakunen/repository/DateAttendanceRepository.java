@@ -3,6 +3,8 @@ package com.example.dogakunen.repository;
 import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.repository.entity.User;
 import jakarta.persistence.criteria.CriteriaBuilder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -10,10 +12,10 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
-import java.time.Duration;
 
 
 @Repository
@@ -22,9 +24,11 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
    //勤怠情報取得
     @Transactional
     @Query(value = "SELECT d FROM DateAttendance d JOIN FETCH d.user " +
-            "WHERE d.month = :month " + "AND d.user.id = :loginId " +
+            "WHERE d.year = :year " +
+            "AND d.month = :month " +
+            "AND d.user.id = :loginId " +
             "ORDER BY d.date ASC")
-    public List<DateAttendance> findAllAttendances(@Param("month") int month, @Param("loginId") Integer loginID);
+    public List<DateAttendance> findAllAttendances(@Param("year") int year, @Param("month") int month, @Param("loginId") Integer loginID);
 
     public List<DateAttendance> findByUserAndDate(User loginUser, Date date);
 
@@ -66,16 +70,50 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
     @Transactional
     @Modifying
     @Query(
-         value = "UPDATE date_attendances SET " +
-                 "attendance = :attendance, " +
-                 "work_time_start = :workTimeStart, " +
-                 "work_time_finish = :workTimeFinish, " +
-                 "break_time = CAST(:breakTime AS interval), " +
-                 "work_time = CAST(:workTime AS interval), " +
-                 "memo = :memo " +
-                 "WHERE id = :id" ,
+         value = "INSERT INTO date_attendances ( " +
+                 "date, user_id, month, year, attendance, " +
+                 "work_time_start, work_time_finish, " +
+                 "break_time, work_time, memo " +
+                 ") VALUES ( " +
+                 ":date, :userId, :month, :year, :attendance, " +
+                 ":workTimeStart, :workTimeFinish, " +
+                 "CAST(:breakTime AS interval), CAST(:workTime AS interval), :memo)" ,
          nativeQuery = true
     )
-    public void addAttendance(@Param("id") Integer id, @Param("attendance") Integer attendance, @Param("workTimeStart") LocalTime workTimeStart, @Param("workTimeFinish") LocalTime workTimeFinish, @Param("breakTime") String breakTime, @Param("workTime") String workTime, @Param("memo") String memo);
+    public void addAttendance(@Param("date") Date date, @Param("userId") Integer userId, @Param("month") Integer month, @Param("year") Integer year, @Param("attendance") Integer attendance, @Param("workTimeStart") LocalTime workTimeStart, @Param("workTimeFinish") LocalTime workTimeFinish, @Param("breakTime") String breakTime, @Param("workTime") String workTime, @Param("memo") String memo);
 
+    //勤怠編集時に使用
+    @Transactional
+    @Modifying
+    @Query(
+            value = "UPDATE date_attendances SET " +
+                    "attendance = :attendance, " +
+                    "work_time_start = :workTimeStart, " +
+                    "work_time_finish = :workTimeFinish, " +
+                    "break_time = CAST(:breakTime AS interval), " +
+                    "work_time = CAST(:workTime AS interval), " +
+                    "memo = :memo, " +
+                    "updated_date = CURRENT_TIMESTAMP " +
+                    "WHERE id = :id " ,
+            nativeQuery = true
+    )
+    public void updateAttendance(@Param("attendance") Integer attendance, @Param("workTimeStart") LocalTime workTimeStart, @Param("workTimeFinish") LocalTime workTimeFinish, @Param("breakTime") String breakTime, @Param("workTime") String workTime, @Param("memo") String memo, @Param("id") Integer id);
+
+
+
+ //【整地前】全社員の総労働時間取得(CSVファイル出力用)
+    @Transactional
+    @Query(
+            value = "SELECT u.name AS name," +
+            "u.employee_number AS employeeNumber," +
+            "SUM(d.work_time) AS totalWorkTime " +
+            "FROM date_attendances d " +
+            "INNER JOIN users u ON d.user_id = u.id " +
+            "WHERE d.month = :month " +
+            "AND d.year = :year " +
+            "GROUP BY u.name, u.employee_number " +
+            "ORDER BY u.employee_number ASC" ,
+            nativeQuery = true
+    )
+    public List<Object[]> selectWorkTime(@Param("year") int year, @Param("month") int month);
 }

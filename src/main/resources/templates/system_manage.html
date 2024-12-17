@@ -75,8 +75,11 @@
         </tr>
     </tbody>
 </table>
-
 <div class="footer-contents">
+    <!--【整地前】CSVファイル出力-->
+    <form  method="get" th:action="@{/csv}" >
+        <input type="submit" value="ファイル出力" class="btn btn-secondary btn-sm" />
+    </form>
     <form th:action="@{/}">
         <input type="submit" value="戻る" class="btn btn-secondary btn-sm" />
     </form>
