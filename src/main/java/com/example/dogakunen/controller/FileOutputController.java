@@ -4,6 +4,8 @@ import com.example.dogakunen.repository.entity.AdministratorCSV;
 import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.service.DateAttendanceService;
 import com.opencsv.exceptions.CsvException;
+import io.micrometer.common.util.StringUtils;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,10 +16,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
 public class FileOutputController {
+    @Autowired
+    HttpSession session;
+
     @Autowired
     DateAttendanceService dateAttendanceService = new DateAttendanceService();
 
@@ -28,6 +34,19 @@ public class FileOutputController {
     @GetMapping("/csv")
     public ModelAndView csv(@RequestParam(name = "target") String target) {
         ModelAndView mav = new ModelAndView();
+
+        //バリデーション
+        //エラーメッセージの準備
+        List<String> errorMessages = new ArrayList();
+        //年月が指定されなかったとき
+        if(StringUtils.isBlank(target)){
+            errorMessages.add("・対象月を選択してください");
+        }
+        //エラーがあった場合はエラーメッセージをセッションにセットしシステム管理画面にリダイレクト
+        if(errorMessages != null){
+            session.setAttribute("errorMessages", errorMessages);
+            return new ModelAndView("redirect:/systemManage");
+        }
 
         //画面から受け取った年月情報を年と月に分解
         String[] parts = target.split("-");
@@ -44,8 +63,8 @@ public class FileOutputController {
             e.printStackTrace();
         }
 
-        // ホーム画面にリダイレクト
-        return new ModelAndView("redirect:/");
+        // システム管理画面にリダイレクト
+        return new ModelAndView("redirect:/systemManage");
     }
 
 }
