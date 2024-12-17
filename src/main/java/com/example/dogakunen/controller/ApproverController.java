@@ -118,7 +118,7 @@ public class ApproverController {
 
         //月の労働時間が200時間を超えた時のバリデーション
         //勤怠記録の取得
-        List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(month, loginUserId);
+        List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(2024, month, loginUserId);
         //月の総労働時間計算
         String totalWorkTime = dateAttendanceService.sumTotalWorkTime(dateAttendances);
         long totalSeconds = 0;
