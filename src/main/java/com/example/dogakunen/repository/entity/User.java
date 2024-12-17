@@ -48,4 +48,8 @@ public class User {
     //DateAttendancesとリレーション形成
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<DateAttendance> dateAttendances;
+
+    //Logとリレーション形成
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = false)
+    private List<Log> log;
 }

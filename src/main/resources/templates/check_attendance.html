@@ -45,10 +45,12 @@
 </table>
 <!-- 勤怠状況ステータスが1:申請中の場合のみ承認/差し戻しボタンを設置 -->
 <div th:if="${monthAttendanceForm.attendanceStatus} == 1" class="d-flex justify-content-end">
-    <form th:action="@{/approve/{id}(id=${monthAttendanceForm.userId})}" th:method="put" class="header-item" onSubmit="return CheckApprove()">
+    <form th:action="@{/approve/{id}/{year}/{month}(id=${monthAttendanceForm.userId},year=${monthAttendanceForm.year},
+        month=${monthAttendanceForm.month})}" th:method="put" class="header-item" onSubmit="return CheckApprove()">
         <input type="submit" value="承認" class="btn btn-primary me-3">
     </form>
-    <form th:action="@{/sendBack/{id}(id=${monthAttendanceForm.userId})}" th:method="put" class="header-item" onSubmit="return CheckSendBack()">
+    <form th:action="@{/sendBack/{id}/{year}/{month}(id=${monthAttendanceForm.userId},year=${monthAttendanceForm.year},
+        month=${monthAttendanceForm.month})}" th:method="put" class="header-item" onSubmit="return CheckSendBack()">
         <input type="submit" value="差し戻し" class="btn btn-danger me-3">
     </form>
 </div>
