@@ -48,13 +48,6 @@
             <button type="submit" class="btn btn-secondary me-3">ログアウト</button>
         </form>
     </div>
-    <!--新規登録は非表示
-    <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
-        <form th:action="@{/newAttendance}" method="get" class="new-button">
-            <input type="submit" value="新規勤怠登録" class="btn btn-secondary btn-lg">
-        </form>
-    </div>
-    -->
 </div>
 <br/>
 
@@ -94,7 +87,11 @@
             <td></td>
             <td></td>
             <td></td>
-            <td></td>
+            <td>
+                <form th:action="@{/newOrEdit}" th:method="get"><input type="submit" value="編集" class="btn btn-outline-secondary">
+                    <input type="hidden" name="date" th:value="${#dates.format(monthDate, 'yyyy-MM-dd')}">
+                </form>
+            </td>
         </span>
         <span th:if="${!#lists.isEmpty(attendances)}" th:each="attendance : ${attendances}">
         <!--<span th:each="attendance : ${attendances}">-->
@@ -114,7 +111,10 @@
                 <td th:text="${attendance.workTime != null && attendance.workTime.startsWith('0') ? #strings.substring(attendance.workTime, 1, 5) : #strings.substring(attendance.workTime, 0, 5)}"></td>
                 <td th:text="${attendance.memo}"></td>
                 <div class="judge-status" th:if="${attendanceStatus == 0}">
-                <td><a th:href="@{/editAttendance/{id}(id=${attendance.id})}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
+                    <td><form th:action="@{/newOrEdit}" th:method="get"><input type="submit" value="編集" class="btn btn-outline-secondary">
+                        <input type="hidden" name="id" th:value="${attendance.id}">
+                        <input type="hidden" name="date" th:value="${#dates.format(monthDate, 'yyyy/MM/dd')}">
+                    </form></td>
                 </div>
                 <!-- 申請中/承認済みの時の編集ボタンの表示 -->
                 <td th:if="${attendanceStatus != 0}">
@@ -140,7 +140,7 @@
     </tbody>
 </table>
 
-<!--勤怠登録updateにしてた時の表示。表記確認のために残している状態です-->
+<!--勤怠登録updateにしてた時の表示。表記確認のために残している状態です
 <table class="table table-hover">
     <thead class="table-light">
         <tr>
@@ -167,18 +167,18 @@
             </td>
             <td th:text="${#temporals.format(attendance.workTimeStart, 'H:mm')}"></td>
             <td th:text="${#temporals.format(attendance.workTimeFinish, 'H:mm')}"></td>
-            <!-- 時間が0から始まる場合(ex.08:00:00)は2文字目から5文字目で切り取り。そうでないとき(ex.16:00:00)は1文字目から5文字目で切り取る -->
+            時間が0から始まる場合(ex.08:00:00)は2文字目から5文字目で切り取り。そうでないとき(ex.16:00:00)は1文字目から5文字目で切り取る
             <td th:text="${attendance.breakTime != null && attendance.breakTime.startsWith('0') ? #strings.substring(attendance.breakTime, 1, 5) : #strings.substring(attendance.breakTime, 0, 5)}"></td>
             <td th:text="${attendance.workTime != null && attendance.workTime.startsWith('0') ? #strings.substring(attendance.workTime, 1, 5) : #strings.substring(attendance.workTime, 0, 5)}"></td>
             <td th:text="${attendance.memo}"></td>
             <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
                 <td><form th:action="@{/newOrEdit}" th:method="get"><input type="submit" value="編集" class="btn btn-outline-secondary">
-                <!--idとdateの渡し方は調整が必要-->
+                idとdateの渡し方は調整が必要
                 <input type="hidden" name="id" th:value="${attendance.id}">
                 <input type="hidden" name="date" th:value="2024-12-16">
                 </form></td>
             </div>
-            <!-- 承認済みの時の編集ボタンの表示 -->
+            承認済みの時の編集ボタンの表示
             <td th:if="${monthAttendance.attendanceStatus != 0}">
                 <button disabled class="btn btn-outline-secondary">編集</button>
             </td>
@@ -201,6 +201,6 @@
             <button disabled class="btn btn-secondary">承認済み</button>
         </span>
     </th:block>
-</div>
+</div>-->
 </body>
 </html>
