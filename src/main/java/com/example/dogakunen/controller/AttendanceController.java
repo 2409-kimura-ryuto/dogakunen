@@ -33,6 +33,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Controller
@@ -285,9 +286,7 @@ public class AttendanceController {
         ModelAndView mav = new ModelAndView();
         List<String> errorMessages = new ArrayList<String>();
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
-
-        //新規登録画面の表示テスト用
-        //id = null;
+        Integer UserID = loginUser.getId();
 
         //idが画面から渡されているかで条件分岐
         //idが渡されてきた場合はバリデーション後に勤怠編集画面に遷移
@@ -313,11 +312,11 @@ public class AttendanceController {
             //URLのIDの勤怠(日)のユーザIDが自分以外のユーザIDの場合のバリデーションと
             //未登録or申請中/承認済みの場合に編集画面に遷移できないようにするバリデーション
             int loginUserId = loginUser.getId();
-            int useId = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getUserId();
+            int userId = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getUserId();
             int attendance = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getAttendance();
             int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUserId, 12).getAttendanceStatus();
 
-            if (loginUserId != useId /*|| attendance == 0*/ || attendanceStatus != 0) {
+            if (loginUserId != userId /*|| attendance == 0*/ || attendanceStatus != 0) {
                 errorMessages.add("・不正なパラメータが入力されました");
             }
 
@@ -336,6 +335,18 @@ public class AttendanceController {
 
         //idが渡されていない場合は、勤怠登録画面に遷移
         }else{
+            //勤怠（月）の存在チェック
+            //リクエストパラメータで取得した日付をLocalDate型に変換
+            LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            //日付から年を算出
+            int year = localDate.getYear();
+            //ユーザIDと現在年から勤怠（月）情報を取得
+            MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndYear(UserID, year);
+            //戻り値がnullの場合は勤怠（月）を作成
+            if(monthAttendanceForm == null){
+                monthAttendanceService.saveNewMonth(UserID, year);
+            }
+
             //日付と休憩時間のデフォルト値を詰めたformModelを入れる
             DateAttendanceForm dateAttendance = new DateAttendanceForm();
             dateAttendance.setDate(date);
@@ -507,14 +518,14 @@ public class AttendanceController {
 
     /*
      * 【整地前】CSVファイル出力（システム管理者用）
-     */
+     *
     @GetMapping("/csv")
-    public ModelAndView csv(/*@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month*/) {       ModelAndView mav = new ModelAndView();
+    public ModelAndView csv(@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {       ModelAndView mav = new ModelAndView();
 
         //全アカウントの労働時間を取得
-        List<AdministratorCSV> results = dateAttendanceService.selectWorkTime(2024, 12/*year, month*/);
+        List<AdministratorCSV> results = dateAttendanceService.selectWorkTime(year, month);
         //結果をもとにCSVファイル出力
-        try (Writer writer = Files.newBufferedWriter(Paths.get(/*"C:\\Users\\trainee0957\\Desktop\\" + year + "年" + month + "月.csv"*/"C:\\Users\\trainee0957\\Desktop\\2024年12月.csv"))) {
+        try (Writer writer = Files.newBufferedWriter(Paths.get("C:\\Users\\trainee0957\\Desktop\\" + year + "年" + month + "月.csv"))) {
             dateAttendanceService.write(writer, results);
         } catch (IOException e) {
             e.printStackTrace();
@@ -524,6 +535,6 @@ public class AttendanceController {
 
         // ホーム画面にリダイレクト
         return new ModelAndView("redirect:/");
-    }
+    }*/
 
 }

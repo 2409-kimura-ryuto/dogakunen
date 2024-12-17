@@ -39,7 +39,7 @@ public class MonthAttendanceService {
     }
 
     /*
-     * 勤怠(月)から対象のカラムを取得
+     * 勤怠(月)からユーザIDと現在月をもとに対象のカラムを取得
      */
     public MonthAttendanceForm findByUserIdAndMonth(Integer id, Integer month) {
         MonthAttendance result = monthAttendanceRepository.findByUserIdAndMonth(id, month);
@@ -54,6 +54,22 @@ public class MonthAttendanceService {
     }
 
     /*
+     * 勤怠(月)からユーザIDと現在年をもとに対象のカラムを取得
+     */
+    public MonthAttendanceForm findByUserIdAndYear(Integer userId, Integer year) {
+        MonthAttendance result = monthAttendanceRepository.findByUserIdAndYear(userId, year);
+
+        //【追加①】resultがnullの時、nullを返す
+        if (result == null) {
+            return null;
+        }
+
+        MonthAttendanceForm monthAttendanceResult = setMonthAttendanceForm(result);
+        return monthAttendanceResult;
+    }
+
+
+    /*
      * DBから取得したデータをFormに設定
      */
     private MonthAttendanceForm setMonthAttendanceForm(MonthAttendance result) {
@@ -63,12 +79,11 @@ public class MonthAttendanceService {
     }
 
     //勤怠マスタ(月)作成
-    public void saveNewMonth(int newUserId) {
+    public void saveNewMonth(int UserID, int year) {
 
         int month;
         for(month = 1; month < 13; month++){
-            //monthAttendance.setMonth(i);
-            monthAttendanceRepository.saveNewMonth(newUserId, month);
+            monthAttendanceRepository.saveNewMonth(UserID, year, month);
         }
     }
 
