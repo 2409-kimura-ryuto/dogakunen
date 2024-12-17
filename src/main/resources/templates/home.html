@@ -56,18 +56,29 @@
     </div>
 </div>
 <br/>
+<form th:action="@{/selectMonth}" class="selectMonthForm">
+    <select name="selectMonth" class="form-control selectMonth">
+        <!--<option value="" th:each="item : ${map}" th:value="${item.key}" th:text="${item.value}"></option>
+        <option value="" th:each="pullDown : ${pullDown}" th:text="${pullDown}"></option>-->
+        <option value="-6" th:text="${pullDown.get(0)}"></option>
+        <option value="-5" th:text="${pullDown.get(1)}"></option>
+        <option value="-4" th:text="${pullDown.get(2)}"></option>
+        <option value="-3" th:text="${pullDown.get(3)}"></option>
+        <option value="-2" th:text="${pullDown.get(4)}"></option>
+        <option value="-1" th:text="${pullDown.get(5)}"></option>
+        <option value="0" th:text="${pullDown.get(6)}" selected></option>
+        <option value="1" th:text="${pullDown.get(7)}"></option>
+        <option value="2" th:text="${pullDown.get(8)}"></option>
+        <option value="3" th:text="${pullDown.get(9)}"></option>
+        <option value="4" th:text="${pullDown.get(10)}"></option>
+        <option value="5" th:text="${pullDown.get(11)}"></option>
+        <option value="6" th:text="${pullDown.get(12)}"></option>
+    </select>
+    <input type="submit" value="表示" class="btn btn-secondary btn-sm" />
+</form>
 
-<select class="form-control">
-    <option value="" disabled selected>選択してください</option>
-    <option value="">選択してください</option>
-</select>
-
-<a th:href="@{/prevMonth}">
-    <input type="button" value="前月へ">
-</a>
-<a th:href="@{/nextMonth}">
-    <input type="button" value="翌月へ">
-</a>
+<a th:href="@{/prevMonth}" class="prevMonth">&lt;前月へ</a>
+<a th:href="@{/nextMonth}">翌月へ&gt;</a>
 
 <table class="table table-hover">
     <thead class="table-light">
@@ -83,7 +94,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="monthDate : ${monthDates}" class="align-middle">
+    <tr th:each="monthDate : ${monthDates}" class="align-middle attendanceList">
         <td th:text="${#dates.format(monthDate, 'yyyy年MM月dd日')}"></td>
 
         <span th:if="${#lists.isEmpty(attendances)}">

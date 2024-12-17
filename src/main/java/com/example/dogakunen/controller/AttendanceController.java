@@ -100,6 +100,41 @@ public class AttendanceController {
 
         }
          */
+        //プルダウン用の表示リスト作成
+
+        List<String> pullDown = new ArrayList<>();
+        Calendar pullDownStart = Calendar.getInstance();
+        pullDownStart.setTime(startDate);
+        Calendar pullDownEnd = Calendar.getInstance();
+        pullDownEnd.setTime(endDate);
+
+        for(int i = -6; i <= 6; i++){
+            pullDownStart.add(Calendar.MONTH, i);
+            pullDownEnd.add(Calendar.MONTH, i);
+            SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日");
+            String startPullDown = sdf2.format(pullDownStart.getTime());
+            String endPullDown = sdf2.format(pullDownEnd.getTime());
+            String allPullDown = startPullDown + "～" + endPullDown;
+            pullDown.add(allPullDown);
+            pullDownStart.setTime(startDate);
+            pullDownEnd.setTime(endDate);
+        }
+
+        //Mapの宣言
+        Map<Integer, String> map = new HashMap<>();
+
+        int i = -6;
+        for(String str : pullDown) {
+            // MapにListの値を追加
+            map.put(i, str);
+            i++;
+        }
+        // キーでソートする
+        Object[] mapkey = map.keySet().toArray();
+        Arrays.sort(mapkey);
+
+
+
 
 
         //ログインユーザ情報取得
@@ -157,6 +192,8 @@ public class AttendanceController {
         mav.addObject("attendanceStatus", attendanceStatus);
         //【追加】月の日付を画面にバインド
         mav.addObject("monthDates", dates);
+        mav.addObject("map", map);
+        mav.addObject("pullDown", pullDown);
         mav.setViewName("/home");
         return mav;
     }
@@ -186,6 +223,21 @@ public class AttendanceController {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(accessDate);
         calendar.add(Calendar.MONTH, 1);
+        accessDate = calendar.getTime();
+
+        return new ModelAndView("redirect:/");
+    }
+
+    /*
+     * プルダウンで期間選択時
+     */
+    @GetMapping("/selectMonth")
+    public ModelAndView selectMonth(@RequestParam(name = "selectMonth") Integer selectMonth) {
+        ModelAndView mav = new ModelAndView();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(accessDate);
+        calendar.add(Calendar.MONTH, selectMonth);
         accessDate = calendar.getTime();
 
         return new ModelAndView("redirect:/");

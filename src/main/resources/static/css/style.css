@@ -114,3 +114,15 @@ body {
     margin : 20px 0 20px 0;
     font-weight : bold;
 }
+.selectMonthForm{
+    display : inline-block;
+}
+
+.selectMonth {
+    width : 300px;
+    display : inline-block;
+}
+
+.prevMonth{
+    margin : 0 10px 0 20px;
+}
