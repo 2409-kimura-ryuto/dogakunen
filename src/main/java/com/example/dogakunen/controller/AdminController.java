@@ -249,7 +249,8 @@ public class AdminController {
     @PutMapping("/update/{id}")
     public ModelAndView updateUser(@PathVariable Integer id,
                                    @ModelAttribute("user") @Validated UserForm userForm, BindingResult result,
-                                   @RequestParam(name="position") Integer positionId){
+                                   @RequestParam(name="position") Integer positionId,
+                                   RedirectAttributes redirectAttributes){
         ModelAndView mav = new ModelAndView();
 
         //バリデーション　必須チェック
@@ -276,14 +277,17 @@ public class AdminController {
 
         if(!errorMessages.isEmpty()) {
             //エラーメッセージに値があれば、エラーメッセージを画面にバインド
-            mav.addObject("errorMessages", errorMessages);
+//            mav.addObject("errorMessages", errorMessages);
+            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
             //入力した値を保管
             userForm.setPositionId(positionId);
             userForm.setEmployeeNumber(editUserForm.getEmployeeNumber());
-            mav.addObject("user", userForm);
+//            mav.addObject("user", userForm);
+            redirectAttributes.addFlashAttribute("user", userForm);
 
-            //アカウント編集画面へフォワード処理
-            mav.setViewName("/edit_user");
+            //アカウント編集画面へリダイレクト処理
+//            mav.setViewName("/edit_user");
+            mav.setViewName("redirect:/editUser/"  + id);
             return mav;
         }
 

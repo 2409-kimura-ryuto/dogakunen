@@ -14,6 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 @Controller
@@ -50,12 +51,16 @@ public class ApproverController {
     @PutMapping("/request")
     public ModelAndView request(RedirectAttributes redirectAttributes) {
         ModelAndView mav = new ModelAndView();
+        List<String> requestErrorMessages = new ArrayList<String>();
         MonthAttendanceForm monthAttendanceForm = new MonthAttendanceForm();
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         int loginUserId = loginUser.getId();
 
-        //完了申請のバリデーション
-        List<String> requestErrorMessages = new ArrayList<String>();
+        //アクセスした日付の取得（実際の月の値を出すときは1を加算する必要がある）
+        Calendar calender = Calendar.getInstance();
+        int month = calender.get(Calendar.MONTH) + 1;
+
+        //未登録があった場合のバリデーション
         //勤怠情報を取得し、勤務区分を１つ１つ確認。0:未登録があったらエラーメッセージを追加して繰り返し処理を終える
         List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(loginUserId, 12);
         for (GeneralDateAttendanceForm generalDateAttendanceForm : generalDateAttendanceForms) {
@@ -63,6 +68,25 @@ public class ApproverController {
                 requestErrorMessages.add("・全ての勤怠を登録してから申請してください");
                 break;
             }
+        }
+
+        //月の労働時間が200時間を超えた時のバリデーション
+        //勤怠記録の取得
+        List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(month, loginUserId);
+        //月の総労働時間計算
+        String totalWorkTime = dateAttendanceService.sumTotalWorkTime(dateAttendances);
+        long totalSeconds = 0;
+
+        String[] timeParts = totalWorkTime.split(":");
+        long hours = Long.parseLong(timeParts[0]);
+        long minutes = Long.parseLong(timeParts[1]);
+
+        //時間を秒単位に変換
+        totalSeconds += hours * 3600 + minutes * 60;
+
+        //720000秒=200時間
+        if (totalSeconds > 720000) {
+            requestErrorMessages.add("・月の総労働時間は200時間を超えないようにしてください");
         }
 
         //エラーメッセージが存在する場合はエラーメッセージをセットし、ホーム画面にリダイレクト

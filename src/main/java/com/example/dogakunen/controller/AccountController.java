@@ -101,11 +101,8 @@ public class AccountController {
     public ModelAndView logout() {
         //セッションのログイン情報を破棄
         session.invalidate();
-        //ログイン画面にフォワード
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/login");
-        return mav;
-
+        //ログイン画面にリダイレクト
+        return new ModelAndView("redirect:/login");
     }
 
     /*
