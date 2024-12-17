@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,6 +27,9 @@ public class FileOutputController {
 
     @Autowired
     DateAttendanceService dateAttendanceService = new DateAttendanceService();
+
+    @Autowired
+    AttendanceController attendanceController = new AttendanceController();
 
 
     /*
@@ -43,7 +47,7 @@ public class FileOutputController {
             errorMessages.add("・対象月を選択してください");
         }
         //エラーがあった場合はエラーメッセージをセッションにセットしシステム管理画面にリダイレクト
-        if(errorMessages != null){
+        if(errorMessages.size() != 0){
             session.setAttribute("errorMessages", errorMessages);
             return new ModelAndView("redirect:/systemManage");
         }
@@ -52,8 +56,17 @@ public class FileOutputController {
         String[] parts = target.split("-");
         Integer year = Integer.parseInt(parts[0]);
         Integer month = Integer.parseInt(parts[1]);
+
+        //所定時間の算出
+        //１日の所定時間を８時間に設定
+        int dailyWorkHours = 8;
+        //画面から受け取った年と月と１日の所定時間をもとに月の所定時間を算出
+        int time = attendanceController.calculateWorkingHours(year, month, dailyWorkHours);
+        //月の所定時間をDuration型に変換
+        Duration Time = Duration.ofHours(time);
+
         //取得した年と月から全アカウントの労働時間を取得
-        List<AdministratorCSV> results = dateAttendanceService.selectWorkTime(year, month);
+        List<AdministratorCSV> results = dateAttendanceService.selectWorkTime(year, month, Time);
         //結果をもとにCSVファイル出力
         try (Writer writer = Files.newBufferedWriter(Paths.get("C:\\Users\\trainee0957\\Desktop\\" + year + "年" + month + "月.csv"))) {
             dateAttendanceService.write(writer, results);

@@ -242,7 +242,7 @@ public class DateAttendanceService {
     /*
      * 【整地前】全社員の総労働時間取得(CSVファイル出力用)
      */
-    public List<AdministratorCSV> selectWorkTime(Integer year, Integer month) {
+    public List<AdministratorCSV> selectWorkTime(Integer year, Integer month, Duration Time) {
         //年と月をもとにselect
         List<Object[]> results = dateAttendanceRepository.selectWorkTime(year, month);
 
@@ -263,8 +263,7 @@ public class DateAttendanceService {
         for(int i = 0; i < csvList.size(); i++) {
             //select結果から総労働時間を取得
             String workTime = csvList.get(i).getTotalWorkTime();
-            //所定時間を定義
-            Duration time = Duration.ofHours(30);
+
             //総労働時間をduration型に変換
             String[] parts = workTime.split(":");
             int hours = Integer.parseInt(parts[0]);
@@ -272,7 +271,7 @@ public class DateAttendanceService {
             int seconds = 0;
             Duration totalWorkTime = Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
             //総労働時間から所定時間を引いて残業時間を算出
-            Duration overWork = totalWorkTime.minus(time);
+            Duration overWork = totalWorkTime.minus(Time);
             if(!overWork.isNegative()){
                 //残業時間をString型に変換
                 long Hours = overWork.toHours();
