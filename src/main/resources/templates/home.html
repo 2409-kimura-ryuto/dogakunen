@@ -166,5 +166,14 @@
         </span>
     </th:block>
 </div>
+総労働時間
+<div th:text="${totalWorkTime}"></div>
+総休憩時間
+<div th:text="${totalBreakTime}"></div>
+所定時間
+<div th:text="${workingHours}"></div>
+<a th:href="@{/all_update_attendance}">
+    <input type="submit" value="一括登録/編集" class="btn btn-outline-secondary">
+</a>
 </body>
 </html>
