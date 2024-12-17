@@ -18,7 +18,7 @@
     <form method="post" th:action="@{/newAttendance}" th:object="${formModel}" class="text-center">
             <table class="table table-newUser">
                 <tr><th>日付</th><td><input type="date" th:value="${#dates.format(date, 'yyyy-MM-dd')}"
-                                            th:field="*{date}" class="form-control"/></td></tr>
+                                            th:field="*{date}" class="form-control" readonly/></td></tr>
                 <tr><th>勤務区分</th>
                     <td>
                         <select name="attendance" th:field="*{attendance}" class="form-select" aria-label="Default select example">
@@ -37,7 +37,6 @@
                 <tr><th>メモ</th><td><textarea th:field="*{memo}" size="1500" maxlength="1500" class="form-control"/></textarea></td></tr>
             </table>
             <input type="submit" value="登録" class="btn btn-primary update-button"/>
-
     </form>
     <div class="footer-contents">
         <form th:action="@{/}">

@@ -27,6 +27,9 @@ public class MonthAttendance {
     @Column
     private Integer month;
 
+    @Column
+    private Integer year;
+
     @Column(name = "attendance_status")
     private Integer attendanceStatus;
 

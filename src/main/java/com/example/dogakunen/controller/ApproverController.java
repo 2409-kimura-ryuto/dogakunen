@@ -119,7 +119,7 @@ public class ApproverController {
         }
 
         //更新したいカラムのIdを取得してmonthAttendanceFormにセット
-        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(loginUserId, 12).getId());
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(loginUserId, 2024, 12).getId());
         //勤怠状況ステータスを1:申請中にセット
         monthAttendanceForm.setAttendanceStatus(1);
         //userIdとmonthもセットしないと0で更新されてしまう
@@ -147,7 +147,7 @@ public class ApproverController {
         //勤怠状況が存在しないユーザのidが入力された際のバリデーション
         if (id.matches("^[0-9]+$")) {
             try {
-                monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 12).getId();
+                monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 2024, 12).getId();
             } catch (RuntimeException e) {
                 errorMessages.add("・不正なパラメータが入力されました");
             }
@@ -163,7 +163,7 @@ public class ApproverController {
         //勤怠情報取得
         List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(Integer.parseInt(id), 12);
         //ユーザ毎に月の勤怠状況ステータスを取得
-        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 12);
+        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 2024, 12);
         mav.addObject("generalDateAttendances", generalDateAttendanceForms);
         mav.addObject("monthAttendanceForm", monthAttendanceForm);
         mav.setViewName("/check_attendance");
@@ -192,7 +192,7 @@ public class ApproverController {
         ModelAndView mav = new ModelAndView();
         MonthAttendanceForm monthAttendanceForm = new MonthAttendanceForm();
         //勤怠マスタから対象者の12月のレコードのidを取得し、monthAttendanceFormnにセット
-        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, 12).getId());
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, 2024, 12).getId());
         //2:承認済みをセット
         monthAttendanceForm.setAttendanceStatus(2);
         //userIdとmonthもセットしないと0で更新されてしまう
@@ -213,7 +213,7 @@ public class ApproverController {
         ModelAndView mav = new ModelAndView();
         MonthAttendanceForm monthAttendanceForm = new MonthAttendanceForm();
         //勤怠マスタから対象者の12月のレコードのidを取得し、monthAttendanceFormにセット
-        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, 12).getId());
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, 2024,  12).getId());
         //0:申請前をセット
         monthAttendanceForm.setAttendanceStatus(0);
         //userIdとmonthもセットしないと0で更新されてしまう
