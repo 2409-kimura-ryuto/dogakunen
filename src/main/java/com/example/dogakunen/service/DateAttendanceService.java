@@ -267,8 +267,8 @@ public class DateAttendanceService {
     /*
      * 社員の勤怠情報取得
      */
-    public List<GeneralDateAttendanceForm> findGeneralDateAttendance(Integer id, Integer month) {
-        List<GeneralDateAttendance> results = generalDateAttendanceRepository.findDateAttendanceByOrderByDate(id, month);
+    public List<GeneralDateAttendanceForm> findGeneralDateAttendance(Integer id, Integer year, Integer month) {
+        List<GeneralDateAttendance> results = generalDateAttendanceRepository.findDateAttendanceByOrderByDate(id, year, month);
         List<GeneralDateAttendanceForm> generalDateAttendanceForm = setGeneralDateAttendanceForm(results);
         return generalDateAttendanceForm;
     }

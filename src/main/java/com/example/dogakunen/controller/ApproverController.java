@@ -17,9 +17,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.example.dogakunen.controller.AttendanceController.accessDate;
 
 @Controller
 public class ApproverController {
@@ -102,13 +105,15 @@ public class ApproverController {
 
         //完了申請のバリデーション
         List<String> requestErrorMessages = new ArrayList<String>();
-        //勤怠情報を取得し、勤務区分を１つ１つ確認。0:未登録があったらエラーメッセージを追加して繰り返し処理を終える
-        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(loginUserId, 12);
-        for (GeneralDateAttendanceForm generalDateAttendanceForm : generalDateAttendanceForms) {
-            if(generalDateAttendanceForm.getAttendance() == 0) {
-                requestErrorMessages.add("・全ての勤怠を登録してから申請してください");
-                break;
-            }
+        Calendar calender = Calendar.getInstance();
+        calender.setTime(accessDate);
+        int month = calender.get(Calendar.MONTH) + 1;
+        int year = calender.get(Calendar.YEAR);
+        int dayOfMonth = calender.getActualMaximum(Calendar.DAY_OF_MONTH);
+        //勤怠情報を取得し、取得したリストのサイズと該当月の日数が一致していなければエラーメッセージを追加する
+        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(loginUserId, year, month);
+        if (generalDateAttendanceForms.size() != dayOfMonth) {
+            requestErrorMessages.add("・全ての勤怠を登録してから申請してください");
         }
 
         //エラーメッセージが存在する場合はエラーメッセージをセットし、ホーム画面にリダイレクト
@@ -119,12 +124,13 @@ public class ApproverController {
         }
 
         //更新したいカラムのIdを取得してmonthAttendanceFormにセット
-        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(loginUserId, 2024, 12).getId());
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(loginUserId, year, month).getId());
         //勤怠状況ステータスを1:申請中にセット
         monthAttendanceForm.setAttendanceStatus(1);
-        //userIdとmonthもセットしないと0で更新されてしまう
+        //userIdとmonthとyearもセットしないと0で更新されてしまう
         monthAttendanceForm.setUserId(loginUserId);
-        monthAttendanceForm.setMonth(12);
+        monthAttendanceForm.setMonth(month);
+        monthAttendanceForm.setYear(year);
         monthAttendanceService.changeStatus(monthAttendanceForm);
         //ホーム画面にリダイレクト
         mav.setViewName("redirect:/");
@@ -161,7 +167,7 @@ public class ApproverController {
         }
 
         //勤怠情報取得
-        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(Integer.parseInt(id), 12);
+        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(Integer.parseInt(id), 2024, 12);
         //ユーザ毎に月の勤怠状況ステータスを取得
         MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 2024, 12);
         mav.addObject("generalDateAttendances", generalDateAttendanceForms);

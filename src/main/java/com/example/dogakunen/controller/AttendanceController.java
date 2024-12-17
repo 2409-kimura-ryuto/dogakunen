@@ -362,12 +362,20 @@ public class AttendanceController {
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         String employeeNumber = loginUser.getEmployeeNumber();
 
+        /*
         //現在日付を取得
         LocalDate today = LocalDate.now();
         // 現在の月と年を取得
         int month = today.getMonthValue();
         int year = today.getYear();
-        //現在の年月をFormにセット
+         */
+        //表示している日時を取得
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(accessDate);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int year = calendar.get(Calendar.YEAR);
+
+        //上記で取得した年月をFormにセット
         reqAttendance.setMonth(month);
         reqAttendance.setYear(year);
 
