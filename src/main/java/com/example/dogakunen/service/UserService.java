@@ -71,8 +71,8 @@ public class UserService {
     /*
      * 申請対象者情報取得
      */
-    public List<GeneralUserForm> findAllGeneralUser(Integer month) {
-        List<GeneralUser> results = generalUserRepository.findAllGeneralUserByOrderById(month);
+    public List<GeneralUserForm> findAllGeneralUser(Integer year, Integer month) {
+        List<GeneralUser> results = generalUserRepository.findAllGeneralUserByOrderById(year, month);
         List<GeneralUserForm> generalUsers = setGeneralUserForm(results);
         return generalUsers;
     }
