@@ -389,7 +389,7 @@ public class DateAttendanceService {
      */
     public List<DateAttendanceListForm.Attendance> findAllAttendancesList(int month, Integer loginId) {
         //データ取得処理
-        List<DateAttendance> results = dateAttendanceRepository.findAllAttendances(month, loginId);
+        List<DateAttendance> results = dateAttendanceRepository.findAllAttendances(2024, month, loginId);
         //フォームに詰め替え
         List<DateAttendanceListForm.Attendance> dateAttendances = setDateAttendanceListForm(results);
         return dateAttendances;
@@ -421,8 +421,6 @@ public class DateAttendanceService {
         return attendances;
     }
 
-}
-
     /*
      * 勤怠編集処理(勤怠一括登録/編集画面で使用)
      */
@@ -447,7 +445,7 @@ public class DateAttendanceService {
             String breakTime = dateAttendance.getBreakTime();
             String memo = dateAttendance.getMemo();
 
-            dateAttendanceRepository.addAttendance(id, attendance, workTimeStart, workTimeFinish, breakTime, formattedWorkTime, memo);
+            dateAttendanceRepository.updateAttendance(attendance, workTimeStart, workTimeFinish, breakTime, formattedWorkTime, memo, id);
         }
     }
 
