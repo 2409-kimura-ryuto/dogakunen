@@ -68,19 +68,38 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
     @Transactional
     @Modifying
     @Query(
-         value = "UPDATE date_attendances SET " +
-                 "attendance = :attendance, " +
-                 "work_time_start = :workTimeStart, " +
-                 "work_time_finish = :workTimeFinish, " +
-                 "break_time = CAST(:breakTime AS interval), " +
-                 "work_time = CAST(:workTime AS interval), " +
-                 "memo = :memo " +
-                 "WHERE id = :id" ,
+         value = "INSERT INTO date_attendances ( " +
+                 "date, user_id, month, year, attendance, " +
+                 "work_time_start, work_time_finish, " +
+                 "break_time, work_time, memo " +
+                 ") VALUES ( " +
+                 ":date, :userId, :month, :year, :attendance, " +
+                 ":workTimeStart, :workTimeFinish, " +
+                 "CAST(:breakTime AS interval), CAST(:workTime AS interval), :memo)" ,
          nativeQuery = true
     )
-    public void addAttendance(@Param("id") Integer id, @Param("attendance") Integer attendance, @Param("workTimeStart") LocalTime workTimeStart, @Param("workTimeFinish") LocalTime workTimeFinish, @Param("breakTime") String breakTime, @Param("workTime") String workTime, @Param("memo") String memo);
+    public void addAttendance(@Param("date") Date date, @Param("userId") Integer userId, @Param("month") Integer month, @Param("year") Integer year, @Param("attendance") Integer attendance, @Param("workTimeStart") LocalTime workTimeStart, @Param("workTimeFinish") LocalTime workTimeFinish, @Param("breakTime") String breakTime, @Param("workTime") String workTime, @Param("memo") String memo);
 
-    //【整地前】全社員の総労働時間取得(CSVファイル出力用)
+    //勤怠編集時に使用
+    @Transactional
+    @Modifying
+    @Query(
+            value = "UPDATE date_attendances SET " +
+                    "attendance = :attendance, " +
+                    "work_time_start = :workTimeStart, " +
+                    "work_time_finish = :workTimeFinish, " +
+                    "break_time = CAST(:breakTime AS interval), " +
+                    "work_time = CAST(:workTime AS interval), " +
+                    "memo = :memo, " +
+                    "updated_date = CURRENT_TIMESTAMP " +
+                    "WHERE id = :id " ,
+            nativeQuery = true
+    )
+    public void updateAttendance(@Param("attendance") Integer attendance, @Param("workTimeStart") LocalTime workTimeStart, @Param("workTimeFinish") LocalTime workTimeFinish, @Param("breakTime") String breakTime, @Param("workTime") String workTime, @Param("memo") String memo, @Param("id") Integer id);
+
+
+
+ //【整地前】全社員の総労働時間取得(CSVファイル出力用)
     @Transactional
     @Query(
             value = "SELECT u.name AS name," +
