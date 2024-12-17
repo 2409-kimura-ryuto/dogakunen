@@ -56,18 +56,28 @@
     </div>-->
 </div>
 <br/>
+<form th:action="@{/selectMonth}" class="selectMonthForm">
+    <select name="selectMonth" class="form-control selectMonth">
+        <!--<option value="" th:each="item : ${map}" th:value="${item.key}" th:text="${item.value}"></option>-->
+        <option value="-6" th:text="${pullDown.get(0)}"></option>
+        <option value="-5" th:text="${pullDown.get(1)}"></option>
+        <option value="-4" th:text="${pullDown.get(2)}"></option>
+        <option value="-3" th:text="${pullDown.get(3)}"></option>
+        <option value="-2" th:text="${pullDown.get(4)}"></option>
+        <option value="-1" th:text="${pullDown.get(5)}"></option>
+        <option value="0" th:text="${pullDown.get(6)}" selected></option>
+        <option value="1" th:text="${pullDown.get(7)}"></option>
+        <option value="2" th:text="${pullDown.get(8)}"></option>
+        <option value="3" th:text="${pullDown.get(9)}"></option>
+        <option value="4" th:text="${pullDown.get(10)}"></option>
+        <option value="5" th:text="${pullDown.get(11)}"></option>
+        <option value="6" th:text="${pullDown.get(12)}"></option>
+    </select>
+    <input type="submit" value="表示" class="btn btn-secondary btn-sm" />
+</form>
 
-<select class="form-control">
-    <option value="" disabled selected>選択してください</option>
-    <option value="">選択してください</option>
-</select>
-
-<a th:href="@{/prevMonth}">
-    <input type="button" value="前月へ">
-</a>
-<a th:href="@{/nextMonth}">
-    <input type="button" value="翌月へ">
-</a>
+<a th:href="@{/selectMonth(selectMonth = -1)}" class="prevMonth">&lt;前月へ</a>
+<a th:href="@{/selectMonth(selectMonth = 1)}">翌月へ&gt;</a>
 
 <table class="table table-hover">
     <thead class="table-light">
@@ -83,7 +93,7 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="monthDate : ${monthDates}" class="align-middle">
+    <tr th:each="monthDate : ${monthDates}" class="align-middle attendanceList">
         <td th:text="${#dates.format(monthDate, 'yyyy年MM月dd日')}"></td>
         <!--<span th:each="attendance : ${attendances}">-->
         <!--<span th:if="${(attendance.date).compareTo(monthDate) == 0}">-->
@@ -91,11 +101,11 @@
                 <span th:each="attendance : ${attendances}">
                     <p th:case="${attendance.date}">
                         <td th:switch="${attendance.attendance}">
-                            <span th:case="0" th:text="未登録">未登録</span>
-                            <span th:case="1" th:text="社内業務（オンサイト）">未登録</span>
-                            <span th:case="2" th:text="社内業務（オフサイト）">未登録</span>
-                            <span th:case="3" th:text="顧客業務（オンサイト）">未登録</span>
-                            <span th:case="4" th:text="顧客業務（オフサイト）">未登録</span>
+                            <span th:case="0" th:text="未登録"></span>
+                            <span th:case="1" th:text="社内業務（オンサイト）"></span>
+                            <span th:case="2" th:text="社内業務（オフサイト）"></span>
+                            <span th:case="3" th:text="顧客業務（オンサイト）"></span>
+                            <span th:case="4" th:text="顧客業務（オフサイト）"></span>
                             <span th:case="5" th:text="休日"></span>
                         </td>
                         <td th:text="${#temporals.format(attendance.workTimeStart, 'H:mm')}"></td>
@@ -137,75 +147,9 @@
                     </td>
                 </p>
             </span>
-        <!--
-        <span th:unless="${(attendance.date).compareTo(monthDate) == 0}"></span>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </span>
-        -->
     </tr>
     </tbody>
 </table>
-
-<!--勤怠登録updateにしてた時の表示。表記確認のために残している状態です
-<table class="table table-hover">
-    <thead class="table-light">
-    <tr>
-        <th>日付</th>
-        <th>勤務区分</th>
-        <th>開始時刻</th>
-        <th>終了時刻</th>
-        <th>休憩時間</th>
-        <th>労働時間</th>
-        <th>メモ</th>
-        <th></th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="attendance : ${attendances}" class="align-middle">
-        <td th:text="${#dates.format(attendance.date, 'yyyy年MM月dd日')}"></td>
-        <td th:switch="${attendance.attendance}">
-            <span th:case="0" th:text="未登録"></span>
-            <span th:case="1" th:text="社内業務（オンサイト）"></span>
-            <span th:case="2" th:text="社内業務（オフサイト）"></span>
-            <span th:case="3" th:text="顧客業務（オンサイト）"></span>
-            <span th:case="4" th:text="顧客業務（オフサイト）"></span>
-            <span th:case="5" th:text="休日"></span>
-        </td>
-        <td th:text="${#temporals.format(attendance.workTimeStart, 'H:mm')}"></td>
-        <td th:text="${#temporals.format(attendance.workTimeFinish, 'H:mm')}"></td>
-        時間が0から始まる場合(ex.08:00:00)は2文字目から5文字目で切り取り。そうでないとき(ex.16:00:00)は1文字目から5文字目で切り取る
-        <td th:text="${attendance.breakTime != null && attendance.breakTime.startsWith('0') ? #strings.substring(attendance.breakTime, 1, 5) : #strings.substring(attendance.breakTime, 0, 5)}"></td>
-        <td th:text="${attendance.workTime != null && attendance.workTime.startsWith('0') ? #strings.substring(attendance.workTime, 1, 5) : #strings.substring(attendance.workTime, 0, 5)}"></td>
-        <td th:text="${attendance.memo}"></td>
-        <div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">
-            <td th:if="${attendance.attendance != 0}"><a th:href="@{/editAttendance/{id}(id=${attendance.id})}"><input type="submit" value="編集" class="btn btn-outline-secondary"></a></td>
-            <td th:if="${attendance.attendance != 0}"><form th:if="${attendance.attendance != 0}" th:action="@{/deleteAttendance{id}(id=${attendance.id})}" th:method="put" class="delete" onSubmit="return CheckDelete()"><input type="submit" value="削除" class="btn btn-outline-danger"></form></td>
-        </div>
-        未登録の時と申請中/承認済みの時の編集/削除ボタンの表示
-        <td th:if="${attendance.attendance == 0}">
-            <button disabled class="btn btn-outline-secondary">編集</button>
-        </td>
-        <td th:if="${attendance.attendance == 0}">
-            <button disabled class="btn btn-outline-secondary">削除</button>
-        </td>
-        <td th:if="${monthAttendance.attendanceStatus != 0}">
-            <button disabled class="btn btn-outline-secondary">編集</button>
-        </td>
-        <td th:if="${monthAttendance.attendanceStatus != 0}">
-            <button disabled class="btn btn-outline-secondary">削除</button>
-        </td>
-    </tr>
-    </tbody>
-</table>
-</div>
-</div>
 <div class="text-center">
     <th:block th:switch="${attendanceStatus}">
         <span th:case="0">
@@ -220,6 +164,15 @@
             <button disabled class="btn btn-secondary">承認済み</button>
         </span>
     </th:block>
-</div>-->
+</div>
+総労働時間
+<div th:text="${totalWorkTime}"></div>
+総休憩時間
+<div th:text="${totalBreakTime}"></div>
+所定時間
+<div th:text="${workingHours}"></div>
+<a th:href="@{/all_update_attendance}">
+    <input type="submit" value="一括登録/編集" class="btn btn-outline-secondary">
+</a>
 </body>
 </html>

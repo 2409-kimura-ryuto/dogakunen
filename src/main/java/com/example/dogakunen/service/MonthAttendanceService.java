@@ -41,8 +41,8 @@ public class MonthAttendanceService {
     /*
      * 勤怠(月)からユーザIDと現在月をもとに対象のカラムを取得
      */
-    public MonthAttendanceForm findByUserIdAndMonth(Integer id, Integer month) {
-        MonthAttendance result = monthAttendanceRepository.findByUserIdAndMonth(id, month);
+    public MonthAttendanceForm findByUserIdAndMonth(Integer id, Integer year, Integer month) {
+        MonthAttendance result = monthAttendanceRepository.findByUserIdAndMonth(id, year, month);
 
         //【追加①】resultがnullの時、nullを返す
         if (result == null) {

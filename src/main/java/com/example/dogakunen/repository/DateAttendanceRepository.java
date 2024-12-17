@@ -24,9 +24,11 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
    //勤怠情報取得
     @Transactional
     @Query(value = "SELECT d FROM DateAttendance d JOIN FETCH d.user " +
-            "WHERE d.month = :month " + "AND d.user.id = :loginId " +
+            "WHERE d.year = :year " +
+            "AND d.month = :month " +
+            "AND d.user.id = :loginId " +
             "ORDER BY d.date ASC")
-    public List<DateAttendance> findAllAttendances(@Param("month") int month, @Param("loginId") Integer loginID);
+    public List<DateAttendance> findAllAttendances(@Param("year") int year, @Param("month") int month, @Param("loginId") Integer loginID);
 
     public List<DateAttendance> findByUserAndDate(User loginUser, Date date);
 
