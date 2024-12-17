@@ -13,12 +13,11 @@ public interface MonthAttendanceRepository extends JpaRepository<MonthAttendance
     @Query(
             value = "SELECT * FROM month_attendances " +
                     "WHERE user_id = :userId " +
-                    "AND month = :month " +
-                    "AND year = :year",
+                    "And year = :year " +
+                    "AND month = :month" ,
             nativeQuery = true
     )
-    public MonthAttendance findByUserIdAndMonth(@Param("userId") Integer userId, @Param("year") Integer year,
-                                                @Param("month") Integer month);
+    public MonthAttendance findByUserIdAndMonth(@Param("userId") Integer userId, @Param("year") Integer year, @Param("month") Integer month);
 
     //勤怠マスタ(月)作成
     @Transactional

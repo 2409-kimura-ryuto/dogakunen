@@ -18,6 +18,7 @@ import java.util.List;
 
 import static com.example.dogakunen.controller.AttendanceController.accessDate;
 
+
 @Controller
 public class AccountController {
 
@@ -108,11 +109,8 @@ public class AccountController {
         //【追加】
         accessDate = new Date();
 
-        //ログイン画面にフォワード
-        ModelAndView mav = new ModelAndView();
-        mav.setViewName("/login");
-        return mav;
-
+        //ログイン画面にリダイレクト
+        return new ModelAndView("redirect:/login");
     }
 
     /*

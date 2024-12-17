@@ -34,6 +34,9 @@ public class DateAttendance {
     private Integer month;
 
     @Column
+    private Integer year;
+
+    @Column
     private Integer attendance;
 
     @Column(name = "work_time_start")
