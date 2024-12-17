@@ -14,8 +14,10 @@ public interface GeneralDateAttendanceRepository extends JpaRepository<GeneralDa
                     "FROM date_attendances " +
                     "WHERE date_attendances.user_id = :userId " +
                     "AND date_attendances.month = :month " +
+                    "AND date_attendances.year = :year " +
                     "ORDER BY date_attendances.date" ,
             nativeQuery = true
     )
-    public List<GeneralDateAttendance> findDateAttendanceByOrderByDate(@Param("userId") Integer userId, @Param("month") Integer month);
+    public List<GeneralDateAttendance> findDateAttendanceByOrderByDate(@Param("userId") Integer userId, @Param("year") Integer year,
+                                                                       @Param("month") Integer month);
 }

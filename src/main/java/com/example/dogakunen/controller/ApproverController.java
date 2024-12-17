@@ -16,7 +16,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -50,39 +52,35 @@ public class ApproverController {
         YearMonth accessDate = YearMonth.now();
         YearMonth getDate = null;
         if (reqDate != null) {
-            getDate = YearMonth.parse(reqDate);
+            getDate = YearMonth.parse(reqDate, DateTimeFormatter.ofPattern("yyyy年MM月"));
         } else {
             getDate = accessDate;
         }
-        /*
-        YearMonth getDate = null;
-        if (reqDate != null){
-            int num = Integer.parseInt(reqDate);
-            getDate = accessDate.plusMonths(num);
-        } else {
-            getDate = accessDate;
-        }
-         */
+
         //アクセスもしくはリクエスト年月をもとに承認者一覧を取得
-        List<GeneralUserForm> generalUsers = userService.findAllGeneralUser(getDate.getYear(),getDate.getMonthValue());
+        int year = getDate.getYear();
+        int month = getDate.getMonthValue();
+        List<GeneralUserForm> generalUsers = userService.findAllGeneralUser(year, month);
         mav.addObject("users", generalUsers);
+        mav.addObject("year", year);
+        mav.addObject("month", month);
 
         //プルダウン表示
         YearMonth finalGetDate = getDate;
         List<String> availableDates = IntStream.rangeClosed(-6, 6)
-                .mapToObj(i -> finalGetDate.plusMonths(i).toString())
+                .mapToObj(i -> finalGetDate.plusMonths(i).format(DateTimeFormatter.ofPattern("yyyy年MM月")))
                 .collect(Collectors.toList());
         mav.addObject("availableDates", availableDates);
 
         //前月・次月表示
-        YearMonth preMonth = null;
-        YearMonth nextMonth = null;
+        String preMonth = null;
+        String nextMonth = null;
         if (reqDate != null) {
-            preMonth = YearMonth.parse(reqDate).plusMonths(1);
-            nextMonth = YearMonth.parse(reqDate).plusMonths(-1);
+            preMonth = getDate.plusMonths(-1).format(DateTimeFormatter.ofPattern("yyyy年MM月"));
+            nextMonth = getDate.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy年MM月"));
         } else {
-            preMonth = accessDate.plusMonths(1);
-            nextMonth = accessDate.plusMonths(-1);
+            preMonth = accessDate.plusMonths(-1).format(DateTimeFormatter.ofPattern("yyyy年MM月"));
+            nextMonth = accessDate.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy年MM月"));
         }
         mav.addObject("preMonth", preMonth);
         mav.addObject("nextMonth", nextMonth);
@@ -119,12 +117,16 @@ public class ApproverController {
         }
 
         //更新したいカラムのIdを取得してmonthAttendanceFormにセット
-        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(loginUserId, 12).getId());
+        YearMonth now = YearMonth.now();
+        int month = now.getMonthValue();
+        int year = now.getYear();
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(loginUserId, year, month).getId());
         //勤怠状況ステータスを1:申請中にセット
         monthAttendanceForm.setAttendanceStatus(1);
         //userIdとmonthもセットしないと0で更新されてしまう
         monthAttendanceForm.setUserId(loginUserId);
-        monthAttendanceForm.setMonth(12);
+        monthAttendanceForm.setMonth(month);
+        monthAttendanceForm.setYear(year);
         monthAttendanceService.changeStatus(monthAttendanceForm);
         //ホーム画面にリダイレクト
         mav.setViewName("redirect:/");
@@ -134,8 +136,9 @@ public class ApproverController {
     /*
      * 勤怠状況確認画面
      */
-    @GetMapping("/check_attendance/{id}")
-    public ModelAndView checkAttendance(@PathVariable String id, RedirectAttributes redirectAttributes) {
+    @GetMapping("/check_attendance/{id}/{year}/{month}")
+    public ModelAndView checkAttendance(@PathVariable String id, @PathVariable String year, @PathVariable String month,
+                                        RedirectAttributes redirectAttributes) {
         ModelAndView mav = new ModelAndView();
 
         //idの正規表現チェック
@@ -147,7 +150,7 @@ public class ApproverController {
         //勤怠状況が存在しないユーザのidが入力された際のバリデーション
         if (id.matches("^[0-9]+$")) {
             try {
-                monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 12).getId();
+                monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), Integer.parseInt(year), Integer.parseInt(month)).getId();
             } catch (RuntimeException e) {
                 errorMessages.add("・不正なパラメータが入力されました");
             }
@@ -161,9 +164,9 @@ public class ApproverController {
         }
 
         //勤怠情報取得
-        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(Integer.parseInt(id), 12);
+        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(Integer.parseInt(id), Integer.parseInt(year), Integer.parseInt(month));
         //ユーザ毎に月の勤怠状況ステータスを取得
-        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), 12);
+        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), Integer.parseInt(year), Integer.parseInt(month));
         mav.addObject("generalDateAttendances", generalDateAttendanceForms);
         mav.addObject("monthAttendanceForm", monthAttendanceForm);
         mav.setViewName("/check_attendance");
@@ -187,17 +190,18 @@ public class ApproverController {
     /*
      * 承認処理
      */
-    @PutMapping("/approve/{id}")
-    public ModelAndView approve(@PathVariable Integer id) {
+    @PutMapping("/approve/{id}/{year}/{month}")
+    public ModelAndView approve(@PathVariable Integer id, @PathVariable String year, @PathVariable String month) {
         ModelAndView mav = new ModelAndView();
         MonthAttendanceForm monthAttendanceForm = new MonthAttendanceForm();
-        //勤怠マスタから対象者の12月のレコードのidを取得し、monthAttendanceFormnにセット
-        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, 12).getId());
+        //勤怠マスタから対象者の12月のレコードのidを取得し、monthAttendanceFormにセット
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, Integer.parseInt(year), Integer.parseInt(month)).getId());
         //2:承認済みをセット
         monthAttendanceForm.setAttendanceStatus(2);
         //userIdとmonthもセットしないと0で更新されてしまう
         monthAttendanceForm.setUserId(id);
-        monthAttendanceForm.setMonth(12);
+        monthAttendanceForm.setYear(Integer.parseInt(year));
+        monthAttendanceForm.setMonth(Integer.parseInt(month));
         //勤怠記録ステータスを2:承認済みに更新
         monthAttendanceService.changeStatus(monthAttendanceForm);
         //承認対象者一覧画面にリダイレクト
@@ -208,17 +212,18 @@ public class ApproverController {
     /*
      * 差し戻し処理
      */
-    @PutMapping("/sendBack/{id}")
-    public ModelAndView sendBack(@PathVariable Integer id) {
+    @PutMapping("/sendBack/{id}/{year}/{month}")
+    public ModelAndView sendBack(@PathVariable Integer id, @PathVariable String year, @PathVariable String month) {
         ModelAndView mav = new ModelAndView();
         MonthAttendanceForm monthAttendanceForm = new MonthAttendanceForm();
         //勤怠マスタから対象者の12月のレコードのidを取得し、monthAttendanceFormにセット
-        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, 12).getId());
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(id, Integer.parseInt(year), Integer.parseInt(month)).getId());
         //0:申請前をセット
         monthAttendanceForm.setAttendanceStatus(0);
         //userIdとmonthもセットしないと0で更新されてしまう
         monthAttendanceForm.setUserId(id);
-        monthAttendanceForm.setMonth(12);
+        monthAttendanceForm.setYear(Integer.parseInt(year));
+        monthAttendanceForm.setMonth(Integer.parseInt(month));
         //勤怠記録ステータスを0:申請前に更新
         monthAttendanceService.changeStatus(monthAttendanceForm);
         //承認対象者一覧画面にリダイレクト

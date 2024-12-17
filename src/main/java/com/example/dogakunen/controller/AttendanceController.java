@@ -107,7 +107,7 @@ public class AttendanceController {
         Integer loginId = loginUser.getId();
 
         //勤怠月取得
-        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(loginId, month);
+        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(loginId, month, year);
         //勤怠記録の取得
         List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances (month, loginId);
         //サンプルで一時的に追加（あとで消します）

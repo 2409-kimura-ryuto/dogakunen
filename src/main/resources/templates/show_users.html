@@ -15,10 +15,10 @@
         <span><div th:text="${errorMessage}" /></span>
     </div>
 <a th:href="@{/show_users(date=${preMonth})}">
-    <input type="button" th:value="${preMonth}">
+    <input type="button" th:value="前月へ">
 </a>
 <a th:href="@{/show_users(date=${nextMonth})}">
-    <input type="button" th:value="${nextMonth}">
+    <input type="button" th:value="翌月へ">
 </a>
 <form th:action="@{/show_users}" method="get" class="form-control">
     <select class="form-control" name="date">
@@ -52,7 +52,7 @@
             </th:block>
         </td>
         <td>
-            <a th:href="@{/check_attendance/{id}(id=${user.id})}">
+            <a th:href="@{/check_attendance/{id}/{year}/{month}(id=${user.id}, year=${year}, month=${month})}">
                 <input type="submit" value="勤怠状況確認" class="btn btn-outline-secondary">
             </a>
         </td>
