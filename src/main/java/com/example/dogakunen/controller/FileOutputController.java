@@ -33,7 +33,7 @@ public class FileOutputController {
 
 
     /*
-     * 【整地前】CSVファイル出力（システム管理者用）
+     * CSVファイル出力（システム管理者用）
      */
     @GetMapping("/csv")
     public ModelAndView csv(@RequestParam(name = "target") String target) {

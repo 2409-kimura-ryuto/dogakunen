@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class MonthAttendanceService {
@@ -57,17 +58,16 @@ public class MonthAttendanceService {
      * 勤怠(月)からユーザIDと現在年をもとに対象のカラムを取得
      */
     public MonthAttendanceForm findByUserIdAndYear(Integer userId, Integer year) {
-        MonthAttendance result = monthAttendanceRepository.findByUserIdAndYear(userId, year);
+        List<MonthAttendance> result = monthAttendanceRepository.findByUserIdAndYear(userId, year);
 
-        //【追加①】resultがnullの時、nullを返す
-        if (result == null) {
+        //resultがnullの時、nullを返す
+        if (result.size() == 0) {
             return null;
         }
 
-        MonthAttendanceForm monthAttendanceResult = setMonthAttendanceForm(result);
+        MonthAttendanceForm monthAttendanceResult = setMonthAttendanceForm(result.get(0));
         return monthAttendanceResult;
     }
-
 
     /*
      * DBから取得したデータをFormに設定

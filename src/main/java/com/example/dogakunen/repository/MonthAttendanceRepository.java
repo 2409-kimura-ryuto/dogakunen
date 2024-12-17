@@ -8,6 +8,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface MonthAttendanceRepository extends JpaRepository<MonthAttendance, Integer> {
     //ユーザIDと現在月から対象のデータを取得
@@ -27,7 +29,7 @@ public interface MonthAttendanceRepository extends JpaRepository<MonthAttendance
                     "AND year = :year" ,
             nativeQuery = true
     )
-    public MonthAttendance findByUserIdAndYear(@Param("userId") Integer userId, @Param("year") Integer year);
+    public List<MonthAttendance> findByUserIdAndYear(@Param("userId") Integer userId, @Param("year") Integer year);
 
     //勤怠マスタ(月)作成
     @Transactional

@@ -508,26 +508,6 @@ public class AttendanceController {
         return new ModelAndView("redirect:/");
     }
 
-    /*
-     * 【整地前】CSVファイル出力（システム管理者用）
-     *
-    @GetMapping("/csv")
-    public ModelAndView csv(@RequestParam(name = "year") Integer year, @RequestParam(name = "month") Integer month) {       ModelAndView mav = new ModelAndView();
-
-        //全アカウントの労働時間を取得
-        List<AdministratorCSV> results = dateAttendanceService.selectWorkTime(year, month);
-        //結果をもとにCSVファイル出力
-        try (Writer writer = Files.newBufferedWriter(Paths.get("C:\\Users\\trainee0957\\Desktop\\" + year + "年" + month + "月.csv"))) {
-            dateAttendanceService.write(writer, results);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (CsvException e) {
-            e.printStackTrace();
-        }
-
-        // ホーム画面にリダイレクト
-        return new ModelAndView("redirect:/");
-    }*/
 
     /*
      * 勤怠一括登録/編集画面表示
