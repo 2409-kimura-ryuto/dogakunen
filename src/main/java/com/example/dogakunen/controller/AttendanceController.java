@@ -535,7 +535,6 @@ public class AttendanceController {
         return new ModelAndView("redirect:/");
     }
 
-
     /*
      * 勤怠一括登録/編集画面表示
      */
