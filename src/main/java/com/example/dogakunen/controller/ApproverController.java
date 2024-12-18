@@ -1,6 +1,7 @@
 package com.example.dogakunen.controller;
 
 import com.example.dogakunen.controller.form.*;
+import com.example.dogakunen.holidayCsv.HolidayCsvParser;
 import com.example.dogakunen.service.DateAttendanceService;
 import com.example.dogakunen.service.MonthAttendanceService;
 import com.example.dogakunen.service.UserService;
@@ -39,6 +40,9 @@ public class ApproverController {
 
     @Autowired
     HttpSession session;
+
+    @Autowired
+    HolidayCsvParser holidayCsvParser;
 
     /*
      * 承認対象者一覧画面
@@ -185,24 +189,17 @@ public class ApproverController {
             mav.setViewName("redirect:/show_users");
             return mav;
         }
+
         //該当月の1カ月分のリスト作成
         Calendar calender = Calendar.getInstance();
-        calender.set(Calendar.YEAR, Integer.parseInt(year));
-        calender.set(Calendar.MONTH, Integer.parseInt(month)-1);
-        calender.set(Calendar.DAY_OF_MONTH, 1);
-        calender.set(Calendar.HOUR_OF_DAY, 0);
-        calender.set(Calendar.MINUTE, 0);
-        calender.set(Calendar.SECOND, 0);
+        calender.set(Integer.parseInt(year), Integer.parseInt(month)-1, 1, 0, 0, 0);
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.s");
         String start = sdf.format(calender.getTime());
         Date startDate = sdf.parse(start);
-        //Date startDate = calender.getTime();
         int endDay = calender.getActualMaximum(Calendar.DAY_OF_MONTH);
         calender.set(Calendar.DAY_OF_MONTH, endDay);
-        //Date型のフォーマット揃える（dateAttendancesのdateと）
         String end = sdf.format(calender.getTime());
         Date endDate = sdf.parse(end);
-        //Date endDate = calender.getTime();
 
         List<Date> dates = new ArrayList<Date>();
         Calendar calendar = new GregorianCalendar();
@@ -218,6 +215,12 @@ public class ApproverController {
         //日付を画面にバインド
         mav.addObject("monthDates", dates);
 
+        //祝日の取得
+        List<String> holidays = holidayCsvParser.parse().stream()
+                .map(holiday -> holiday.getDate().toString()) // LocalDateを文字列に変換
+                .collect(Collectors.toList());
+        mav.addObject("holidays", holidays);
+
 
         //勤怠情報取得
         List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(Integer.parseInt(id), Integer.parseInt(year), Integer.parseInt(month));
@@ -225,9 +228,8 @@ public class ApproverController {
         MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), Integer.parseInt(year), Integer.parseInt(month));
         mav.addObject("generalDateAttendances", generalDateAttendanceForms);
         mav.addObject("monthAttendanceForm", monthAttendanceForm);
-        //追加
+        //追加(戻るボタンを押下時に日付が保持されるようYearMonth型の年月を作成したのち、String型に変換して画面にバインド)
         YearMonth ym = YearMonth.of(Integer.parseInt(year), Integer.parseInt(month));
-        //YearMonth date = YearMonth.parse(str, DateTimeFormatter.ofPattern("yyyy年MM月"));
         String yearMonth = ym.format(DateTimeFormatter.ofPattern("yyyy年MM月"));
         mav.addObject("yearMonth", yearMonth);
 
