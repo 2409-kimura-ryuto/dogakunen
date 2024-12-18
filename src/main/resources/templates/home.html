@@ -93,8 +93,13 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="monthDate : ${monthDates}" class="align-middle attendanceList">
-        <td th:text="${#dates.format(monthDate, 'yyyy年MM月dd日')}"></td>
+    <tr th:each="monthDate : ${monthDates}" class="align-middle attendanceList" >
+        <td>
+            <div th:text="${#dates.format(monthDate, 'yyyy年MM月dd日 (E)')}"
+                 th:classappend="${#dates.format(monthDate, 'E') == '土' ? 'saturday' : '' +
+                      #dates.format(monthDate, 'E') == '日' || #lists.contains(holidays, #dates.format(monthDate, 'yyyy-MM-dd')) ? ' holiday' : ''}">
+            </div>
+        </td>
         <!--<span th:each="attendance : ${attendances}">-->
         <!--<span th:if="${(attendance.date).compareTo(monthDate) == 0}">-->
         <span th:switch="${monthDate}">
