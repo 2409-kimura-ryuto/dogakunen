@@ -17,6 +17,7 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,17 +46,25 @@ public class FileOutputController {
         //年月が指定されなかったとき
         if(StringUtils.isBlank(target)){
             errorMessages.add("・対象月を選択してください");
-        }
-        //エラーがあった場合はエラーメッセージをセッションにセットしシステム管理画面にリダイレクト
-        if(errorMessages.size() != 0){
             session.setAttribute("errorMessages", errorMessages);
             return new ModelAndView("redirect:/systemManage");
         }
-
         //画面から受け取った年月情報を年と月に分解
         String[] parts = target.split("-");
         Integer year = Integer.parseInt(parts[0]);
         Integer month = Integer.parseInt(parts[1]);
+        //年月が未来だったとき
+        //現在日付を取得
+        LocalDate today = LocalDate.now();
+        // 現在の月と年を取得
+        int Year = today.getYear();
+        int Month = today.getMonthValue();
+        //現在の年月と指定された年月を比較
+        if(year > Year || (year == Year && month > Month)){
+            errorMessages.add("・未来のファイルは出力できません");
+            session.setAttribute("errorMessages", errorMessages);
+            return new ModelAndView("redirect:/systemManage");
+        }
 
         //所定時間の算出
         //１日の所定時間を８時間に設定
@@ -68,7 +77,7 @@ public class FileOutputController {
         //取得した年と月から全アカウントの労働時間を取得
         List<AdministratorCSV> results = dateAttendanceService.selectWorkTime(year, month, Time);
         //結果をもとにCSVファイル出力
-        try (Writer writer = Files.newBufferedWriter(Paths.get("C:\\Users\\trainee0919\\Desktop\\" + year + "年" + month + "月.csv"))) {
+        try (Writer writer = Files.newBufferedWriter(Paths.get("C:\\Users\\trainee0957\\Desktop\\" + year + "年" + month + "月.csv"))) {
             dateAttendanceService.write(writer, results);
         } catch (IOException e) {
             e.printStackTrace();

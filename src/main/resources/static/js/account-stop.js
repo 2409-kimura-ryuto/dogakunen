@@ -20,4 +20,15 @@ $(function() {
             return false;
         }
     });
+
+    //ファイル出力時の完了アラート
+    $('.outputButton').on('click', function() {
+        let result = confirm('ファイルを出力しますか');
+
+        if (result) {
+            return true;
+        } else {
+            return false;
+        }
+    });
 });
