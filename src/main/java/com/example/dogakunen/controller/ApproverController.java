@@ -1,6 +1,7 @@
 package com.example.dogakunen.controller;
 
 import com.example.dogakunen.controller.form.*;
+import com.example.dogakunen.holidayCsv.HolidayCsvParser;
 import com.example.dogakunen.service.DateAttendanceService;
 import com.example.dogakunen.service.MonthAttendanceService;
 import com.example.dogakunen.service.UserService;
@@ -14,14 +15,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static com.example.dogakunen.controller.AttendanceController.accessDate;
 
 @Controller
 public class ApproverController {
@@ -37,6 +40,9 @@ public class ApproverController {
 
     @Autowired
     HttpSession session;
+
+    @Autowired
+    HolidayCsvParser holidayCsvParser;
 
     /*
      * 承認対象者一覧画面
@@ -90,27 +96,27 @@ public class ApproverController {
 
     /*
      * 完了申請処理
+     */
     @PutMapping("/request")
     public ModelAndView request(RedirectAttributes redirectAttributes) {
         ModelAndView mav = new ModelAndView();
-        List<String> requestErrorMessages = new ArrayList<String>();
         MonthAttendanceForm monthAttendanceForm = new MonthAttendanceForm();
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         int loginUserId = loginUser.getId();
 
-        //アクセスした日付の取得（実際の月の値を出すときは1を加算する必要がある）
+        //完了申請のバリデーション
+        List<String> requestErrorMessages = new ArrayList<String>();
         Calendar calender = Calendar.getInstance();
+        calender.setTime(accessDate);
         int month = calender.get(Calendar.MONTH) + 1;
-
-        //未登録があった場合のバリデーション
-        //勤怠情報を取得し、勤務区分を１つ１つ確認。0:未登録があったらエラーメッセージを追加して繰り返し処理を終える
-        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(loginUserId, 12);
-        for (GeneralDateAttendanceForm generalDateAttendanceForm : generalDateAttendanceForms) {
-            if(generalDateAttendanceForm.getAttendance() == 0) {
-                requestErrorMessages.add("・全ての勤怠を登録してから申請してください");
-                break;
-            }
+        int year = calender.get(Calendar.YEAR);
+        int dayOfMonth = calender.getActualMaximum(Calendar.DAY_OF_MONTH);
+        //勤怠情報を取得し、取得したリストのサイズと該当月の日数が一致していなければエラーメッセージを追加する
+        List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(loginUserId, year, month);
+        if (generalDateAttendanceForms.size() != dayOfMonth) {
+            requestErrorMessages.add("・全ての勤怠を登録してから申請してください");
         }
+
         //月の労働時間が200時間を超えた時のバリデーション
         //勤怠記録の取得
         List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances(2024, month, loginUserId);
@@ -138,12 +144,13 @@ public class ApproverController {
         }
 
         //更新したいカラムのIdを取得してmonthAttendanceFormにセット
-        YearMonth now = YearMonth.now();
-        int year = now.getYear();
+        monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(loginUserId, year, month).getId());
+        //YearMonth now = YearMonth.now();
+        //int year = now.getYear();
         monthAttendanceForm.setId(monthAttendanceService.findByUserIdAndMonth(loginUserId, year, month).getId());
         //勤怠状況ステータスを1:申請中にセット
         monthAttendanceForm.setAttendanceStatus(1);
-        //userIdとmonthもセットしないと0で更新されてしまう
+        //userIdとmonthとyearもセットしないと0で更新されてしまう
         monthAttendanceForm.setUserId(loginUserId);
         monthAttendanceForm.setMonth(month);
         monthAttendanceForm.setYear(year);
@@ -152,14 +159,13 @@ public class ApproverController {
         mav.setViewName("redirect:/");
         return mav;
     }
-    */
 
     /*
      * 勤怠状況確認画面
      */
     @GetMapping("/check_attendance/{id}/{year}/{month}")
     public ModelAndView checkAttendance(@PathVariable String id, @PathVariable String year, @PathVariable String month,
-                                        RedirectAttributes redirectAttributes) {
+                                        RedirectAttributes redirectAttributes) throws ParseException {
         ModelAndView mav = new ModelAndView();
 
         //idの正規表現チェック
@@ -184,12 +190,49 @@ public class ApproverController {
             return mav;
         }
 
+        //該当月の1カ月分のリスト作成
+        Calendar calender = Calendar.getInstance();
+        calender.set(Integer.parseInt(year), Integer.parseInt(month)-1, 1, 0, 0, 0);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.s");
+        String start = sdf.format(calender.getTime());
+        Date startDate = sdf.parse(start);
+        int endDay = calender.getActualMaximum(Calendar.DAY_OF_MONTH);
+        calender.set(Calendar.DAY_OF_MONTH, endDay);
+        String end = sdf.format(calender.getTime());
+        Date endDate = sdf.parse(end);
+
+        List<Date> dates = new ArrayList<Date>();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(startDate);
+
+        while (calendar.getTime().before(endDate))
+        {
+            Date result = calendar.getTime();
+            dates.add(result);
+            calendar.add(Calendar.DATE, 1);
+        }
+        dates.add(endDate);
+        //日付を画面にバインド
+        mav.addObject("monthDates", dates);
+
+        //祝日の取得
+        List<String> holidays = holidayCsvParser.parse().stream()
+                .map(holiday -> holiday.getDate().toString()) // LocalDateを文字列に変換
+                .collect(Collectors.toList());
+        mav.addObject("holidays", holidays);
+
+
         //勤怠情報取得
         List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(Integer.parseInt(id), Integer.parseInt(year), Integer.parseInt(month));
         //ユーザ毎に月の勤怠状況ステータスを取得
         MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), Integer.parseInt(year), Integer.parseInt(month));
         mav.addObject("generalDateAttendances", generalDateAttendanceForms);
         mav.addObject("monthAttendanceForm", monthAttendanceForm);
+        //追加(戻るボタンを押下時に日付が保持されるようYearMonth型の年月を作成したのち、String型に変換して画面にバインド)
+        YearMonth ym = YearMonth.of(Integer.parseInt(year), Integer.parseInt(month));
+        String yearMonth = ym.format(DateTimeFormatter.ofPattern("yyyy年MM月"));
+        mav.addObject("yearMonth", yearMonth);
+
         mav.setViewName("/check_attendance");
         return mav;
     }

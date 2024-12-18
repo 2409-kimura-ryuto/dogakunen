@@ -14,21 +14,33 @@
     <div th:if="${errorMessages}" th:each="errorMessage : ${errorMessages}" class="alert alert-danger">
         <span><div th:text="${errorMessage}" /></span>
     </div>
-<a th:href="@{/show_users(date=${preMonth})}">
-    <input type="button" th:value="前月へ">
-</a>
-<a th:href="@{/show_users(date=${nextMonth})}">
-    <input type="button" th:value="翌月へ">
-</a>
-<form th:action="@{/show_users}" method="get" class="form-control">
-    <select class="form-control" name="date">
-        <option value="" disabled selected>選択してください</option>
+
+<form th:action="@{/show_users}" method="get" class="selectMonthForm">
+    <select class="form-control selectMonth" name="date">
+        <!--<option value="" disabled selected>選択してください</option>
         <th:block th:each="date : ${availableDates}">
             <option th:value="${date}">[[${date}]]</option>
-        </th:block>
+        </th:block>-->
+        <option th:text="${availableDates.get(0)}"></option>
+        <option th:text="${availableDates.get(1)}"></option>
+        <option th:text="${availableDates.get(2)}"></option>
+        <option th:text="${availableDates.get(3)}"></option>
+        <option th:text="${availableDates.get(4)}"></option>
+        <option th:text="${availableDates.get(5)}"></option>
+        <option th:text="${availableDates.get(6)}" selected></option>
+        <option th:text="${availableDates.get(7)}"></option>
+        <option th:text="${availableDates.get(8)}"></option>
+        <option th:text="${availableDates.get(9)}"></option>
+        <option th:text="${availableDates.get(10)}"></option>
+        <option th:text="${availableDates.get(11)}"></option>
+        <option th:text="${availableDates.get(12)}"></option>
     </select>
-    <input type="submit" value="表示" class="btn btn-secondary btn-lg">
+    <input type="submit" value="表示" class="btn btn-secondary btn-sm">
 </form>
+
+<a th:href="@{/show_users(date=${preMonth})}" class="prevMonth">&lt;前月へ</a>
+<a th:href="@{/show_users(date=${nextMonth})}">翌月へ&gt;</a>
+
 <table class="table table-hover">
     <thead class="table-light">
     <tr>

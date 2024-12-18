@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class MonthAttendanceService {
@@ -39,7 +40,7 @@ public class MonthAttendanceService {
     }
 
     /*
-     * 勤怠(月)から対象のカラムを取得
+     * 勤怠(月)からユーザIDと現在月をもとに対象のカラムを取得
      */
     public MonthAttendanceForm findByUserIdAndMonth(Integer id, Integer year, Integer month) {
         MonthAttendance result = monthAttendanceRepository.findByUserIdAndMonth(id, year, month);
@@ -54,6 +55,21 @@ public class MonthAttendanceService {
     }
 
     /*
+     * 勤怠(月)からユーザIDと現在年をもとに対象のカラムを取得
+     */
+    public MonthAttendanceForm findByUserIdAndYear(Integer userId, Integer year) {
+        List<MonthAttendance> result = monthAttendanceRepository.findByUserIdAndYear(userId, year);
+
+        //resultがnullの時、nullを返す
+        if (result.size() == 0) {
+            return null;
+        }
+
+        MonthAttendanceForm monthAttendanceResult = setMonthAttendanceForm(result.get(0));
+        return monthAttendanceResult;
+    }
+
+    /*
      * DBから取得したデータをFormに設定
      */
     private MonthAttendanceForm setMonthAttendanceForm(MonthAttendance result) {
@@ -63,12 +79,11 @@ public class MonthAttendanceService {
     }
 
     //勤怠マスタ(月)作成
-    public void saveNewMonth(int newUserId) {
+    public void saveNewMonth(int UserID, int year) {
 
         int month;
         for(month = 1; month < 13; month++){
-            //monthAttendance.setMonth(i);
-            monthAttendanceRepository.saveNewMonth(newUserId, month);
+            monthAttendanceRepository.saveNewMonth(UserID, year, month);
         }
     }
 

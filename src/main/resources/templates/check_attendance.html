@@ -23,23 +23,41 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="generalDateAttendance: ${generalDateAttendances}">
-        <td th:text="${#dates.format(generalDateAttendance.date, 'yyyy年MM月dd日')}"></td>
+    <tr th:each="monthDate : ${monthDates}" class="align-middle attendanceList">
         <td>
-            <th:block th:switch="${generalDateAttendance.attendance}">
-                <span th:case="0">未登録</span>
-                <span th:case="1">社内業務（オンサイト）</span>
-                <span th:case="2">社内業務（オフサイト）</span>
-                <span th:case="3">顧客業務（オンサイト）</span>
-                <span th:case="4">顧客業務（オフサイト）</span>
-                <span th:case="5">休日</span>
-            </th:block>
+            <div th:text="${#dates.format(monthDate, 'yyyy年MM月dd日 (E)')}"
+                 th:classappend="${#dates.format(monthDate, 'E') == '土' ? 'saturday' : '' +
+                 #dates.format(monthDate, 'E') == '日' || #lists.contains(holidays, #dates.format(monthDate, 'yyyy-MM-dd')) ? ' holiday' : ''}">
+            </div>
         </td>
-        <td th:text="${#dates.format(generalDateAttendance.workTimeStart, 'H:mm')}"></td>
-        <td th:text="${#dates.format(generalDateAttendance.workTimeFinish, 'H:mm')}"></td>
-        <td th:text="${#dates.format(generalDateAttendance.breakTime, 'H:mm')}"></td>
-        <td th:text="${#dates.format(generalDateAttendance.workTime, 'H:mm')}"></td>
-        <td th:text="${generalDateAttendance.memo}"></td>
+        <span th:switch="${monthDate}">
+            <span th:each="generalDateAttendance: ${generalDateAttendances}">
+                <p th:case="${generalDateAttendance.date}">
+                    <td th:switch="${generalDateAttendance.attendance}">
+                            <span th:case="0">未登録</span>
+                            <span th:case="1">社内業務（オンサイト）</span>
+                            <span th:case="2">社内業務（オフサイト）</span>
+                            <span th:case="3">顧客業務（オンサイト）</span>
+                            <span th:case="4">顧客業務（オフサイト）</span>
+                            <span th:case="5">休日</span>
+                    </td>
+                    <td th:text="${#dates.format(generalDateAttendance.workTimeStart, 'H:mm')}"></td>
+                    <td th:text="${#dates.format(generalDateAttendance.workTimeFinish, 'H:mm')}"></td>
+                    <td th:text="${#dates.format(generalDateAttendance.breakTime, 'H:mm')}"></td>
+                    <td th:text="${#dates.format(generalDateAttendance.workTime, 'H:mm')}"></td>
+                    <td th:text="${generalDateAttendance.memo}"></td>
+                </p>
+            </span>
+
+            <p th:case="*">
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </p>
+        </span>
     </tr>
     </tbody>
 </table>
@@ -54,7 +72,7 @@
         <input type="submit" value="差し戻し" class="btn btn-danger me-3">
     </form>
 </div>
-<a th:href="@{/show_users}">
+<a th:href="@{/show_users(date=${yearMonth})}">
     <input type="button" value="戻る" class="btn btn-secondary btn-sm">
 </a>
 </body>

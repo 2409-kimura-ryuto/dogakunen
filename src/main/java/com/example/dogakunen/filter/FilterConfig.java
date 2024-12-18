@@ -14,6 +14,7 @@ public class FilterConfig {
         bean.setFilter(new LoginFilter());
         //login画面以外の全ての画面にフィルターを設定
         bean.addUrlPatterns("/");
+        bean.addUrlPatterns("/newOrEdit");
         bean.addUrlPatterns("/newAttendance");
         bean.addUrlPatterns("/editAttendance/*");
         bean.addUrlPatterns("/setting");

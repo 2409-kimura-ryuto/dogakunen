@@ -24,7 +24,10 @@
 <form th:action="@{/newUser}">
     <input type="submit" value="新規登録" class="btn btn-secondary newUser-button"/>
 </form>
-
+<form method="get" th:action="@{/csv}" >
+    <input type="month" name="target" class="btn-secondary-border-subtle">
+    <input type="submit" value="ファイル出力" class="btn btn-secondary btn-sm" />
+</form>
 <table class="table table-hover table-systemManage">
     <thead>
         <tr>
@@ -76,10 +79,6 @@
     </tbody>
 </table>
 <div class="footer-contents">
-    <!--【整地前】CSVファイル出力-->
-    <form  method="get" th:action="@{/csv}" >
-        <input type="submit" value="ファイル出力" class="btn btn-secondary btn-sm" />
-    </form>
     <form th:action="@{/}">
         <input type="submit" value="戻る" class="btn btn-secondary btn-sm" />
     </form>

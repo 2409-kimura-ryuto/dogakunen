@@ -13,8 +13,8 @@ public interface GeneralDateAttendanceRepository extends JpaRepository<GeneralDa
             value = "SELECT * " +
                     "FROM date_attendances " +
                     "WHERE date_attendances.user_id = :userId " +
-                    "AND date_attendances.month = :month " +
                     "AND date_attendances.year = :year " +
+                    "AND date_attendances.month = :month " +
                     "ORDER BY date_attendances.date" ,
             nativeQuery = true
     )

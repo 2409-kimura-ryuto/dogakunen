@@ -51,6 +51,10 @@ public class AdminController {
         int loginUserId = ((UserForm) session.getAttribute("loginUser")).getId();
         mav.addObject("loginUserId", loginUserId);
 
+        //エラーメッセージの取得と表示
+        List<String> errorMessages = (List<String>)session.getAttribute("errorMessages");
+        mav.addObject("errorMessages", errorMessages);
+
         //画面遷移先を指定
         mav.setViewName("/system_manage");
 

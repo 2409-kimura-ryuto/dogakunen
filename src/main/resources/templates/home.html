@@ -94,8 +94,13 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="monthDate : ${monthDates}" class="align-middle attendanceList">
-        <td th:text="${#dates.format(monthDate, 'yyyy年MM月dd日')}"></td>
+    <tr th:each="monthDate : ${monthDates}" class="align-middle attendanceList" >
+        <td>
+            <div th:text="${#dates.format(monthDate, 'yyyy年MM月dd日 (E)')}"
+                 th:classappend="${#dates.format(monthDate, 'E') == '土' ? 'saturday' : '' +
+                      #dates.format(monthDate, 'E') == '日' || #lists.contains(holidays, #dates.format(monthDate, 'yyyy-MM-dd')) ? ' holiday' : ''}">
+            </div>
+        </td>
         <!--<span th:each="attendance : ${attendances}">-->
         <!--<span th:if="${(attendance.date).compareTo(monthDate) == 0}">-->
         <span th:switch="${monthDate}">
@@ -151,6 +156,7 @@
     </tr>
     </tbody>
 </table>
+
 <div class="text-center">
     <th:block th:switch="${attendanceStatus}">
         <span th:case="0">
@@ -166,12 +172,12 @@
         </span>
     </th:block>
 </div>
+所定時間
+<div th:text="${workingHours + ':00'}"></div>
 総労働時間
 <div th:text="${totalWorkTime}"></div>
 総休憩時間
 <div th:text="${totalBreakTime}"></div>
-所定時間
-<div th:text="${workingHours}"></div>
 <a th:href="@{/all_update_attendance}">
     <input type="submit" value="一括登録/編集" class="btn btn-outline-secondary">
 </a>
