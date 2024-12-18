@@ -54,6 +54,8 @@ public class AdminController {
         //エラーメッセージの取得と表示
         List<String> errorMessages = (List<String>)session.getAttribute("errorMessages");
         mav.addObject("errorMessages", errorMessages);
+        //セッションを破棄
+        session.removeAttribute("errorMessages");
 
         //画面遷移先を指定
         mav.setViewName("/system_manage");

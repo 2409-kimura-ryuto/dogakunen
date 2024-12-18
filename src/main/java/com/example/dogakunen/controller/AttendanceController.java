@@ -358,6 +358,14 @@ public class AttendanceController {
         LocalTime finishTime = reqAttendance.getWorkTimeFinish();
         String breakTime = reqAttendance.getBreakTime();
         int attendanceNumber = reqAttendance.getAttendance();
+
+        //勤務区分が休日の場合
+        if (reqAttendance.getAttendance() == 5) {
+            reqAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
+            reqAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
+            reqAttendance.setBreakTime("00:00");
+        }
+
         if (Objects.isNull(startTime) && attendanceNumber != 5) {
             errorMessages.add("・開始時刻を入力してください");
         }
@@ -418,11 +426,7 @@ public class AttendanceController {
             mav.setViewName("/new_attendance");
             return mav;
         }
-        //勤務区分が休日の場合
-        if (reqAttendance.getAttendance() == 5) {
-            reqAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
-            reqAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
-        }
+        
         //勤怠登録処理
         dateAttendanceService.postNew(reqAttendance, employeeNumber);
         logService.newLog(reqAttendance, employeeNumber);
@@ -446,6 +450,14 @@ public class AttendanceController {
         LocalTime finishTime = reqAttendance.getWorkTimeFinish();
         String breakTime = reqAttendance.getBreakTime();
         int attendanceNumber = reqAttendance.getAttendance();
+
+        //勤務区分が休日の場合
+        if (reqAttendance.getAttendance() == 5) {
+            reqAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
+            reqAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
+            reqAttendance.setBreakTime("00:00");
+        }
+
         //各バリデーション
         if (Objects.isNull(startTime) && attendanceNumber != 5) {
             errorMessages.add("・開始時刻を入力してください");
@@ -510,12 +522,6 @@ public class AttendanceController {
             return mav;
         }
 
-        //勤務区分が休日の場合
-        if (reqAttendance.getAttendance() == 5) {
-            reqAttendance.setWorkTimeStart(LocalTime.parse("00:00"));
-            reqAttendance.setWorkTimeFinish(LocalTime.parse("00:00"));
-        }
-
         //ログインユーザ情報から社員番号取得
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         String employeeNumber = loginUser.getEmployeeNumber();
@@ -528,7 +534,6 @@ public class AttendanceController {
         logService.editLog(preAttendance, reqAttendance, employeeNumber);
         return new ModelAndView("redirect:/");
     }
-
 
     /*
      * 勤怠一括登録/編集画面表示
@@ -608,8 +613,7 @@ public class AttendanceController {
             pullDownStart.setTime(startDate);
             pullDownEnd.setTime(endDate);
         }
-
-
+        
 //        // リストに勤怠情報を追加
 //        List<DateAttendanceListForm.Attendance> attendances = List.of(attendance1, attendance2);
         //勤怠記録の取得
@@ -678,6 +682,14 @@ public class AttendanceController {
 
             //バリデーション(何かしらの項目に入力があった時のみ)
             if (attendance.getAttendance() != 0 || attendance.getWorkTimeStart() != null || attendance.getWorkTimeFinish() != null || attendance.getBreakTime() != "" || attendance.getMemo() != "") {
+
+                //勤務区分が休日の場合
+                if (attendance.getAttendance() == 5) {
+                    attendance.setWorkTimeStart(LocalTime.parse("00:00"));
+                    attendance.setWorkTimeFinish(LocalTime.parse("00:00"));
+                    attendance.setBreakTime("00:00");
+                }
+
                 //エラーメッセージの準備
                 List<String> errorMessages = new ArrayList<>();
                 //Formから業務開始・終了時間、休憩時間、勤怠区分を取得
@@ -829,11 +841,6 @@ public class AttendanceController {
                     return mav;
                 }
             }
-//            //勤務区分が休日の場合
-//            if (attendance.getAttendance() == 5) {
-//                attendance.setWorkTimeStart(LocalTime.parse("00:00"));
-//                attendance.setWorkTimeFinish(LocalTime.parse("00:00"));
-//            }
 
             //登録か編集かの条件分岐(メモ以外の全ての項目が入力された時のみ)
             if (attendance.getAttendance() != 0 && attendance.getWorkTimeStart() != null && attendance.getWorkTimeFinish() != null && attendance.getBreakTime() != "") {

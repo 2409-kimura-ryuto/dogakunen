@@ -283,6 +283,12 @@ public class DateAttendanceService {
             }else{
                 csvList.get(i).setTotalOverTime("00:00:00");
             }
+            //所定時間のフォーマットを整える
+            Long HOURS = Time.toHours();
+            // 時間を "HH:mm:ss" 形式にフォーマット
+            String formattedTime = HOURS + ":00:00" ;
+            //所定時間をEntityにセット
+            csvList.get(i).setPrescribedWorkTime(formattedTime.toString());
         }
 
         return csvList;
