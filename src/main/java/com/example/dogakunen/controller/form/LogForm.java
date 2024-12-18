@@ -13,12 +13,12 @@ public class LogForm {
 
     private int userId;
 
-    private int operation;
+    private String operation;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date date;
 
-    private int field;
+    private String field;
 
     private String content;
 

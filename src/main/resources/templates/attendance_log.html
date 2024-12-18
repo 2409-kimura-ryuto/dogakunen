@@ -1,10 +1,36 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
 <head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <meta charset="UTF-8">
-    <title>Title</title>
+    <link th:href="@{/css/style.css}" rel="styleSheet">
+    <script th:src="@{/js/script.js}"></script>
+    <title>勤怠操作ログ画面</title>
 </head>
 <body>
+<div class="header-contents">
+    <h1 class="container text-center my-3">勤怠履歴</h1>
+</div>
+
+<table class="table table-hover log">
+    <thead class="table-light">
+    <tr>
+        <th>#</th>
+        <th>勤務日</th>
+        <th>内容</th>
+        <th>更新日</th>
+    </tr>
+    </thead>
+    <tbody>
+        <tr th:each="log : ${logForms}" class="align-middle attendanceList">
+            <td></td>
+            <td th:text="${#dates.format(log.date, 'yyyy/MM/dd')}"></td>
+            <td th:text="${log.userName} + 'さん' + 'が' + ${log.field} + 'を' + ${log.content} + 'に' + ${log.operation} + 'しました'"></td>
+            <td th:text="${log.updatedDate}"></td>
+        </tr>
+    </tbody>
+</table>
 
 </body>
 </html>

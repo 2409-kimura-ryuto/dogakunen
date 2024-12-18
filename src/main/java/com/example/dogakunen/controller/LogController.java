@@ -19,12 +19,13 @@ public class LogController {
     @Autowired
     LogService logService;
 
-    @GetMapping("/attendance_log")
+    @GetMapping("/attendanceLog")
     public ModelAndView getLog(){
         ModelAndView mav = new ModelAndView();
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         List<LogForm> logForms = logService.findAllLog(loginUser.getId());
-        mav.addObject("attendanceLog", logForms);
+        mav.addObject("logForms", logForms);
+        mav.setViewName("/attendance_log");
         return mav;
     }
 }

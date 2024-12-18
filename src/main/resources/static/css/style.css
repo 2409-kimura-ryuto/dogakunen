@@ -10,6 +10,13 @@ body {
     border-bottom : 1px solid #ccc;
 }
 
+table.log {
+    counter-reset: number;
+}
+table.log tbody th:before {
+   counter-increment: ranking;
+}
+
 .table:empty {
     border-collapse: collapse;
     border-top : 1px solid #ddd;

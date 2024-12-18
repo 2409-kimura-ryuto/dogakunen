@@ -19,13 +19,13 @@ public class Log {
     private User user;
 
     @Column
-    private Integer operation;
+    private String operation;
 
     @Column
     private Date date;
 
     @Column
-    private Integer field;
+    private String field;
 
     @Column
     private String content;
