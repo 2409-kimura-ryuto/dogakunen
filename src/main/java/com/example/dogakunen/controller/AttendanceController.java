@@ -45,6 +45,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 public class AttendanceController {
@@ -107,6 +108,11 @@ public class AttendanceController {
             calendar.add(Calendar.DATE, 1);
         }
         dates.add(endDate);
+
+        //祝日の取得
+        List<String> holidays = holidayCsvParser.parse().stream()
+                .map(holiday -> holiday.getDate().toString()) // LocalDateを文字列に変換
+                .collect(Collectors.toList());
 
         //プルダウン用の表示リスト作成
         List<String> pullDown = new ArrayList<>();
@@ -193,6 +199,8 @@ public class AttendanceController {
         mav.addObject("workingHours", workingHours);
         //【追加】月の日付を画面にバインド
         mav.addObject("monthDates", dates);
+        //祝日を画面にバインド
+        mav.addObject("holidays", holidays);
         //mav.addObject("map", map);
         mav.addObject("pullDown", pullDown);
         mav.setViewName("/home");
@@ -225,6 +233,13 @@ public class AttendanceController {
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         Integer UserID = loginUser.getId();
 
+        //リクエストパラメータで取得した日付をLocalDate型に変換
+        LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        //日付から年を算出
+        int year = localDate.getYear();
+        //日付から年を算出
+        int month = localDate.getMonthValue();
+
         //idが画面から渡されているかで条件分岐
         //idが渡されてきた場合はバリデーション後に勤怠編集画面に遷移
         if (id != null) {
@@ -251,7 +266,7 @@ public class AttendanceController {
             int loginUserId = loginUser.getId();
             int userId = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getUserId();
             int attendance = dateAttendanceService.findDateAttendanceById(Integer.parseInt(id)).getAttendance();
-            int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUserId, 2024, 12).getAttendanceStatus();
+            int attendanceStatus = monthAttendanceService.findByUserIdAndMonth(loginUserId, year, month).getAttendanceStatus();
 
             if (loginUserId != userId /*|| attendance == 0*/ || attendanceStatus != 0) {
                 errorMessages.add("・不正なパラメータが入力されました");
@@ -273,10 +288,6 @@ public class AttendanceController {
         //idが渡されていない場合は、勤怠登録画面に遷移
         }else{
             //勤怠（月）の存在チェック
-            //リクエストパラメータで取得した日付をLocalDate型に変換
-            LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-            //日付から年を算出
-            int year = localDate.getYear();
             //ユーザIDと現在年から勤怠（月）情報を取得
             MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndYear(UserID, year);
             //戻り値がnullの場合は勤怠（月）を作成

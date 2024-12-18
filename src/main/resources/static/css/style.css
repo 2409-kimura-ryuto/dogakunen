@@ -132,3 +132,11 @@ body {
 .prevMonth{
     margin : 0 10px 0 20px;
 }
+
+.saturday{
+    color : blue;
+}
+
+.holiday{
+    color : red;
+}
