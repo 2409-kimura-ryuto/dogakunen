@@ -820,7 +820,6 @@ public class AttendanceController {
                     return mav;
                 }
             }
-
 //            //勤務区分が休日の場合
 //            if (attendance.getAttendance() == 5) {
 //                attendance.setWorkTimeStart(LocalTime.parse("00:00"));
