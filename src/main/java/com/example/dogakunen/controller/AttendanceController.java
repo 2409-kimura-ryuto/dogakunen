@@ -7,6 +7,7 @@ import com.example.dogakunen.repository.entity.AdministratorCSV;
 import com.example.dogakunen.repository.entity.DateAttendance;
 import com.example.dogakunen.repository.entity.User;
 import com.example.dogakunen.service.DateAttendanceService;
+import com.example.dogakunen.service.LogService;
 import com.opencsv.exceptions.CsvException;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,9 @@ public class AttendanceController {
 
     @Autowired
     HolidayCsvParser holidayCsvParser;
+
+    @Autowired
+    LogService logService;
 
     public static Date accessDate = new Date();
 
@@ -389,7 +393,7 @@ public class AttendanceController {
         }
         //勤怠登録処理
         dateAttendanceService.postNew(reqAttendance, employeeNumber);
-
+        logService.newLog(reqAttendance, employeeNumber);
         return new ModelAndView("redirect:/");
     }
 
@@ -400,7 +404,7 @@ public class AttendanceController {
     @PostMapping("/editAttendance")
     public ModelAndView postEditAttendance(@ModelAttribute(name = "formModel") @Validated DateAttendanceForm reqAttendance,
                                            BindingResult result, @RequestParam(name = "id") Integer id,
-                                           @RequestParam(name = "month") Integer month) throws ParseException {
+                                           @RequestParam(name = "month") Integer month) throws ParseException, IllegalAccessException {
         ModelAndView mav = new ModelAndView();
         //バリデーション
         //エラーメッセージの準備
@@ -484,7 +488,12 @@ public class AttendanceController {
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         String employeeNumber = loginUser.getEmployeeNumber();
         reqAttendance.setId(id);
+
+        //変更前の勤怠情報を持ってくる
+        DateAttendanceForm preAttendance = dateAttendanceService.findDateAttendanceById(id);
         dateAttendanceService.updateAttendance(reqAttendance, employeeNumber, month);
+        //変更後に勤怠履歴を残す
+        logService.editLog(preAttendance, reqAttendance, employeeNumber);
         return new ModelAndView("redirect:/");
     }
 

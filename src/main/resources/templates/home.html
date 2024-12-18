@@ -47,6 +47,7 @@
         <form th:action="@{/logout}" method="get" class="header-item">
             <button type="submit" class="btn btn-secondary me-3">ログアウト</button>
         </form>
+        <a th:href="@{/attendanceLog}">勤怠履歴</a>
     </div>
     <!--<div class="judge-status" th:if="${monthAttendance.attendanceStatus == 0}">-
     <div class="judge-status" th:if="${attendanceStatus == 0}">
