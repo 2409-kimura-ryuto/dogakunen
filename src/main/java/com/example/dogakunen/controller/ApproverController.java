@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -161,7 +161,7 @@ public class ApproverController {
      */
     @GetMapping("/check_attendance/{id}/{year}/{month}")
     public ModelAndView checkAttendance(@PathVariable String id, @PathVariable String year, @PathVariable String month,
-                                        RedirectAttributes redirectAttributes) {
+                                        RedirectAttributes redirectAttributes) throws ParseException {
         ModelAndView mav = new ModelAndView();
 
         //idの正規表現チェック
@@ -185,6 +185,39 @@ public class ApproverController {
             mav.setViewName("redirect:/show_users");
             return mav;
         }
+        //該当月の1カ月分のリスト作成
+        Calendar calender = Calendar.getInstance();
+        calender.set(Calendar.YEAR, Integer.parseInt(year));
+        calender.set(Calendar.MONTH, Integer.parseInt(month)-1);
+        calender.set(Calendar.DAY_OF_MONTH, 1);
+        calender.set(Calendar.HOUR_OF_DAY, 0);
+        calender.set(Calendar.MINUTE, 0);
+        calender.set(Calendar.SECOND, 0);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.s");
+        String start = sdf.format(calender.getTime());
+        Date startDate = sdf.parse(start);
+        //Date startDate = calender.getTime();
+        int endDay = calender.getActualMaximum(Calendar.DAY_OF_MONTH);
+        calender.set(Calendar.DAY_OF_MONTH, endDay);
+        //Date型のフォーマット揃える（dateAttendancesのdateと）
+        String end = sdf.format(calender.getTime());
+        Date endDate = sdf.parse(end);
+        //Date endDate = calender.getTime();
+
+        List<Date> dates = new ArrayList<Date>();
+        Calendar calendar = new GregorianCalendar();
+        calendar.setTime(startDate);
+
+        while (calendar.getTime().before(endDate))
+        {
+            Date result = calendar.getTime();
+            dates.add(result);
+            calendar.add(Calendar.DATE, 1);
+        }
+        dates.add(endDate);
+        //日付を画面にバインド
+        mav.addObject("monthDates", dates);
+
 
         //勤怠情報取得
         List<GeneralDateAttendanceForm> generalDateAttendanceForms = dateAttendanceService.findGeneralDateAttendance(Integer.parseInt(id), Integer.parseInt(year), Integer.parseInt(month));
@@ -192,6 +225,12 @@ public class ApproverController {
         MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(Integer.parseInt(id), Integer.parseInt(year), Integer.parseInt(month));
         mav.addObject("generalDateAttendances", generalDateAttendanceForms);
         mav.addObject("monthAttendanceForm", monthAttendanceForm);
+        //追加
+        YearMonth ym = YearMonth.of(Integer.parseInt(year), Integer.parseInt(month));
+        //YearMonth date = YearMonth.parse(str, DateTimeFormatter.ofPattern("yyyy年MM月"));
+        String yearMonth = ym.format(DateTimeFormatter.ofPattern("yyyy年MM月"));
+        mav.addObject("yearMonth", yearMonth);
+
         mav.setViewName("/check_attendance");
         return mav;
     }
