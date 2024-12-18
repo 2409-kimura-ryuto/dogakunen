@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Slf4j
 @Service
 public class LogService {
     @Autowired
@@ -27,12 +26,14 @@ public class LogService {
     @Autowired
     UserRepository userRepository;
 
+    //勤怠操作履歴を全て持ってくる
     public List<LogForm> findAllLog(int loginUserId){
         List<Log> results = logRepository.findAllLogByUserId(loginUserId);
         List<LogForm> logs = setLog(results);
         return logs;
     }
 
+    //entityをformに詰める
     public List<LogForm> setLog(List<Log> results){
         List<LogForm> logForms = new ArrayList<>();
         for (int i = 0; i < results.size(); i++) {
@@ -52,10 +53,13 @@ public class LogService {
         return logForms;
     }
 
+    //勤怠編集時にログを登録
     public void editLog(DateAttendanceForm preAttendance ,DateAttendanceForm reqAttendance, String employeeNumber) throws IllegalAccessException, ParseException {
+        //ログインユーザをとってくる
         List<User> userList = userRepository.findByEmployeeNumber(employeeNumber);
         User loginUser = userList.get(0);
         List<Log> logList = new ArrayList<>();
+        //フィールドで回して変更した箇所のみ登録
         for(Field field : reqAttendance.getClass().getDeclaredFields()){
             field.setAccessible(true);
             if (field.get(reqAttendance) != null && !field.get(reqAttendance).equals(field.get(preAttendance))){
@@ -74,30 +78,30 @@ public class LogService {
                         logEntity.setField("勤務区分");
                         logEntity.setContent(
                                 switch (reqAttendance.getAttendance()){
-                                    case 1 -> "社内業務（オンサイト）";
-                                    case 2 -> "社内業務（オフサイト）";
-                                    case 3 -> "顧客業務（オンサイト）";
-                                    case 4 -> "顧客業務（オフサイト）";
-                                    case 5 -> "休日";
-                                    default -> "未登録";
+                                    case 1 -> "「社内業務（オンサイト）」";
+                                    case 2 -> "「社内業務（オフサイト）」";
+                                    case 3 -> "「顧客業務（オンサイト）」";
+                                    case 4 -> "「顧客業務（オフサイト）」";
+                                    case 5 -> "「休日」";
+                                    default -> "「未登録」";
                                 }
                         );
                         break;
                     case "workTimeStart":
                         logEntity.setField("開始時刻");
-                        logEntity.setContent(reqAttendance.getWorkTimeStart().toString());
+                        logEntity.setContent("「" + reqAttendance.getWorkTimeStart().toString()+ "」");
                         break;
                     case "workTimeFinish":
                         logEntity.setField("終了時刻");
-                        logEntity.setContent(reqAttendance.getWorkTimeFinish().toString());
+                        logEntity.setContent("「" + reqAttendance.getWorkTimeFinish().toString() + "」");
                         break;
                     case "breakTime":
                         logEntity.setField("休憩時間");
-                        logEntity.setContent(reqAttendance.getBreakTime());
+                        logEntity.setContent("「" + reqAttendance.getBreakTime() + "」");
                         break;
                     case "memo":
                         logEntity.setField("メモ");
-                        logEntity.setContent(reqAttendance.getMemo());
+                        logEntity.setContent("「" + reqAttendance.getMemo() + "」");
                         break;
                     default:
                         continue;
@@ -105,14 +109,17 @@ public class LogService {
                 logList.add(logEntity);
             }
         }
+        //1件ずつ登録
         for(Log log : logList) {
             logRepository.save(log);
         }
     }
 
-
+    //新規登録勤怠のログを登録
     public void newLog(DateAttendanceForm reqAttendance, String employeeNumber) throws ParseException {
+        //勤怠情報をログentityListにつめる
         List<Log> logList = setLogList(reqAttendance, employeeNumber);
+        //1件ずつ登録
         for(Log log : logList) {
             logRepository.save(log);
         }
