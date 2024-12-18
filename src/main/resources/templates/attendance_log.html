@@ -13,7 +13,7 @@
     <h1 class="container text-center my-3">勤怠履歴</h1>
 </div>
 
-<table class="table table-hover log">
+<table class="table table-hover log-table">
     <thead class="table-light">
     <tr>
         <th>#</th>
@@ -27,10 +27,12 @@
             <td></td>
             <td th:text="${#dates.format(log.date, 'yyyy/MM/dd')}"></td>
             <td th:text="${log.userName} + 'さん' + 'が' + ${log.field} + 'を' + ${log.content} + 'に' + ${log.operation} + 'しました'"></td>
-            <td th:text="${log.updatedDate}"></td>
+            <td th:text="${#dates.format(log.updatedDate, 'yyyy/MM/dd HH:mm:ss')}"></td>
         </tr>
     </tbody>
 </table>
-
+<form th:action="@{/all_update_attendance}">
+    <input type="submit" value="戻る" class="btn btn-secondary btn-sm" />
+</form>
 </body>
 </html>

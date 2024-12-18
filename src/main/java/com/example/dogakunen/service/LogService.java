@@ -62,30 +62,34 @@ public class LogService {
         //フィールドで回して変更した箇所のみ登録
         for(Field field : reqAttendance.getClass().getDeclaredFields()){
             field.setAccessible(true);
-            if (field.get(reqAttendance) != null && !field.get(reqAttendance).equals(field.get(preAttendance))){
+            loop : if (field.get(reqAttendance) != null && !field.get(reqAttendance).equals(field.get(preAttendance))){
                 Log logEntity = new Log();
                 logEntity.setOperation("更新");
                 logEntity.setUser(loginUser);
                 logEntity.setDate(reqAttendance.getDate());
                 //更新日時の設定
                 Date nowDate = new Date();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
                 String currentTime = sdf.format(nowDate);
                 logEntity.setCreatedDate(sdf.parse(currentTime));
                 logEntity.setUpdatedDate(sdf.parse(currentTime));
                 switch(field.getName()){
                     case "attendance":
                         logEntity.setField("勤務区分");
-                        logEntity.setContent(
-                                switch (reqAttendance.getAttendance()){
-                                    case 1 -> "「社内業務（オンサイト）」";
-                                    case 2 -> "「社内業務（オフサイト）」";
-                                    case 3 -> "「顧客業務（オンサイト）」";
-                                    case 4 -> "「顧客業務（オフサイト）」";
-                                    case 5 -> "「休日」";
-                                    default -> "「未登録」";
-                                }
-                        );
+                        switch (reqAttendance.getAttendance()){
+                            case 1 : logEntity.setContent("社内業務（オンサイト）");
+                            break;
+                            case 2 : logEntity.setContent("社内業務（オフサイト）");
+                            break;
+                            case 3 : logEntity.setContent("顧客業務（オンサイト）");
+                            break;
+                            case 4 : logEntity.setContent("顧客業務（オフサイト）");
+                            break;
+                            case 5 : logEntity.setContent("休日");
+                                     logList.add(logEntity);
+                                     break loop;
+                            default : break;
+                        }
                         break;
                     case "workTimeStart":
                         logEntity.setField("開始時刻");
@@ -125,35 +129,40 @@ public class LogService {
         }
     }
 
+    //ログをentityにつめる
     public List<Log> setLogList(DateAttendanceForm reqAttendance, String employeeNumber) throws ParseException {
         List<User> userList = userRepository.findByEmployeeNumber(employeeNumber);
         User loginUser = userList.get(0);
         List<Log> logList = new ArrayList<>();
 
-        for (Field field : reqAttendance.getClass().getDeclaredFields()){
+        loop : for (Field field : reqAttendance.getClass().getDeclaredFields()){
             Log logEntity = new Log();
             logEntity.setDate(reqAttendance.getDate());
             logEntity.setUser(loginUser);
             logEntity.setOperation("登録");
             //更新日時の設定
             Date nowDate = new Date();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
             String currentTime = sdf.format(nowDate);
             logEntity.setCreatedDate(sdf.parse(currentTime));
             logEntity.setUpdatedDate(sdf.parse(currentTime));
             switch(field.getName()){
                 case "attendance":
                     logEntity.setField("勤務区分");
-                    logEntity.setContent(
-                        switch (reqAttendance.getAttendance()){
-                            case 1 -> "社内業務（オンサイト）";
-                            case 2 -> "社内業務（オフサイト）";
-                            case 3 -> "顧客業務（オンサイト）";
-                            case 4 -> "顧客業務（オフサイト）";
-                            case 5 -> "休日";
-                            default -> "未登録";
-                        }
-                    );
+                    switch (reqAttendance.getAttendance()){
+                        case 1 : logEntity.setContent("社内業務（オンサイト）");
+                        break;
+                        case 2 : logEntity.setContent("社内業務（オフサイト）");
+                        break;
+                        case 3 : logEntity.setContent("顧客業務（オンサイト）");
+                        break;
+                        case 4 : logEntity.setContent("顧客業務（オフサイト）");
+                        break;
+                        case 5 : logEntity.setContent("休日");
+                                 logList.add(logEntity);
+                                 break loop;
+                        default : break;
+                    }
                     break;
                 case "workTimeStart":
                     logEntity.setField("開始時刻");
