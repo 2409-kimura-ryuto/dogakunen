@@ -1,5 +1,6 @@
 package com.example.dogakunen.controller.form;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 public class DateAttendanceListForm {
+    @Valid
     private List<Attendance> attendances;
 
     @Getter
@@ -26,6 +28,8 @@ public class DateAttendanceListForm {
 
         private int month;
 
+        private int year;
+
         private int attendance;
 
         @DateTimeFormat(pattern = "HH:mm")
@@ -38,7 +42,6 @@ public class DateAttendanceListForm {
 
         private String workTime;
 
-        @Size(max = 60, message = "・60文字以下で入力してください")
         private String memo;
 
         private Date createdDate;

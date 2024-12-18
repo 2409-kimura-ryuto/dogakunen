@@ -386,9 +386,9 @@ public class DateAttendanceService {
     /*
      *　勤怠情報取得処理(勤怠一括登録/編集画面で使用)
      */
-    public List<DateAttendanceListForm.Attendance> findAllAttendancesList(int month, Integer loginId) {
+    public List<DateAttendanceListForm.Attendance> findAllAttendancesList(int year, int month, Integer loginId) {
         //データ取得処理
-        List<DateAttendance> results = dateAttendanceRepository.findAllAttendances(2024, month, loginId);
+        List<DateAttendance> results = dateAttendanceRepository.findAllAttendances(year, month, loginId);
         //フォームに詰め替え
         List<DateAttendanceListForm.Attendance> dateAttendances = setDateAttendanceListForm(results);
         return dateAttendances;
@@ -406,6 +406,7 @@ public class DateAttendanceService {
             dateAttendance.setUserId(result.getUser().getId());
             dateAttendance.setDate(result.getDate());
             dateAttendance.setMonth(result.getMonth());
+            dateAttendance.setYear(result.getYear());
             dateAttendance.setAttendance(result.getAttendance());
             dateAttendance.setWorkTimeStart(result.getWorkTimeStart());
             dateAttendance.setWorkTimeFinish(result.getWorkTimeFinish());
@@ -421,31 +422,90 @@ public class DateAttendanceService {
     }
 
     /*
+     *　新規勤怠登録処理(勤怠一括登録/編集画面で使用)
+     */
+    public void postListNew(DateAttendanceListForm.Attendance reqAttendance, String employeeNumber) throws ParseException {
+        //社員番号からユーザ情報を持ってくる
+        List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
+
+        //労働時間を計算
+        //休憩時間を取得
+        String breakTime1 = reqAttendance.getBreakTime();
+        //休憩時間をduration型に変換
+        String[] parts = breakTime1.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int seconds = 0;
+        Duration breakDuration = Duration.ofHours(hours).plusMinutes(minutes).plusSeconds(seconds);
+        //労働開始時間と労働終了時間から労働時間を算出
+        Duration duration = Duration.between(reqAttendance.getWorkTimeStart(), reqAttendance.getWorkTimeFinish());
+        //労働時間から休憩時間を引いて純労働時間を算出
+        Duration workDuration = duration.minus(breakDuration);
+        //フォーマットを「00:00」に変換
+        String formattedWorkTime = String.format("%02d:%02d:%02d", workDuration.toHoursPart(), workDuration.toMinutesPart(), duration.toSecondsPart());
+
+        //算出した労働時間をセット
+        DateAttendance dateAttendance = setAllEntity(reqAttendance, results.get(0));
+
+        //entityから取り出した要素を引数にリポジトリを呼び出す
+        Date date = dateAttendance.getDate();
+        Integer userId = dateAttendance.getUser().getId();
+        Integer month = dateAttendance.getMonth();
+        Integer year = dateAttendance.getYear();
+        Integer attendance = dateAttendance.getAttendance();
+        LocalTime workTimeStart = dateAttendance.getWorkTimeStart();
+        LocalTime workTimeFinish = dateAttendance.getWorkTimeFinish();
+        String breakTime = dateAttendance.getBreakTime() + ":00";
+        String memo = dateAttendance.getMemo();
+
+        dateAttendanceRepository.addAttendance(date, userId, month, year, attendance, workTimeStart, workTimeFinish, breakTime, formattedWorkTime, memo);
+    }
+
+    /*
      * 勤怠編集処理(勤怠一括登録/編集画面で使用)
      */
-    public void updateAllAttendances(List<DateAttendanceListForm.Attendance> attendances, String employeeNumber, Integer month) throws ParseException {
+    public void updateAllAttendances(DateAttendanceListForm.Attendance reqAttendance, String employeeNumber, Integer month) throws ParseException {
 
-        for (DateAttendanceListForm.Attendance reqAttendance : attendances) {
-            //社員番号からユーザ情報を持ってくる
-            List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
-            reqAttendance.setMonth(month);
+//        for (DateAttendanceListForm.Attendance reqAttendance : attendances) {
+//            //社員番号からユーザ情報を持ってくる
+//            List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
+//            reqAttendance.setMonth(month);
+//
+//            //労働時間を計算し、変数に代入
+//            String formattedWorkTime = calculateWorkTimeList(reqAttendance);
+//            reqAttendance.setWorkTime(formattedWorkTime);
+//            //算出した労働時間をセット
+//            DateAttendance dateAttendance = setAllEntity(reqAttendance, results.get(0));
+//
+//            //entityから取り出した要素を引数にリポジトリを呼び出す
+//            Integer id = dateAttendance.getId();
+//            Integer attendance = dateAttendance.getAttendance();
+//            LocalTime workTimeStart = dateAttendance.getWorkTimeStart();
+//            LocalTime workTimeFinish = dateAttendance.getWorkTimeFinish();
+//            String breakTime = dateAttendance.getBreakTime();
+//            String memo = dateAttendance.getMemo();
+//
+//            dateAttendanceRepository.updateAttendance(attendance, workTimeStart, workTimeFinish, breakTime, formattedWorkTime, memo, id);
+//        }
+        //社員番号からユーザ情報を持ってくる
+        List<User> results = userRepository.findByEmployeeNumber(employeeNumber);
+        reqAttendance.setMonth(month);
 
-            //労働時間を計算し、変数に代入
-            String formattedWorkTime = calculateWorkTimeList(reqAttendance);
-            reqAttendance.setWorkTime(formattedWorkTime);
-            //算出した労働時間をセット
-            DateAttendance dateAttendance = setAllEntity(reqAttendance, results.get(0));
+        //労働時間を計算し、変数に代入
+        String formattedWorkTime = calculateWorkTimeList(reqAttendance);
+        reqAttendance.setWorkTime(formattedWorkTime);
+        //算出した労働時間をセット
+        DateAttendance dateAttendance = setAllEntity(reqAttendance, results.get(0));
 
-            //entityから取り出した要素を引数にリポジトリを呼び出す
-            Integer id = dateAttendance.getId();
-            Integer attendance = dateAttendance.getAttendance();
-            LocalTime workTimeStart = dateAttendance.getWorkTimeStart();
-            LocalTime workTimeFinish = dateAttendance.getWorkTimeFinish();
-            String breakTime = dateAttendance.getBreakTime();
-            String memo = dateAttendance.getMemo();
+        //entityから取り出した要素を引数にリポジトリを呼び出す
+        Integer id = dateAttendance.getId();
+        Integer attendance = dateAttendance.getAttendance();
+        LocalTime workTimeStart = dateAttendance.getWorkTimeStart();
+        LocalTime workTimeFinish = dateAttendance.getWorkTimeFinish();
+        String breakTime = dateAttendance.getBreakTime();
+        String memo = dateAttendance.getMemo();
 
-            dateAttendanceRepository.updateAttendance(attendance, workTimeStart, workTimeFinish, breakTime, formattedWorkTime, memo, id);
-        }
+        dateAttendanceRepository.updateAttendance(attendance, workTimeStart, workTimeFinish, breakTime, formattedWorkTime, memo, id);
     }
 
     /*
@@ -456,6 +516,7 @@ public class DateAttendanceService {
 
         dateAttendance.setUser(loginUser);
         dateAttendance.setMonth(reqAttendance.getMonth());
+        dateAttendance.setYear(reqAttendance.getYear());
         dateAttendance.setId(reqAttendance.getId());
         dateAttendance.setDate(reqAttendance.getDate());
         dateAttendance.setBreakTime(reqAttendance.getBreakTime());
