@@ -116,4 +116,5 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
             nativeQuery = true
     )
     public List<Object[]> selectWorkTime(@Param("year") int year, @Param("month") int month);
+
 }
