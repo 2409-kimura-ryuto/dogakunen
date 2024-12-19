@@ -2,6 +2,7 @@ package com.example.dogakunen.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
 
@@ -36,5 +37,6 @@ public class Log {
 
     @Column(name = "updated_date", insertable = true, updatable = true)
     @Temporal(TemporalType.TIMESTAMP)
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date updatedDate;
 }

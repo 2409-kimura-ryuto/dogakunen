@@ -23,6 +23,8 @@ public class FilterConfig {
         bean.addUrlPatterns("/systemManage");
         bean.addUrlPatterns("/newUser");
         bean.addUrlPatterns("/editUser/*");
+        bean.addUrlPatterns("/all_update_attendance");
+        bean.addUrlPatterns("/attendanceLog");
         bean.setOrder(1);
         return bean;
     }

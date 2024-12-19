@@ -10,11 +10,16 @@ body {
     border-bottom : 1px solid #ccc;
 }
 
-table.log {
-    counter-reset: number;
+table.log-table {
+  counter-reset: rowCount;
 }
-table.log tbody th:before {
-   counter-increment: ranking;
+
+table.log-table > tbody > tr {
+  counter-increment: rowCount;
+}
+
+table.log-table > tbody > tr > td:first-child::before {
+  content: counter(rowCount);
 }
 
 .table:empty {

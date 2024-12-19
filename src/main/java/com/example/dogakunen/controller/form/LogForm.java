@@ -28,5 +28,6 @@ public class LogForm {
 
     private Date createdDate;
 
+    @DateTimeFormat(pattern = "yyyy/MM/dd HH:mm:ss")
     private Date updatedDate;
 }

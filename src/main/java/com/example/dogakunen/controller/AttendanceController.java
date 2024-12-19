@@ -855,7 +855,7 @@ public class AttendanceController {
                     dateAttendanceService.postListNew(attendance, employeeNumber);
                 } else {
                     //編集処理
-                    dateAttendanceService.updateAllAttendances(attendance, employeeNumber, 12);
+                    dateAttendanceService.updateAllAttendances(attendance, employeeNumber, month);
                 }
             }
         }
