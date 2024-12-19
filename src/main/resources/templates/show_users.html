@@ -64,9 +64,16 @@
             </th:block>
         </td>
         <td>
-            <a th:href="@{/check_attendance/{id}/{year}/{month}(id=${user.id}, year=${year}, month=${month})}">
+            <form th:action="@{/check_attendance/{id}(id=${user.id})}" method="get" >
+                <input type="hidden" name="year" th:value="${year}">
+                <input type="hidden" name="month" th:value="${month}">
                 <input type="submit" value="勤怠状況確認" class="btn btn-outline-secondary">
-            </a>
+            </form>
+            <!--<a th:href="@{/check_attendance/{id}(id=${user.id})}">
+                <input type="hidden" name="year" th:value="${year}">
+                <input type="hidden" name="month" th:value="${month}">
+                <input type="submit" value="勤怠状況確認" class="btn btn-outline-secondary">
+            </a>-->
         </td>
     </tr>
     </tbody>

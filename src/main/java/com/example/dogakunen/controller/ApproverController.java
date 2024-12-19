@@ -6,6 +6,7 @@ import com.example.dogakunen.service.DateAttendanceService;
 import com.example.dogakunen.service.MonthAttendanceService;
 import com.example.dogakunen.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.constraints.NotBlank;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,8 +69,8 @@ public class ApproverController {
         int month = getDate.getMonthValue();
         List<GeneralUserForm> generalUsers = userService.findAllGeneralUser(year, month);
         mav.addObject("users", generalUsers);
-        mav.addObject("year", year);
-        mav.addObject("month", month);
+        mav.addObject("year", Integer.toString(year));
+        mav.addObject("month", Integer.toString(month));
 
         //プルダウン表示
         YearMonth finalGetDate = getDate;
@@ -163,15 +164,19 @@ public class ApproverController {
     /*
      * 勤怠状況確認画面
      */
-    @GetMapping("/check_attendance/{id}/{year}/{month}")
-    public ModelAndView checkAttendance(@PathVariable String id, @PathVariable String year, @PathVariable String month,
-                                        RedirectAttributes redirectAttributes) throws ParseException {
+    @GetMapping("/check_attendance/{id}")
+    public ModelAndView checkAttendance(@PathVariable String id, @RequestParam(name = "year") String year,
+                                        @RequestParam(name = "month") String month, RedirectAttributes redirectAttributes) throws ParseException {
         ModelAndView mav = new ModelAndView();
 
         //idの正規表現チェック
         List<String> errorMessages = new ArrayList<String>();
-        if ((id == null) || (!id.matches("^[0-9]+$"))) {
+        if ((id == null) || (!id.matches("^[0-9]+$")) || (year == null) || (!year.matches("20[0-9][0-9]"))
+                                || (month == null) || (!month.matches("[1-9]|[1][0-2]"))) {
             errorMessages.add("・不正なパラメータが入力されました");
+            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+            mav.setViewName("redirect:/show_users");
+            return mav;
         }
 
         //勤怠状況が存在しないユーザのidが入力された際のバリデーション

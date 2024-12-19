@@ -853,6 +853,7 @@ public class AttendanceController {
                     i++;
                     //登録処理
                     dateAttendanceService.postListNew(attendance, employeeNumber);
+                    logService.newLog(attendance, employeeNumber);
                 } else {
                     //編集処理
                     dateAttendanceService.updateAllAttendances(attendance, employeeNumber, month);
