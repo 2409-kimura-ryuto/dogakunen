@@ -205,11 +205,11 @@ public class AdminController {
         List<String> errorMessages = new ArrayList<>();
         if(!id.matches("^[0-9]+$")) {
             errorMessages.add("・不正なパラメータが入力されました");
-            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+//            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+            session.setAttribute("errorMessages", errorMessages);
             //システム管理画面に遷移
             return new ModelAndView("redirect:/systemManage");
         }
-
 
         //編集ユーザー情報を取得
         Integer editUserId = Integer.parseInt(id);
@@ -219,14 +219,23 @@ public class AdminController {
         if(editUser == null) {
             errorMessages.add("・不正なパラメータが入力されました");
             //エラーメッセージを格納して、ユーザー管理画面へ遷移
-            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+//            redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+            session.setAttribute("errorMessages", errorMessages);
             //ユーザー管理画面にリダイレクト
             return new ModelAndView("redirect:/systemManage");
         }
 
+        //sessionから編集バリデーション時のuserForm取得する
+        UserForm userForm = (UserForm) session.getAttribute("user");
+        if(userForm != null) {
+            //編集バリデーション発生時のユーザー情報を画面にバインド
+            mav.addObject("user", userForm);
+            session.removeAttribute("user");
+        } else {
+            //編集するユーザー情報を画面にバインド
+            mav.addObject("user", editUser);
+        }
 
-        //編集するユーザー情報を画面にバインド
-        mav.addObject("user", editUser);
 
         //【追加】セッションからユーザIDを取得・画面にバインド
         int loginUserId = ((UserForm) session.getAttribute("loginUser")).getId();
@@ -247,7 +256,8 @@ public class AdminController {
         List<String> errorMessages = new ArrayList<String>();
         errorMessages.add("・不正なパラメータが入力されました");
         //エラーメッセージを格納して、ユーザー管理画面へ遷移
-        redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+//        redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
+        session.setAttribute("errorMessages", errorMessages);
         //ユーザー管理画面にリダイレクト
         return new ModelAndView("redirect:/systemManage");
     }
@@ -292,7 +302,8 @@ public class AdminController {
             userForm.setPositionId(positionId);
             userForm.setEmployeeNumber(editUserForm.getEmployeeNumber());
 //            mav.addObject("user", userForm);
-            redirectAttributes.addFlashAttribute("user", userForm);
+            session.setAttribute("user", userForm);
+//            redirectAttributes.addFlashAttribute("user", userForm);
 
             //アカウント編集画面へリダイレクト処理
 //            mav.setViewName("/edit_user");
