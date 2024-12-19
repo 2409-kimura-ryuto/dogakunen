@@ -2,6 +2,7 @@ package com.example.dogakunen.controller;
 
 import com.example.dogakunen.controller.form.LogForm;
 import com.example.dogakunen.controller.form.UserForm;
+import com.example.dogakunen.repository.entity.Log;
 import com.example.dogakunen.service.LogService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
