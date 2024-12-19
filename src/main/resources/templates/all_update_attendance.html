@@ -75,9 +75,10 @@
         </tr>
         </thead>
         <tbody>
+<!--        <tr th:each="attendance, iterStat : ${formModel.attendances}">-->
+<!--        <tr th:each="date : ${monthDates}">-->
         <tr th:each="date, iterStat : ${monthDates}">
             <!--日付の表示 -->
-<!--            <td th:text="${#dates.format(date, 'yyyy年MM月dd日')}"></td>-->
             <td>
                 <div th:text="${#dates.format(date, 'yyyy年MM月dd日 (E)')}"
                      th:classappend="${#dates.format(date, 'E') == '土' ? 'saturday' : '' +
