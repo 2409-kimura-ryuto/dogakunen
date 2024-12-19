@@ -60,9 +60,9 @@ public class LogService {
         User loginUser = userList.get(0);
         List<Log> logList = new ArrayList<>();
         //フィールドで回して変更した箇所のみ登録
-        for(Field field : reqAttendance.getClass().getDeclaredFields()){
+        loop : for(Field field : reqAttendance.getClass().getDeclaredFields()){
             field.setAccessible(true);
-            loop : if (field.get(reqAttendance) != null && !field.get(reqAttendance).equals(field.get(preAttendance))){
+            if (field.get(reqAttendance) != null && !field.get(reqAttendance).equals(field.get(preAttendance))){
                 Log logEntity = new Log();
                 logEntity.setOperation("更新");
                 logEntity.setUser(loginUser);
@@ -77,16 +77,27 @@ public class LogService {
                     case "attendance":
                         logEntity.setField("勤務区分");
                         switch (reqAttendance.getAttendance()){
-                            case 1 : logEntity.setContent("社内業務（オンサイト）");
+                            case 1 : logEntity.setContent("「" + "社内業務（オンサイト）" + "」");
                             break;
-                            case 2 : logEntity.setContent("社内業務（オフサイト）");
+                            case 2 : logEntity.setContent("「" + "社内業務（オフサイト）" + "」");
                             break;
-                            case 3 : logEntity.setContent("顧客業務（オンサイト）");
+                            case 3 : logEntity.setContent("「" + "顧客業務（オンサイト）" + "」");
                             break;
-                            case 4 : logEntity.setContent("顧客業務（オフサイト）");
+                            case 4 : logEntity.setContent("「" + "顧客業務（オフサイト）" + "」");
                             break;
-                            case 5 : logEntity.setContent("休日");
+                            case 5 : logEntity.setContent("「" + "休日" + "」");
                                      logList.add(logEntity);
+                                    if(!reqAttendance.getMemo().isBlank()) {
+                                        Log logEntity2 = new Log();
+                                        logEntity2.setDate(reqAttendance.getDate());
+                                        logEntity2.setUser(loginUser);
+                                        logEntity2.setOperation("更新");
+                                        logEntity2.setCreatedDate(sdf.parse(currentTime));
+                                        logEntity2.setUpdatedDate(sdf.parse(currentTime));
+                                        logEntity2.setField("メモ");
+                                        logEntity2.setContent("「" + reqAttendance.getMemo() + "」");
+                                        logList.add(logEntity2);
+                                    }
                                      break loop;
                             default : break;
                         }
@@ -104,13 +115,17 @@ public class LogService {
                         logEntity.setContent("「" + reqAttendance.getBreakTime() + "」");
                         break;
                     case "memo":
-                        logEntity.setField("メモ");
-                        logEntity.setContent("「" + reqAttendance.getMemo() + "」");
+                        if(!reqAttendance.getMemo().isBlank()) {
+                            logEntity.setField("メモ");
+                            logEntity.setContent("「" + reqAttendance.getMemo() + "」");
+                        }
                         break;
                     default:
                         continue;
                 }
-                logList.add(logEntity);
+                if(logEntity.getField() != null && logEntity.getContent() != null){
+                    logList.add(logEntity);
+                }
             }
         }
         //1件ずつ登録
@@ -150,40 +165,55 @@ public class LogService {
                 case "attendance":
                     logEntity.setField("勤務区分");
                     switch (reqAttendance.getAttendance()){
-                        case 1 : logEntity.setContent("社内業務（オンサイト）");
+                        case 1 : logEntity.setContent("「" + "社内業務（オンサイト）" + "」");
                         break;
-                        case 2 : logEntity.setContent("社内業務（オフサイト）");
+                        case 2 : logEntity.setContent("「" + "社内業務（オフサイト）" + "」");
                         break;
-                        case 3 : logEntity.setContent("顧客業務（オンサイト）");
+                        case 3 : logEntity.setContent("「" + "顧客業務（オンサイト）" + "」");
                         break;
-                        case 4 : logEntity.setContent("顧客業務（オフサイト）");
+                        case 4 : logEntity.setContent("「" + "顧客業務（オフサイト）" + "」");
                         break;
-                        case 5 : logEntity.setContent("休日");
+                        case 5 : logEntity.setContent("「" + "休日" + "」");
                                  logList.add(logEntity);
+                                if(!reqAttendance.getMemo().isBlank()) {
+                                    Log logEntity2 = new Log();
+                                    logEntity2.setDate(reqAttendance.getDate());
+                                    logEntity2.setUser(loginUser);
+                                    logEntity2.setOperation("登録");
+                                    logEntity2.setCreatedDate(sdf.parse(currentTime));
+                                    logEntity2.setUpdatedDate(sdf.parse(currentTime));
+                                    logEntity2.setField("メモ");
+                                    logEntity2.setContent("「" + reqAttendance.getMemo() + "」");
+                                    logList.add(logEntity2);
+                                }
                                  break loop;
                         default : break;
                     }
                     break;
                 case "workTimeStart":
                     logEntity.setField("開始時刻");
-                    logEntity.setContent(reqAttendance.getWorkTimeStart().toString());
+                    logEntity.setContent("「" + reqAttendance.getWorkTimeStart().toString() + "」");
                     break;
                 case "workTimeFinish":
                     logEntity.setField("終了時刻");
-                    logEntity.setContent(reqAttendance.getWorkTimeFinish().toString());
+                    logEntity.setContent("「" + reqAttendance.getWorkTimeFinish().toString() + "」");
                     break;
                 case "breakTime":
                     logEntity.setField("休憩時間");
-                    logEntity.setContent(reqAttendance.getBreakTime());
+                    logEntity.setContent("「" + reqAttendance.getBreakTime() + "」");
                     break;
                 case "memo":
-                    logEntity.setField("メモ");
-                    logEntity.setContent(reqAttendance.getMemo());
+                    if(!reqAttendance.getMemo().isBlank()) {
+                        logEntity.setField("メモ");
+                        logEntity.setContent("「" + reqAttendance.getMemo() + "」");
+                    }
                     break;
                 default:
                     continue;
             }
-            logList.add(logEntity);
+            if(logEntity.getField() != null && logEntity.getContent() != null){
+                logList.add(logEntity);
+            }
         }
         return logList;
     }
