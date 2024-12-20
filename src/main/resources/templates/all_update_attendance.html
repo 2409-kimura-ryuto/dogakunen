@@ -97,6 +97,7 @@
                         <textarea th:field="*{attendances[__${iterStat.index}__].memo}" class="form-control" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"></textarea>
                       </td>
                       <input type="hidden" th:field="*{attendances[__${iterStat.index}__].id}" th:value="${dateAttendance.id}"/>
+                      <input type="hidden" th:field="*{attendances[__${iterStat.index}__].date}" th:value="${#dates.format(date, 'yyyy/MM/dd')}"/>
                     </p>
                 </span>
 
