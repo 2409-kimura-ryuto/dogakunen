@@ -685,7 +685,7 @@ public class AttendanceController {
     public ModelAndView updateAll(@ModelAttribute @Validated DateAttendanceListForm formModel,
                                   BindingResult result,
                                   @RequestParam(name = "dates", required = false) List<Date> dates,
-                                  RedirectAttributes redirectAttributes) throws ParseException {
+                                  RedirectAttributes redirectAttributes) throws ParseException, IllegalAccessException, NoSuchFieldException {
         ModelAndView mav = new ModelAndView();
         DateAttendanceListForm listForm = new DateAttendanceListForm();
         //ログインユーザ情報から社員番号取得
@@ -878,10 +878,20 @@ public class AttendanceController {
                     i++;
                     //登録処理
                     dateAttendanceService.postListNew(attendance, employeeNumber);
-                    logService.newLog(attendance, employeeNumber);
+                    //勤怠履歴登録処理
+                    logService.newAllLog(attendance, employeeNumber);
                 } else {
+                    //変更前の情報を持ってくる
+                    List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances (year, month, loginUserId);
                     //編集処理
                     dateAttendanceService.updateAllAttendances(attendance, employeeNumber, month);
+                    //勤怠履歴登録処理
+                    for (DateAttendanceForm dateAttendance : dateAttendances){
+                        if (dateAttendance.getId() == attendance.getId()){
+                            logService.editAllLog(dateAttendance, attendance, employeeNumber);
+                            break;
+                        }
+                    }
                 }
             }
         }

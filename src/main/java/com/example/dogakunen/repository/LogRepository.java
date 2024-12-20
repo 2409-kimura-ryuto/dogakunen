@@ -15,6 +15,6 @@ public interface LogRepository extends JpaRepository<Log, Integer> {
     @Transactional
     @Query(value = "SELECT l FROM Log l JOIN FETCH l.user " +
             "WHERE l.user.id = :loginUserId " +
-            "ORDER BY l.updatedDate DESC LIMIT 50")
+            "ORDER BY l.updatedDate DESC, l.date ASC LIMIT 50")
     public List<Log> findAllLogByUserId(@Param("loginUserId") int loginUserId);
 }
