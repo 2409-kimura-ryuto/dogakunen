@@ -9,6 +9,7 @@ import com.example.dogakunen.repository.entity.User;
 import com.example.dogakunen.service.DateAttendanceService;
 import com.example.dogakunen.service.LogService;
 import com.opencsv.exceptions.CsvException;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import com.example.dogakunen.service.MonthAttendanceService;
@@ -189,6 +190,19 @@ public class AttendanceController {
         int dayWorkingHour = 8;
         int workingHours = calculateWorkingHours(year, month, dayWorkingHour);
 
+        //月の残業時間を計算
+        String totalOverTime = calculateOverTime(totalWorkTime, workingHours);
+
+        //残業時間が30時間を超えた際はメッセージを設定してviewで表示させる
+        String[] parts = totalOverTime.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int overTimeMinute = hours * 60 + minutes;
+        if (overTimeMinute > 30 * 60){
+            String overTimeAlert = "残業時間が30時間を超えています";
+            mav.addObject("overTimeAlert", overTimeAlert);
+        }
+
         //承認者orシステム管理者フィルターのエラーメッセージをmavに詰めてセッション削除
         List<String> filterErrorMessages = (List<String>) session.getAttribute("filterErrorMessages");
         mav.addObject("filterErrorMessages", filterErrorMessages);
@@ -202,6 +216,7 @@ public class AttendanceController {
         mav.addObject("totalWorkTime", totalWorkTime);
         mav.addObject("totalBreakTime", totalBreakTime);
         mav.addObject("workingHours", workingHours);
+        mav.addObject("totalOverTime", totalOverTime);
         //【追加】月の日付を画面にバインド
         mav.addObject("monthDates", dates);
         //祝日を画面にバインド
@@ -232,7 +247,9 @@ public class AttendanceController {
      * 勤怠登録・編集画面表示
      */
     @GetMapping("/newOrEdit")
-    public ModelAndView getEditAttendance(@RequestParam(name = "id", required = false) String id , @RequestParam(name = "date") @DateTimeFormat(pattern = "yyyy/MM/dd") Date date, RedirectAttributes redirectAttributes) {
+    public ModelAndView getEditAttendance(@RequestParam(name = "id", required = false) String id ,
+                                          @RequestParam(name = "date", required = false) @DateTimeFormat(pattern = "yyyy/MM/dd") Date date,
+                                          RedirectAttributes redirectAttributes) {
         ModelAndView mav = new ModelAndView();
         List<String> errorMessages = new ArrayList<String>();
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
@@ -327,7 +344,7 @@ public class AttendanceController {
     /*
      *　IDが空で渡ってきた場合
      *
-    @GetMapping("/editAttendance/")
+    @GetMapping("/newOrEdit/")
     public ModelAndView returnEditAttendance(RedirectAttributes redirectAttributes) {
         ModelAndView mav = new ModelAndView();
         //バリデーション
@@ -336,7 +353,8 @@ public class AttendanceController {
         redirectAttributes.addFlashAttribute("parameterErrorMessages", errorMessages);
         mav.setViewName("redirect:/");
         return mav;
-    }*/
+    }
+     */
 
     /*
      * 新規勤怠登録処理
@@ -393,7 +411,7 @@ public class AttendanceController {
             errorMessages.add("・無効な入力です");
         }
         if (attendanceNumber != 5 && Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)) {
-                errorMessages.add("・無効な入力です");
+            errorMessages.add("・無効な入力です");
         }
 
         //休憩時間のバリデーション
@@ -413,12 +431,12 @@ public class AttendanceController {
 
                 //労働時間が6時間超8時間未満の場合
                 if (workSeconds > 6 * 3600 && workSeconds < 8 * 3600 && breakSeconds < 45 * 60) {
-                    errorMessages.add("・労働時間が6時間超8時間未満の場合は、休憩時間を最低45分取得してください");
+                    errorMessages.add("・休憩時間を最低45分取得してください");
                 }
 
                 //労働時間が8時間超の場合
                 if (workSeconds > 8 * 3600 && breakSeconds < 60 * 60) {
-                    errorMessages.add("・労働時間が8時間超の場合は、休憩時間を最低1時間取得してください");
+                    errorMessages.add("・休憩時間を最低1時間取得してください");
                 }
             } catch (DateTimeParseException e) {
                 errorMessages.add("・休憩時間は労働時間を上回らないようにしてください");
@@ -461,7 +479,7 @@ public class AttendanceController {
     @PostMapping("/editAttendance")
     public ModelAndView postEditAttendance(@ModelAttribute(name = "formModel") @Validated DateAttendanceForm reqAttendance,
                                            BindingResult result, @RequestParam(name = "id") Integer id,
-                                           @RequestParam(name = "month") Integer month, RedirectAttributes redirectAttributes) throws ParseException, IllegalAccessException {
+                                           @RequestParam(name = "month") Integer month, RedirectAttributes redirectAttributes) throws ParseException, IllegalAccessException, NoSuchFieldException {
         ModelAndView mav = new ModelAndView();
         //バリデーション
         //エラーメッセージの準備
@@ -513,12 +531,12 @@ public class AttendanceController {
 
                 //労働時間が6時間超8時間未満の場合
                 if (workSeconds > 6 * 3600 && workSeconds < 8 * 3600 && breakSeconds < 45 * 60) {
-                    errorMessages.add("・労働時間が6時間超8時間未満の場合は、休憩時間を最低45分取得してください");
+                    errorMessages.add("・休憩時間を最低45分取得してください");
                 }
 
                 //労働時間が8時間超の場合
                 if (workSeconds > 8 * 3600 && breakSeconds < 60 * 60) {
-                    errorMessages.add("・労働時間が8時間超の場合は、休憩時間を最低1時間取得してください");
+                    errorMessages.add("・休憩時間を最低1時間取得してください");
                 }
                 //労働時間がマイナスになった際は例外が発生するため、その例外をキャッチした際にバリデーション処理を記述
             } catch (DateTimeParseException e) {
@@ -638,21 +656,42 @@ public class AttendanceController {
             pullDownStart.setTime(startDate);
             pullDownEnd.setTime(endDate);
         }
-        
-//        // リストに勤怠情報を追加
-//        List<DateAttendanceListForm.Attendance> attendances = List.of(attendance1, attendance2);
+
+        //勤怠月取得
+        MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(loginUserId, year, month);
+
         //勤怠記録の取得
-        //個々の引数は動的に変わるようにする
         List<DateAttendanceListForm.Attendance> attendances = dateAttendanceService.findAllAttendancesList(year, month, loginUserId);
 
         // AttendanceFormにリストを設定
         DateAttendanceListForm formModel = new DateAttendanceListForm();
         formModel.setAttendances(attendances);
 
-        //勤怠記録の取得
+        //勤怠記録の取得(viewで条件分岐をする際にのみ使用)
         List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances (year, month, loginUserId);
 
+        //月リストと勤怠情報リストの要素数を合わ処理
+        for (int j = 0; j < dates.size(); j++) {
+            //月リストと勤怠情報リストの日付のフォーマットを揃える
+            Date date = dates.get(j);
+            Date attendanceDate = attendances.size() > j ? attendances.get(j).getDate() : null;
+            LocalDate localDate = date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate attendanceLocalDate = attendanceDate == null ? null : attendanceDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            //勤怠情報リストの中で勤怠登録がない日付には日付のみを持たせる
+            if (attendanceLocalDate == null || !localDate.isEqual(attendanceLocalDate)) {
+                DateAttendanceListForm.Attendance reqAttendance = new DateAttendanceListForm.Attendance();
+                reqAttendance.setDate(date);
+
+                if (attendances.size() <= j) {
+                    attendances.add(reqAttendance);
+                } else {
+                    attendances.add(j, reqAttendance);
+                }
+            }
+        }
+
         mav.addObject("monthDates", dates);
+        mav.addObject("monthAttendance", monthAttendanceForm);
         mav.addObject("formModel", formModel);
         mav.addObject("dateAttendances", dateAttendances);
         mav.addObject("pullDown", pullDown);
@@ -683,11 +722,8 @@ public class AttendanceController {
      */
     @PostMapping("/updateAll")
     public ModelAndView updateAll(@ModelAttribute @Validated DateAttendanceListForm formModel,
-                                  BindingResult result,
-                                  @RequestParam(name = "dates", required = false) List<Date> dates,
-                                  RedirectAttributes redirectAttributes) throws ParseException, IllegalAccessException, NoSuchFieldException {
+                                  BindingResult result) throws ParseException, IllegalAccessException, NoSuchFieldException {
         ModelAndView mav = new ModelAndView();
-        DateAttendanceListForm listForm = new DateAttendanceListForm();
         //ログインユーザ情報から社員番号取得
         UserForm loginUser = (UserForm) session.getAttribute("loginUser");
         String employeeNumber = loginUser.getEmployeeNumber();
@@ -698,8 +734,6 @@ public class AttendanceController {
         calendar.setTime(accessDate);
         int month = calendar.get(Calendar.MONTH) + 1;
         int year = calendar.get(Calendar.YEAR);
-
-        int i = 0;
 
         //フォームから送信された複数の勤怠情報を処理
         List<DateAttendanceListForm.Attendance> attendances = formModel.getAttendances();
@@ -732,10 +766,15 @@ public class AttendanceController {
                 if (attendanceNumber == 0) {
                     errorMessages.add("・勤怠区分を登録してください");
                 }
-                if (attendanceNumber == 5 && (!startTime.equals(LocalTime.parse("00:00")) || !finishTime.equals(LocalTime.parse("00:00"))
-                        || (!breakTime.equals("00:00:00") && !breakTime.equals("00:00")))) {
-                    errorMessages.add("・無効な入力です");
+
+                //一括登録/編集画面ではデフォルトの入力が00:00で無いため、--:--でもエラーにならないように条件分岐
+                if (startTime != null && finishTime != null && breakTime != null) {
+                    if (attendanceNumber == 5 && (!startTime.equals(LocalTime.parse("00:00")) || !finishTime.equals(LocalTime.parse("00:00"))
+                            || (!breakTime.equals("00:00:00") && !breakTime.equals("00:00")))) {
+                        errorMessages.add("・無効な入力です");
+                    }
                 }
+
                 if (attendanceNumber != 5 && Objects.nonNull(startTime) && Objects.nonNull(finishTime) && !startTime.isBefore(finishTime)) {
                     errorMessages.add("・無効な入力です");
                 }
@@ -759,12 +798,12 @@ public class AttendanceController {
 
                         //労働時間が6時間超8時間未満の場合
                         if (workSeconds > 6 * 3600 && workSeconds < 8 * 3600 && breakSeconds < 45 * 60) {
-                            errorMessages.add("・労働時間が6時間超8時間未満の場合は、休憩時間を最低45分取得してください");
+                            errorMessages.add("・休憩時間を最低45分取得してください");
                         }
 
                         //労働時間が8時間超の場合
                         if (workSeconds > 8 * 3600 && breakSeconds < 60 * 60) {
-                            errorMessages.add("・労働時間が8時間超の場合は、休憩時間を最低1時間取得してください");
+                            errorMessages.add("・休憩時間を最低1時間取得してください");
                         }
                         //労働時間がマイナスになった際は例外が発生するため、その例外をキャッチした際にバリデーション処理を記述
                     } catch (DateTimeParseException e) {
@@ -783,9 +822,11 @@ public class AttendanceController {
                 }
                 //エラーメッセージが１つでもあった場合は、画面にエラーメッセージをセットし、勤怠編集画面に遷移
                 if (!errorMessages.isEmpty()) {
-                    //                mav.addObject("formModel", reqAttendance);
-                    // AttendanceFormにリストを設定
-                    listForm.setAttendances(attendances);
+                    //エラーになった勤怠の日付フォーマットを整え、エラーメッセージを追加
+                    SimpleDateFormat errorFormatter = new SimpleDateFormat("yyyy年MM年dd日（E）", Locale.JAPANESE);
+                    String formattedErrorDate = errorFormatter.format(attendance.getDate());
+                    errorMessages.add("・" + formattedErrorDate + "の勤怠を確認してください");
+
                     mav.addObject("formModel", formModel);
                     mav.addObject("loginUser", loginUser);
                     mav.addObject("errorMessages", errorMessages);
@@ -793,8 +834,6 @@ public class AttendanceController {
                     //エラー時にフォワードして入力値を保持させるためにプルダウンと前月/翌月の記述を書く
                     Calendar calendar2 = Calendar.getInstance();
                     calendar2.setTime(accessDate);
-//                    int month = calendar.get(Calendar.MONTH) + 1;
-//                    int year = calendar.get(Calendar.YEAR);
                     calendar2.set(Calendar.DAY_OF_MONTH, 1);
                     calendar2.set(Calendar.HOUR_OF_DAY, 0);
                     calendar2.set(Calendar.MINUTE, 0);
@@ -810,16 +849,16 @@ public class AttendanceController {
                     String end = sdf.format(calendar2.getTime());
                     Date endDate = sdf.parse(end);
                     //Date endDate = calender.getTime();
-                    List<Date> dates2 = new ArrayList<Date>();
+                    List<Date> anotherDates = new ArrayList<Date>();
                     Calendar calendar3 = new GregorianCalendar();
                     calendar3.setTime(startDate);
                     while (calendar3.getTime().before(endDate))
                     {
                         Date result2 = calendar3.getTime();
-                        dates2.add(result2);
+                        anotherDates.add(result2);
                         calendar3.add(Calendar.DATE, 1);
                     }
-                    dates2.add(endDate);
+                    anotherDates.add(endDate);
 
                     //プルダウン用の表示リスト作成
                     List<String> pullDown = new ArrayList<>();
@@ -828,7 +867,7 @@ public class AttendanceController {
                     Calendar pullDownEnd = Calendar.getInstance();
                     pullDownEnd.setTime(endDate);
 
-                    for(int j = -6; j <= 6; j++){
+                    for(int i = -6; i <= 6; i++){
                         pullDownStart.add(Calendar.MONTH, i);
                         pullDownEnd.add(Calendar.MONTH, i);
                         SimpleDateFormat sdf2 = new SimpleDateFormat("yyyy年MM月dd日");
@@ -843,28 +882,32 @@ public class AttendanceController {
                         pullDownEnd.setTime(endDate);
                     }
 
-
-                    mav.addObject("monthDates", dates2);
-                    mav.addObject("pullDown", pullDown);
-                    mav.setViewName("/all_update_attendance");
-
-                    //勤怠記録の取得の記述も書いてフォワード先に渡す
+                    //エラー時にフォワードして入力値を保持させるために勤怠記録の取得の記述も書いてフォワード先に渡す
                     List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances (year, month, loginUserId);
                     mav.addObject("dateAttendances", dateAttendances);
 
-                    //祝日の取得も同様に
+                    //エラー時にフォワードして入力値を保持させるために祝日の取得もする
                     List<String> holidays = holidayCsvParser.parse().stream()
-                            .map(holiday -> holiday.getDate().toString()) // LocalDateを文字列に変換
+                            .map(holiday -> holiday.getDate().toString()) //LocalDateを文字列に変換
                             .collect(Collectors.toList());
 
+                    //エラー時にフォワードして入力値を保持させるために勤怠月モ取得する
+                    MonthAttendanceForm monthAttendanceForm = monthAttendanceService.findByUserIdAndMonth(loginUserId, year, month);
+
+                    mav.addObject("monthDates", anotherDates);
+                    mav.addObject("pullDown", pullDown);
+                    mav.setViewName("/all_update_attendance");
                     mav.addObject("holidays", holidays);
-
-//                    redirectAttributes.addFlashAttribute("formModel", formModel);
-//                    redirectAttributes.addFlashAttribute("errorMessages", errorMessages);
-//                    mav.setViewName("redirect:/all_update_attendance");
-
+                    mav.addObject("monthAttendance", monthAttendanceForm);
                     return mav;
                 }
+            }
+
+            //勤務区分が休日の場合はデフォルト値をセット
+            if (attendance.getAttendance() == 5) {
+                attendance.setWorkTimeStart(LocalTime.parse("00:00"));
+                attendance.setWorkTimeFinish(LocalTime.parse("00:00"));
+                attendance.setBreakTime("00:00");
             }
 
             //登録か編集かの条件分岐(メモ以外の全ての項目が入力された時のみ)
@@ -874,8 +917,6 @@ public class AttendanceController {
                     attendance.setMonth(month);
                     attendance.setYear(year);
 
-                    attendance.setDate(dates.get(i));
-                    i++;
                     //登録処理
                     dateAttendanceService.postListNew(attendance, employeeNumber);
                     //勤怠履歴登録処理
@@ -923,5 +964,34 @@ public class AttendanceController {
             totalWorkingHours += dailyWorkHours;
         }
         return totalWorkingHours;
+    }
+
+    /*
+     * 月の残業時間を計算するメソッド
+     */
+    public String calculateOverTime(String totalWorkTime, int workingHours) {
+        //労働時間を分に変換
+        String[] parts = totalWorkTime.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int workMinutes = hours * 60 + minutes;
+
+        //所定時間を分に変換
+        int standardMinutes = workingHours * 60;
+
+        //残業時間を計算。計算結果がマイナスになる場合は0にする
+        int overtimeMinutes = Math.max(workMinutes - standardMinutes, 0);
+
+        //計算した時間のフォーマットを整える。計算結果が0の時は00:00で格納する。
+        String overtime;
+        if (overtimeMinutes == 0) {
+            overtime = "00:00";
+        } else {
+            int fixedHours = overtimeMinutes / 60;
+            int remainingMinutes = overtimeMinutes % 60;
+            overtime = String.format("%d:%02d", fixedHours, remainingMinutes);
+        }
+
+        return overtime;
     }
 }

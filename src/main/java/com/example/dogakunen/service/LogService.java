@@ -55,7 +55,7 @@ public class LogService {
     }
 
     //勤怠編集時にログを登録
-    public void editLog(DateAttendanceForm preAttendance ,DateAttendanceForm reqAttendance, String employeeNumber) throws IllegalAccessException, ParseException {
+    public void editLog(DateAttendanceForm preAttendance ,DateAttendanceForm reqAttendance, String employeeNumber) throws IllegalAccessException, ParseException, NoSuchFieldException {
         //ログインユーザをとってくる
         List<User> userList = userRepository.findByEmployeeNumber(employeeNumber);
         User loginUser = userList.get(0);
@@ -63,6 +63,12 @@ public class LogService {
         //フィールドで回して変更した箇所のみ登録
         loop : for(Field field : reqAttendance.getClass().getDeclaredFields()){
             field.setAccessible(true);
+            Field prefield = preAttendance.getClass().getDeclaredField(field.getName());
+            prefield.setAccessible(true);
+            if (field.get(reqAttendance) != null && field.getName().equals("attendance") && field.get(reqAttendance).equals(5)
+                    && prefield.getName().equals("attendance") && prefield.get(preAttendance).equals(5)){
+                break;
+            }
             if (field.get(reqAttendance) != null && !field.get(reqAttendance).equals(field.get(preAttendance))){
                 Log logEntity = new Log();
                 logEntity.setOperation("更新");
@@ -310,14 +316,14 @@ public class LogService {
         List<Log> logList = new ArrayList<>();
 
         //フィールドで回して変更した箇所のみ登録
-        System.out.println("hoge");
-        System.out.println(reqAttendance.getClass());
         loop : for(Field field : reqAttendance.getClass().getDeclaredFields()){
             field.setAccessible(true);
-            System.out.println(field.get(reqAttendance));
-            System.out.println(preAttendance.getClass().getDeclaredField(field.getName()));
             Field prefield = preAttendance.getClass().getDeclaredField(field.getName());
             prefield.setAccessible(true);
+            if (field.get(reqAttendance) != null && field.getName().equals("attendance") && field.get(reqAttendance).equals(5)
+                    && prefield.getName().equals("attendance") && prefield.get(preAttendance).equals(5)){
+                break;
+            }
             if (field.get(reqAttendance) != null && !field.get(reqAttendance).equals(prefield.get(preAttendance))){
                 Log logEntity = new Log();
                 logEntity.setOperation("更新");
