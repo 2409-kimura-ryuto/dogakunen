@@ -132,7 +132,8 @@
                         <td th:text="${attendance.workTime != null && attendance.workTime.startsWith('0') ? #strings.substring(attendance.workTime, 1, 5) : #strings.substring(attendance.workTime, 0, 5)}"></td>
                         <td th:text="${attendance.memo}"></td>
                         <td th:if="${attendanceStatus == 0}">
-                            <a th:href="@{/newOrEdit(date=${#dates.format(monthDate, 'yyyy/MM/dd')}, id=${attendance.id})}">
+                            <!--<a th:href="@{/edit(date=${#dates.format(monthDate, 'yyyy/MM/dd')}, id=${attendance.id})}">-->
+                            <a th:href="@{/edit/{id}(id=${attendance.id})}">
                                 <input type="submit" value="編集" class="btn btn-outline-secondary">
                             </a>
                         </td>
@@ -154,8 +155,9 @@
                     <td></td>
                     <td></td>
                     <td th:if="${attendanceStatus == 0}">
-                        <a th:href="@{/newOrEdit(date=${#dates.format(monthDate, 'yyyy/MM/dd')})}">
-                            <input type="submit" value="編集" class="btn btn-outline-secondary">
+                        <!--<a th:href="@{/new/{date}(date=${#dates.format(monthDate, 'yyyy/MM/dd')})}">-->
+                        <a th:href="@{/new(date=${#dates.format(monthDate, 'yyyy/MM/dd')})}">
+                            <input type="submit" value="登録" class="btn btn-outline-secondary">
                         </a>
                     </td>
                     <!-- 申請中/承認済みの時の編集ボタンの表示 -->

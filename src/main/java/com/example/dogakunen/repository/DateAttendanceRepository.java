@@ -13,9 +13,11 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 
 @Repository
@@ -29,6 +31,8 @@ public interface DateAttendanceRepository extends JpaRepository<DateAttendance, 
             "AND d.user.id = :loginId " +
             "ORDER BY d.date ASC")
     public List<DateAttendance> findAllAttendances(@Param("year") int year, @Param("month") int month, @Param("loginId") Integer loginID);
+
+    public Optional<DateAttendance> findByUserIdAndDate(Integer userId, Date date);
 
     public List<DateAttendance> findByUserAndDate(User loginUser, Date date);
 
