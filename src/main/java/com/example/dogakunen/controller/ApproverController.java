@@ -63,6 +63,13 @@ public class ApproverController {
             getDate = accessDate;
         }
 
+        //【追加】sessionから承認・差し戻しした年月(yearMonth)を取得。存在すればgetDateに代入する
+        String approveYearMonth = (String) session.getAttribute("yearMonth");
+        if (approveYearMonth != null) {
+            getDate = YearMonth.parse(approveYearMonth, DateTimeFormatter.ofPattern("yyyy年MM月"));
+            session.removeAttribute("yearMonth");
+        }
+
         //アクセスもしくはリクエスト年月をもとに承認者一覧を取得
         int year = getDate.getYear();
         int month = getDate.getMonthValue();
@@ -81,7 +88,7 @@ public class ApproverController {
         //前月・次月表示
         String preMonth = null;
         String nextMonth = null;
-        if (reqDate != null) {
+        if ((reqDate != null) || (approveYearMonth != null)) {
             preMonth = getDate.plusMonths(-1).format(DateTimeFormatter.ofPattern("yyyy年MM月"));
             nextMonth = getDate.plusMonths(1).format(DateTimeFormatter.ofPattern("yyyy年MM月"));
         } else {
@@ -268,6 +275,12 @@ public class ApproverController {
         monthAttendanceForm.setMonth(Integer.parseInt(month));
         //勤怠記録ステータスを2:承認済みに更新
         monthAttendanceService.changeStatus(monthAttendanceForm);
+
+        //追加(承認ボタンを押下時に承認対象画面の日付が保持されるようYearMonth型の年月を作成したのち、sessionに入れる)
+        YearMonth ym = YearMonth.of(Integer.parseInt(year), Integer.parseInt(month));
+        String approveYearMonth = ym.format(DateTimeFormatter.ofPattern("yyyy年MM月"));
+        session.setAttribute("yearMonth", approveYearMonth);
+
         //承認対象者一覧画面にリダイレクト
         mav.setViewName("redirect:/show_users");
         return mav;
@@ -290,6 +303,12 @@ public class ApproverController {
         monthAttendanceForm.setMonth(Integer.parseInt(month));
         //勤怠記録ステータスを0:申請前に更新
         monthAttendanceService.changeStatus(monthAttendanceForm);
+
+        //追加(差し戻しボタンを押下時に承認対象画面の日付が保持されるようYearMonth型の年月を作成したのち、sessionに入れる)
+        YearMonth ym = YearMonth.of(Integer.parseInt(year), Integer.parseInt(month));
+        String sendBackYearMonth = ym.format(DateTimeFormatter.ofPattern("yyyy年MM月"));
+        session.setAttribute("yearMonth", sendBackYearMonth);
+
         //承認対象者一覧画面にリダイレクト
         mav.setViewName("redirect:/show_users");
         return mav;
