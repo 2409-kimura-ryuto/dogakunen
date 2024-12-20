@@ -114,6 +114,10 @@ table.log-table > tbody > tr > td:first-child::before {
     margin-top : 20px;
 }
 
+.return-button-all {
+    margin-bottom : 20px;
+}
+
 .update-button {
     width : 120px;
     margin-bottom : 20px;
