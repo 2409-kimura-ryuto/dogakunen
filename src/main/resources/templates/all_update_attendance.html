@@ -18,23 +18,8 @@
 </div>
 
 <div class="header">
-    <div class="me-3 fs-6">
-        社員番号：<span th:text="${loginUser.employeeNumber}"/><br>
-            　氏名：<span th:text="${loginUser.name}"/><br>
-    </div>
-    <br/>
-    <!-- 個人のCSVファイル出力をするときに使う -->
-    <!--        <form th:action="@{/setting}" method="get" class="header-item">-->
-    <!--            <button type="submit" class="btn btn-secondary me-3">ファイル出力</button>-->
-    <!--        </form>-->
     <form th:action="@{/attendanceLog}" method="get" class="header-item">
         <button type="submit" class="btn btn-secondary me-3">勤務履歴</button>
-    </form>
-    <form th:action="@{/setting}" method="get" class="header-item">
-        <button type="submit" class="btn btn-secondary me-3">設定</button>
-    </form>
-    <form th:action="@{/logout}" method="get" class="header-item">
-        <button type="submit" class="btn btn-secondary me-3">ログアウト</button>
     </form>
 </div>
 
@@ -75,8 +60,6 @@
         </tr>
         </thead>
         <tbody>
-<!--        <tr th:each="attendance, iterStat : ${formModel.attendances}">-->
-<!--        <tr th:each="date : ${monthDates}">-->
         <tr th:each="date, iterStat : ${monthDates}">
             <!--日付の表示 -->
             <td>
@@ -91,10 +74,8 @@
                 <span th:each="dateAttendance : ${dateAttendances}">
                     <!-- 該当する勤怠情報がある場合 -->
                     <p th:case="${dateAttendance.date}">
-<!--        <th:block th:each="attendance : ${formModel.attendances}"-->
-                        <!--                  th:if="${attendance.date != null && #dates.format(attendance.date, 'yyyy-MM-dd') == #dates.format(date, 'yyyy-MM-dd')}">-->
                       <td>
-                        <select th:field="*{attendances[__${iterStat.index}__].attendance}" class="form-select">
+                        <select th:field="*{attendances[__${iterStat.index}__].attendance}" class="form-select" th:attr="disabled=${monthAttendance.attendanceStatus != 0}">
                           <option th:value="0" th:text="未登録"></option>
                           <option th:value="1" th:text="社内業務（オンサイト）"></option>
                           <option th:value="2" th:text="社内業務（オフサイト）"></option>
@@ -104,27 +85,25 @@
                         </select>
                       </td>
                       <td>
-                        <input type="time" th:field="*{attendances[__${iterStat.index}__].workTimeStart}" class="form-control"/>
+                        <input type="time" th:field="*{attendances[__${iterStat.index}__].workTimeStart}" class="form-control" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"/>
                       </td>
                       <td>
-                        <input type="time" th:field="*{attendances[__${iterStat.index}__].workTimeFinish}" class="form-control"/>
+                        <input type="time" th:field="*{attendances[__${iterStat.index}__].workTimeFinish}" class="form-control" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"/>
                       </td>
                       <td>
-                        <input type="time" th:field="*{attendances[__${iterStat.index}__].breakTime}" class="form-control"/>
+                        <input type="time" th:field="*{attendances[__${iterStat.index}__].breakTime}" class="form-control" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"/>
                       </td>
                       <td>
-                        <textarea th:field="*{attendances[__${iterStat.index}__].memo}" class="form-control"></textarea>
+                        <textarea th:field="*{attendances[__${iterStat.index}__].memo}" class="form-control" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"></textarea>
                       </td>
                       <input type="hidden" th:field="*{attendances[__${iterStat.index}__].id}" th:value="${dateAttendance.id}"/>
                     </p>
                 </span>
 
-                <!-- 該当する勤怠情報がない場合 -->
+          <!-- 該当する勤怠情報がない場合 -->
           <p th:case="*">
-<!--        <th:block th:if="${formModel.attendances == null || #lists.isEmpty(formModel.attendances)-->
-              <!--                   || #lists.isEmpty(formModel.attendances.?[#dates.format(date, 'yyyy-MM-dd') == #dates.format(date, 'yyyy-MM-dd')])}">-->
               <td>
-                <select th:field="*{attendances[__${iterStat.index}__].attendance}" class="form-select">
+                <select th:field="*{attendances[__${iterStat.index}__].attendance}" class="form-select" th:attr="disabled=${monthAttendance.attendanceStatus != 0}">
                   <option th:value="0" th:text="未登録"></option>
                   <option th:value="1" th:text="社内業務（オンサイト）"></option>
                   <option th:value="2" th:text="社内業務（オフサイト）"></option>
@@ -134,32 +113,27 @@
                 </select>
               </td>
               <td>
-                <input type="time" th:field="*{attendances[__${iterStat.index}__].workTimeStart}" class="form-control"/>
+                <input type="time" th:field="*{attendances[__${iterStat.index}__].workTimeStart}" class="form-control" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"/>
               </td>
               <td>
-                <input type="time" th:field="*{attendances[__${iterStat.index}__].workTimeFinish}" class="form-control"/>
+                <input type="time" th:field="*{attendances[__${iterStat.index}__].workTimeFinish}" class="form-control" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"/>
               </td>
               <td>
-                <input type="time" th:field="*{attendances[__${iterStat.index}__].breakTime}" class="form-control"/>
+                <input type="time" th:field="*{attendances[__${iterStat.index}__].breakTime}" class="form-control" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"/>
               </td>
               <td>
-                <textarea th:field="*{attendances[__${iterStat.index}__].memo}" class="form-control"></textarea>
+                <textarea th:field="*{attendances[__${iterStat.index}__].memo}" class="form-control" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"></textarea>
               </td>
-              <input type="hidden" th:name="dates"
-                     th:value="${#dates.format(date, 'yyyy/MM/dd')}"/>
-              <!--        </th:block>-->
+              <input type="hidden" th:field="*{attendances[__${iterStat.index}__].date}" th:value="${#dates.format(date, 'yyyy/MM/dd')}"/>
           </p>
         </span>
         </tr>
         </tbody>
     </table>
-    <input type="submit" value="更新" class="btn btn-primary update-button"/>
+    <input type="submit" value="更新" class="btn btn-primary update-button" th:attr="disabled=${monthAttendance.attendanceStatus != 0}"/>
 </form>
-<div class="footer-contents">
-    <form th:action="@{/}">
-        <input type="submit" value="戻る" class="btn btn-secondary btn-sm"/>
-    </form>
-</div>
-</div>
+<a th:href="@{/}">
+    <input type="button" value="戻る" class="btn btn-secondary btn-sm return-button-all">
+</a>
 </body>
 </html>
