@@ -191,7 +191,7 @@ public class AttendanceController {
         int workingHours = calculateWorkingHours(year, month, dayWorkingHour);
 
         //月の残業時間を計算
-        String totalOverTime = calculateOverTime(totalWorkTime, workingHours);
+        String totalOverTime = dateAttendanceService.calculateOverTime(totalWorkTime, workingHours);
 
         //残業時間が30時間を超えた際はメッセージを設定してviewで表示させる
         String[] parts = totalOverTime.split(":");
@@ -462,8 +462,8 @@ public class AttendanceController {
                 long workSeconds = workTimeParsed.toSecondOfDay();
                 long breakSeconds = breakTimeParsed.toSecondOfDay();
 
-                //労働時間が6時間超8時間未満の場合
-                if (workSeconds > 6 * 3600 && workSeconds < 8 * 3600 && breakSeconds < 45 * 60) {
+                //労働時間が6時間超8時間以下の場合
+                if (workSeconds > 6 * 3600 && workSeconds <= 8 * 3600 && breakSeconds < 45 * 60) {
                     errorMessages.add("・休憩時間を最低45分取得してください");
                 }
 
@@ -561,8 +561,8 @@ public class AttendanceController {
                 long workSeconds = workTimeParsed.toSecondOfDay();
                 long breakSeconds = breakTimeParsed.toSecondOfDay();
 
-                //労働時間が6時間超8時間未満の場合
-                if (workSeconds > 6 * 3600 && workSeconds < 8 * 3600 && breakSeconds < 45 * 60) {
+                //労働時間が6時間超8時間以下の場合
+                if (workSeconds > 6 * 3600 && workSeconds <= 8 * 3600 && breakSeconds < 45 * 60) {
                     errorMessages.add("・休憩時間を最低45分取得してください");
                 }
 
@@ -702,14 +702,14 @@ public class AttendanceController {
         //勤怠記録の取得
         List<DateAttendanceListForm.Attendance> attendances = dateAttendanceService.findAllAttendancesList(year, month, loginUserId);
 
-        // AttendanceFormにリストを設定
+        //AttendanceFormにリストを設定
         DateAttendanceListForm formModel = new DateAttendanceListForm();
         formModel.setAttendances(attendances);
 
         //勤怠記録の取得(viewで条件分岐をする際にのみ使用)
         List<DateAttendanceForm> dateAttendances = dateAttendanceService.findALLAttendances (year, month, loginUserId);
 
-        //月リストと勤怠情報リストの要素数を合わ処理
+        //月リストと勤怠情報リストの要素数を合わせる処理
         for (int j = 0; j < dates.size(); j++) {
             //月リストと勤怠情報リストの日付のフォーマットを揃える
             Date date = dates.get(j);
@@ -835,8 +835,8 @@ public class AttendanceController {
                         long workSeconds = workTimeParsed.toSecondOfDay();
                         long breakSeconds = breakTimeParsed.toSecondOfDay();
 
-                        //労働時間が6時間超8時間未満の場合
-                        if (workSeconds > 6 * 3600 && workSeconds < 8 * 3600 && breakSeconds < 45 * 60) {
+                        //労働時間が6時間超8時間以下の場合
+                        if (workSeconds > 6 * 3600 && workSeconds <= 8 * 3600 && breakSeconds < 45 * 60) {
                             errorMessages.add("・休憩時間を最低45分取得してください");
                         }
 
@@ -1003,34 +1003,5 @@ public class AttendanceController {
             totalWorkingHours += dailyWorkHours;
         }
         return totalWorkingHours;
-    }
-
-    /*
-     * 月の残業時間を計算するメソッド
-     */
-    public String calculateOverTime(String totalWorkTime, int workingHours) {
-        //労働時間を分に変換
-        String[] parts = totalWorkTime.split(":");
-        int hours = Integer.parseInt(parts[0]);
-        int minutes = Integer.parseInt(parts[1]);
-        int workMinutes = hours * 60 + minutes;
-
-        //所定時間を分に変換
-        int standardMinutes = workingHours * 60;
-
-        //残業時間を計算。計算結果がマイナスになる場合は0にする
-        int overtimeMinutes = Math.max(workMinutes - standardMinutes, 0);
-
-        //計算した時間のフォーマットを整える。計算結果が0の時は00:00で格納する。
-        String overtime;
-        if (overtimeMinutes == 0) {
-            overtime = "00:00";
-        } else {
-            int fixedHours = overtimeMinutes / 60;
-            int remainingMinutes = overtimeMinutes % 60;
-            overtime = String.format("%d:%02d", fixedHours, remainingMinutes);
-        }
-
-        return overtime;
     }
 }

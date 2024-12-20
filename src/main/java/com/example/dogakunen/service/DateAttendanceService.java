@@ -577,4 +577,33 @@ public class DateAttendanceService {
 
         return formattedWorkTime;
     }
+
+    /*
+     * 月の残業時間を計算処理
+     */
+    public String calculateOverTime(String totalWorkTime, int workingHours) {
+        //労働時間を分に変換
+        String[] parts = totalWorkTime.split(":");
+        int hours = Integer.parseInt(parts[0]);
+        int minutes = Integer.parseInt(parts[1]);
+        int workMinutes = hours * 60 + minutes;
+
+        //所定時間を分に変換
+        int standardMinutes = workingHours * 60;
+
+        //残業時間を計算。計算結果がマイナスになる場合は0にする
+        int overtimeMinutes = Math.max(workMinutes - standardMinutes, 0);
+
+        //計算した時間のフォーマットを整える。計算結果が0の時は00:00で格納する。
+        String overtime;
+        if (overtimeMinutes == 0) {
+            overtime = "00:00";
+        } else {
+            int fixedHours = overtimeMinutes / 60;
+            int remainingMinutes = overtimeMinutes % 60;
+            overtime = String.format("%d:%02d", fixedHours, remainingMinutes);
+        }
+
+        return overtime;
+    }
 }
