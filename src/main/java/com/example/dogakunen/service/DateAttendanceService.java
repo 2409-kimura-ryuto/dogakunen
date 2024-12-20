@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.io.Writer;
+import java.time.LocalDate;
 import java.util.*;
 import java.sql.Time;
 import java.text.ParseException;
@@ -132,6 +133,18 @@ public class DateAttendanceService {
         results.add(dateAttendanceRepository.findById(id).orElse(null));
         List<DateAttendanceForm> dateAttendances = setDateAttendanceForm(results);
         return dateAttendances.get(0);
+    }
+
+    /*
+     * 勤怠登録時に既存の勤怠がないかチェック
+     */
+    public DateAttendance findDateAttendanceByUserIdAndDate(Integer userId, Date date){
+        //List<DateAttendance> results = new ArrayList<>();
+        //results.add(    //.orElse(null)
+        Optional<DateAttendance> result = dateAttendanceRepository.findByUserIdAndDate(userId, date);
+        //List<DateAttendanceForm> dateAttendances = setDateAttendanceForm(results);
+        //return dateAttendances.get(0);
+        return result.orElse(null);
     }
 
     /*
