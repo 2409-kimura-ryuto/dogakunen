@@ -77,7 +77,7 @@ public class FileOutputController {
         //取得した年と月から全アカウントの労働時間を取得
         List<AdministratorCSV> results = dateAttendanceService.selectWorkTime(year, month, Time);
         //結果をもとにCSVファイル出力
-        try (Writer writer = Files.newBufferedWriter(Paths.get("C:\\Users\\trainee0957\\Desktop\\" + year + "年" + month + "月.csv"))) {
+        try (Writer writer = Files.newBufferedWriter(Paths.get("C:\\Users\\trainee0919\\Desktop\\" + year + "年" + month + "月.csv"))) {
             dateAttendanceService.write(writer, results);
         } catch (IOException e) {
             e.printStackTrace();

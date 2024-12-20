@@ -9,7 +9,7 @@ body {
     border-top : 1px solid #ddd;
     border-bottom : 1px solid #ccc;
 }
-
+/*
 table.log-table {
   counter-reset: rowCount;
 }
@@ -21,6 +21,7 @@ table.log-table > tbody > tr {
 table.log-table > tbody > tr > td:first-child::before {
   content: counter(rowCount);
 }
+*/
 
 .table:empty {
     border-collapse: collapse;
@@ -155,4 +156,49 @@ table.log-table > tbody > tr > td:first-child::before {
 
 .holiday{
     color : red;
+}
+
+/*ページネーション追加*/
+.PageNumWrap {
+  margin-bottom: 10px;
+}
+.PageNum {
+  margin-right: 10px;
+  cursor: pointer;
+  color: #0000ff;
+}
+.PageNum:hover {
+  border-bottom: 1px solid #0000ff;
+}
+.PageNum:last-child {
+  margin-right: 0;
+}
+.PageNum.-currentPage {
+  color: #000;
+  cursor: auto;
+}
+.PageNum.-currentPage:hover {
+  color: inherit;
+  border: none;
+}
+.PageNum.-dots {
+  color: #000;
+}
+.PageNum.-dots:hover {
+  color: #000;
+  border: none;
+  cursor: auto;
+}
+
+.log-number {
+    width : 5%;
+}
+.log-date {
+    width : 10%;
+}
+.log-content {
+    width : 70%;
+}
+.log-update {
+    width : 15%;
 }

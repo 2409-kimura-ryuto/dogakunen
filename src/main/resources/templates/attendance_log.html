@@ -5,6 +5,8 @@
           integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <meta charset="UTF-8">
     <link th:href="@{/css/style.css}" rel="styleSheet">
+    <script th:src="@{/js/jquery-3.7.1.js}"></script>
+    <script th:src="@{/js/jquery-3.7.1.min.js}"></script>
     <script th:src="@{/js/script.js}"></script>
     <title>勤怠操作ログ画面</title>
 </head>
@@ -13,26 +15,44 @@
     <h1 class="container text-center my-3">勤怠履歴</h1>
 </div>
 
-<table class="table table-hover log-table">
-    <thead class="table-light">
-    <tr>
-        <th>#</th>
-        <th>勤務日</th>
-        <th>内容</th>
-        <th>更新日</th>
-    </tr>
-    </thead>
-    <tbody>
-        <tr th:each="log : ${logForms}" class="align-middle attendanceList">
-            <td></td>
-            <td th:text="${#dates.format(log.date, 'yyyy/MM/dd')}"></td>
-            <td th:text="${log.userName} + 'さん' + 'が' + ${log.field} + 'を' + ${log.content} + 'に' + ${log.operation} + 'しました'"></td>
-            <td th:text="${#dates.format(log.updatedDate, 'yyyy/MM/dd HH:mm:ss')}"></td>
+<div class="PageNumWrap"></div>
+<div class="TableBox">
+    <table class="table table-hover log-table TableWrap">
+        <thead class="table-light">
+        <tr class="TableWrap_row">
+            <th class="log-number">#</th>
+            <th class="log-date">勤務日</th>
+            <th class="log-content">内容</th>
+            <th class="log-update">更新日</th>
         </tr>
-    </tbody>
-</table>
+        </thead>
+        <!--<tbody class="page-group">-->
+            <tr th:each="log : ${logForms}" class="align-middle attendanceList TableWrap_row">
+                    <td th:text="${logForms.indexOf(log) + 1}" class="log-number"></td>
+                    <td th:text="${#dates.format(log.date, 'yyyy/MM/dd')}" class="log-date"></td>
+                    <td th:text="${log.userName} + 'さん' + 'が' + ${log.field} + 'を' + ${log.content} + 'に' + ${log.operation} + 'しました'" class="log-content"></td>
+                    <td th:text="${#dates.format(log.updatedDate, 'yyyy/MM/dd HH:mm:ss')}" class="log-update"></td>
+            </tr>
+        <!--</tbody>-->
+
+    </table>
+</div>
+
 <form th:action="@{/all_update_attendance}">
     <input type="submit" value="戻る" class="btn btn-secondary btn-sm" />
 </form>
+
+<script th:src="@{/js/page.js}"></script>
+<!--paginathingバージョン-->
+<!--<script>
+    $(function() {
+	$('.page-group').paginathing({//親要素のclassを記述
+		perPage: 20,//1ページあたりの表示件数
+		prevText:'前へ',//1つ前のページへ移動するボタンのテキスト
+		nextText:'次へ',//1つ次のページへ移動するボタンのテキスト
+		activeClass: 'navi-active',//現在のページ番号に任意のclassを付与できます
+	})
+});
+</script>-->
 </body>
 </html>
